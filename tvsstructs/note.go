@@ -1,17 +1,16 @@
 package tvsstructs
 
 import (
- 
 	"time"
 )
 
 type Note struct {
-	CustomerID        int32
-	CreatedByUserID   int32
-	ActionUserID      int32
-	CategoryID        string
-	CompletionStageID string
-	Body              string
-	NoteID            int32
-	CreateDateTime    time.Time
+	CustomerID        int       `json:"customerid"`
+	CreatedByUserID   int       `json:"createdbyuserid"`
+	ActionUserID      int       `json:"actionuserid"`
+	CategoryID        string    `json:"categoryid"`
+	CompletionStageID string    `json:"completionstageid"`
+	Body              string    `json:"body"`
+	NoteID            int       `json:"noteid"`
+	CreateDateTime    time.Time `json:"createdatetime"`
 }
