@@ -19,6 +19,7 @@ type TVS_Customer_response struct {
 func add(tvscustreq TVS_Customer_request) TVS_Customer_response  {
 	  resulttvsresponse := TVS_Customer_response{}
 	  resulttvsresponse.Orderno =tvscustreq.Orderno
+	  resulttvsresponse.Resultcode = "insert completed"
 	return resulttvsresponse
 }
 func main() {
