@@ -1,4 +1,4 @@
-package main
+package common
 
 import (
 	"fmt"
@@ -53,7 +53,7 @@ func ExecutetData(profilename string, sqlStmnt string) (string, error) {
 
 	return jreSult, err
 }
-func main() {
+func main1() {
 	var err error
 	var result = " "
 	result, err = ExecutetData("ICC", "INSERT INTO TEMP_OOD VALUES('111')")
