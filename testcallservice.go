@@ -126,3 +126,4 @@ func queryagreementdetail() (string, error) {
 
 	return string(contents), nil
 }
+// edit by nattachais
