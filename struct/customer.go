@@ -1,4 +1,4 @@
-package customer_struct
+package customer
 
 import (
 	"fmt"
@@ -56,10 +56,11 @@ type Customerinfo struct {
 	 
 }
 
-func init() {
+func main() {
 	fmt.Println("customer struct package initialized")
 
 }
+
 // func Area(len, wid float64) float64 {
 // 	area := len * wid
 // 	return area
