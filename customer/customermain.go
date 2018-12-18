@@ -37,7 +37,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", router))
 	//	tvscustreq := TVS_Customer_request{}
 	//	tvscustreq.Orderno="100"
-	//tvscustreq.customer_obj.
+	// tvscustreq.customer_obj.
 	//	Res:= add(tvscustreq)
 	//	fmt.Println(Res)
 	//	var Customer_requestobj c.Customerinfo[]
