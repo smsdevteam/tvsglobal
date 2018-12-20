@@ -1,4 +1,4 @@
-package struct
+package structwww
 
 import (
 	"fmt"
