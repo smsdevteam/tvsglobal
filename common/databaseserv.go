@@ -1,13 +1,8 @@
 package common
 
 import (
-	"fmt"
-	"log"
-
-	//"log"
-	//"os"
-	//"path/filepath"
 	"database/sql"
+	"fmt"
 
 	config "github.com/micro/go-config"
 	"github.com/micro/go-config/source/file"
@@ -29,50 +24,27 @@ func readconfig(profilename string) (string, string, string, string) {
 	connectionstring = config.Get("hosts", profilename, "connectionstring").String("")
 	return dbname, username, password, connectionstring
 }
+
+//ExecutetData is function excute sql command
 func ExecutetData(profilename string, sqlStmnt string) (string, error) {
 	var dbname = " "
 	var username = ""
 	var password = ""
 	var connectionstring = ""
 	var jreSult = ""
-
 	fmt.Print(connectionstring)
 	dbname, username, password, connectionstring = readconfig(profilename)
 	db, err := sql.Open("goracle", username+"/"+password+"@"+dbname)
 	reSult, err := db.Exec(sqlStmnt)
-	fmt.Print(reSult)
+	fmt.Print(dbname, username, password, connectionstring, reSult)
 	jreSult = "-"
 	if err != nil {
-		jreSult = "error"
+		jreSult = "error" + err.Error()
+		Writelogfile()
 	} else {
 		jreSult = "success"
 	}
 	defer db.Close()
 
 	return jreSult, err
-}
-func main() {
-	var err error
-	var result = " "
-	result, err = ExecutetData("ICC", "INSERT INTO TEMP_OOD VALUES('111')")
-	var dbname = " "
-	var username = ""
-	var password = ""
-	var connectionstring = ""
-	fmt.Println("start" + result)
-	dbname, username, password, connectionstring = readconfig("ICC")
-
-	fmt.Println(dbname + username + password + connectionstring)
-	db, err := sql.Open("goracle", username+"/"+password+"@"+dbname)
-	if err != nil {
-
-		log.Fatal(err)
-	}
-	defer db.Close()
-	fmt.Println("Hell 77666, complete ")
-
-	config.Load(file.NewSource(
-		file.WithPath("dbconfig.json"),
-	))
-
 }

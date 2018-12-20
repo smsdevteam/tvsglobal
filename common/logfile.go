@@ -5,11 +5,12 @@ import (
 	"time"
 )
 
-func writelogfile() {
+//Writelogfile is write log file
+func Writelogfile() {
 
 	filenamea := "tvs-applicationlog"
 	currentdate := time.Now()
-	filenamea := +currentdate.Format("20060102")
+	filenamea = filenamea + currentdate.Format("20060102") + ".txt"
 	f, err := os.OpenFile("d:/"+filenamea, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
