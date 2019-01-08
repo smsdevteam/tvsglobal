@@ -1,13 +1,14 @@
 package common
 
 import (
+	"fmt"
 	"os"
 	"time"
 )
 
 //Writelogfile is write log file
-func Writelogfile() {
-
+func Writelogfile(textline string) {
+	fmt.Println(textline)
 	filenamea := "tvs-applicationlog"
 	currentdate := time.Now()
 	filenamea = filenamea + currentdate.Format("20060102") + ".txt"
@@ -17,7 +18,7 @@ func Writelogfile() {
 	}
 	defer f.Close()
 
-	if _, err = f.WriteString("new data that wasn't there originally\n"); err != nil {
+	if _, err = f.WriteString(textline); err != nil {
 		panic(err)
 	}
 
