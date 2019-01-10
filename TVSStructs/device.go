@@ -18,3 +18,11 @@ type Device struct {
 	AgentName           string `json:"agentname"`
 	ReturnDate          string `json:"returndate"`
 }
+
+type StockReceiveDetails struct {
+	BatchNumber       string `json:"batchnumber"`
+	FromStockHanderId int64  `json:"fromdepotid"`
+	ToStockHanderId   int64  `json:"todepotid"`
+	IBSModelId        int64  `json:"modelid"`
+	WarrantyEndDate   string `json:"wrenddate"`
+}
