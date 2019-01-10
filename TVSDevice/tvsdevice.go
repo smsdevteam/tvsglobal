@@ -18,8 +18,8 @@ import (
 
 	s "strings"
 
-	cm "github.com/pimpina/tvsglobalb/Common"     // db
-	st "github.com/pimpina/tvsglobalb/TVSStructs" // referpath
+	cm "github.com/smsdevteam/tvsglobal/Common"     // db
+	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
 var p = fmt.Println

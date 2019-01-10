@@ -8,8 +8,8 @@ import (
 
 	_ "gopkg.in/goracle.v2"
 
-	cm "github.com/pimpina/tvsglobalb/Common"     // db
-	so "github.com/pimpina/tvsglobalb/TVSStructs" // referpath
+	cm "github.com/smsdevteam/tvsglobal/Common"     // db
+	so "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
 // GetShippingOrder

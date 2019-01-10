@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	so "github.com/pimpina/tvsglobalb/TVSStructs" // referpath
+	so "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
