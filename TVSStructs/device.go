@@ -19,10 +19,27 @@ type Device struct {
 	ReturnDate          string `json:"returndate"`
 }
 
+// StockReceiveDetails Obj
 type StockReceiveDetails struct {
-	BatchNumber       string `json:"batchnumber"`
-	FromStockHanderId int64  `json:"fromdepotid"`
-	ToStockHanderId   int64  `json:"todepotid"`
-	IBSModelId        int64  `json:"modelid"`
-	WarrantyEndDate   string `json:"wrenddate"`
+	StockReceiveDetailsID int64  `json:"id"`
+	BatchNumber           string `json:"batchnumber"`
+	FromStockHanderId     int64  `json:"fromdepotid"`
+	ToStockHanderId       int64  `json:"todepotid"`
+	IBSModelId            int64  `json:"modelid"`
+	WarrantyEndDate       string `json:"wrenddate"`
+}
+
+// NewDeviceReq Obj
+type NewDeviceReq struct {
+	StockReceiveDetail StockReceiveDetails `json:"stockreceivedetails"`
+	SerialNumber       []string            `json:"serialno"`
+	Reason             int64               `json:"reason"`
+	ByUser             string              `json:"byusername"`
+}
+
+// NewDeviceRes Obj
+type NewDeviceRes struct {
+	SerialNumber string `json:"serialno"`
+	ResultCode   int    `json:"resultcode"`
+	ResultDesc   string `json:"resultdesc"`
 }
