@@ -27,14 +27,19 @@ func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
 	resulttvsresponse.Orderno = tvscustreq.Orderno
 	return resulttvsresponse
 }
-
+func index(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to TVS Customer Restful")
+}
 func main() {
-	fmt.Println("start service")
+ 
+//	fmt.Println("start service...")
+  // 	mainRouter.HandleFunc("/tvscustomer", index)
+//	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
+//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
+//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
+//	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
 
-	router := mux.NewRouter()
-	router.HandleFunc("/getcustomerinfo", addTVS).Methods("POST")
-
-	log.Fatal(http.ListenAndServe(":8000", router))
+//	log.Fatal(http.ListenAndServe(":8080", router))
 	//	tvscustreq := TVS_Customer_request{}
 	//	tvscustreq.Orderno="100"
 	// tvscustreq.customer_obj.
@@ -48,7 +53,16 @@ func main() {
 
 }
 
-func addTVS(w http.ResponseWriter, r *http.Request) {
+func getCustomer(w http.ResponseWriter, r *http.Request) {
+params := mux.Vars(r)
+	 
+	var cusotmerResult  c.Customer
+
+	customerResult = GetCustomerByCustomerID(params["customerid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cusotmerResult)
+}
+/* func addTVS(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -72,4 +86,4 @@ func addTVS(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
-}
+} */
