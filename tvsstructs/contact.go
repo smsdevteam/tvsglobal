@@ -85,7 +85,7 @@ type CreateContactRequest struct {
 	InContact struct {
 		ActionDate              time.Time `xml:"ActionDate" json:"ActionDate"`
 		ActionTaken             string    `xml:"ActionTaken" json:"ActionTaken"`
-		AllocatedToUser         int64     `xml:"AllocatedToUser" json:"AllocatedToUser"`
+		AllocatedToUser         int64     `xml:"AllocatedToUserKey" json:"AllocatedToUserKey"`
 		CategoryKey             int64     `xml:"CategoryKey" json:"CategoryKey"`
 		CreatedByUserKey        int64     `xml:"CreatedByUserKey" json:"CreatedByUserKey"`
 		CreatedDate             time.Time `xml:"CreatedDate" json:"CreatedDate"`
