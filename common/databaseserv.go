@@ -9,7 +9,7 @@ import (
 	//"path/filepath"
 	"database/sql"
 
-	"github.com/micro/go-config"
+	config "github.com/micro/go-config"
 	"github.com/micro/go-config/source/file"
 	_ "gopkg.in/goracle.v2"
 )

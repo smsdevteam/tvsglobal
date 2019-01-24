@@ -12,10 +12,9 @@ import (
 
 	"strconv"
 
-	_ "gopkg.in/goracle.v2"
-
-	cm "github.com/smsdevteam/tvsglobal/common"    // db
+	cm "github.com/smsdevteam/tvsglobal/common"
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	_ "gopkg.in/goracle.v2"
 )
 
 var p = fmt.Println
@@ -39,24 +38,10 @@ type body struct {
 // }
 
 type completeResponse struct {
-	XMLName                xml.Name             `xml:"CreateCustomerResponse"`
-	MyCreateCustomerResult CreateCustomerResult `xml:"CreateCustomerResult"`
+	XMLName xml.Name `xml:"CreateCustomerResponse"`
+	//	MyCreateCustomerResult CreateCustomerResult `xml:"CreateCustomerResult"`
 	//	MyResult authenHD `xml:"AuthenticateByProofResult "`
 }
-
-type CreateCustomerResult struct {
-	XMLName     xml.Name `xml:"CreateCustomerResult"`
-	ResultValue string   `xml:"ResultValue"`
-	ErrorCode   string   `xml:"ErrorCode"`
-	ErrorDesc   string   `xml:"ErrorDesc"`
-}
-
-// MyRespEnvelope for UpdateNote
-type MyRespEnvelopeUpdateCustomer struct {
-	XMLName xml.Name `xml:"Envelope"`
-	//Body    bodyUpdateNote `xml:"Body"`
-}
-
 type bodyUpdateCustomer struct {
 	XMLName xml.Name `xml:"Body"`
 	//Fault       *fault
@@ -94,7 +79,6 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
-
 	var dbsource string
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
@@ -135,6 +119,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 				ocustomerInfo.BusinessUnitID = values[0].(string)
 
 			}
+
 			//ocustomerInfo = oCustomer
 
 		}

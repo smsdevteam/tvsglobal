@@ -91,6 +91,10 @@ type CustomerInfo struct {
 	TypeKey                  string `xml:"TypeKey"`
 }
 
+/* type Customerrespon  struct {
+   CustomerInfoobj  CustomerInfo
+   ResponResult  ResponseResult
+} */
 // func Area(len, wid float64) float64 {
 // 	area := len * wid
 // 	return area

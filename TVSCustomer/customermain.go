@@ -11,21 +11,11 @@ import (
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
-type TVS_Customer_request struct {
-	customer_obj c.CustomerInfo
-	Orderno      string
-}
-type TVS_Customer_response struct {
-	customer_obj c.CustomerInfo
-	Orderno      string
-	Resultcode   string
-}
-
-func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
+/* func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
 	resulttvsresponse := TVS_Customer_response{}
 	resulttvsresponse.Orderno = tvscustreq.Orderno
 	return resulttvsresponse
-}
+} */
 func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to TVS Customer Restful")
 }
