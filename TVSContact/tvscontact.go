@@ -70,6 +70,52 @@ type getContactResult struct {
 	Extended                string   `xml:"Extended" json:"Extended"`
 }
 
+type MyRespEnvelopeCreateContact struct {
+	XMLName xml.Name          `xml:"Envelope"`
+	Body    bodyCreateContact `xml:"Body"`
+}
+
+type bodyCreateContact struct {
+	XMLName                xml.Name              `xml:"Body"`
+	VCreateContactResponse createContactResponse `xml:"CreateContactResponse"`
+}
+
+type createContactResponse struct {
+	XMLName xml.Name `xml:"CreateContactResponse"`
+	//VGetContactResult st.ContactXML `xml:"GetContactResult"`
+	VCreateContactResult createContactResult `xml:"CreateContactResult"`
+}
+
+type createContactResult struct {
+	XMLName     xml.Name `xml:"CreateContactResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
+
+type MyRespEnvelopeUpdateContact struct {
+	XMLName xml.Name          `xml:"Envelope"`
+	Body    bodyUpdateContact `xml:"Body"`
+}
+
+type bodyUpdateContact struct {
+	XMLName                xml.Name              `xml:"Body"`
+	VUpdateContactResponse updateContactResponse `xml:"UpdateContactResponse"`
+}
+
+type updateContactResponse struct {
+	XMLName xml.Name `xml:"UpdateContactResponse"`
+	//VGetContactResult st.ContactXML `xml:"GetContactResult"`
+	VUpdateContactResult updateContactResult `xml:"UpdateContactResult"`
+}
+
+type updateContactResult struct {
+	XMLName     xml.Name `xml:"UpdateContactResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
+
 const getTemplateforGetContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 <s:Body>
 	<GetContact xmlns="http://tempuri.org/">
@@ -135,7 +181,11 @@ func GetContactByContactID(iContactID string) st.Contact {
 	myResult := MyRespEnvelopeGetContact{}
 	xml.Unmarshal([]byte(contents), &myResult)
 	//log.Println(myResult)
-	layoutForDatetime := "2006-01-02T15:04:05.000Z"
+	layoutForDatetime := "2006-01-02T15:04:05"
+	oContact.ActionDate, _ = time.Parse(layoutForDatetime, myResult.Body.VGetContactResponse.VGetContactResult.ActionDate)
+	oContact.ActionTaken = myResult.Body.VGetContactResponse.VGetContactResult.ActionTaken
+	oContact.AllocatedToUser, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.AllocatedToUser), 10, 64)
+	oContact.Category, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.AllocatedToUser), 10, 64)
 	oContact.ContactID, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.ContactID), 10, 64)
 	oContact.CreatedByUser, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.CreatedByUserKey), 10, 64)
 	oContact.CreatedDate, _ = time.Parse(layoutForDatetime, myResult.Body.VGetContactResponse.VGetContactResult.CreatedDate)
@@ -328,28 +378,28 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 
 const getTemplateforCreateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 <s:Body>
-	<CreateContact>
+	<CreateContact xmlns="http://tempuri.org/">
          <inContact>
-            <ActionDate>2019-01-21T08:01:43+07:00</ActionDate>
+            <ActionDate>$actionDate</ActionDate>
             <ActionTaken>$actionTaken</ActionTaken>
             <AllocatedToUserKey>$allocatedToUserKey</AllocatedToUserKey>
             <CategoryKey>$categoryKey</CategoryKey>
             <CreatedByUserKey>$createdByUserKey</CreatedByUserKey>
-            <CreatedDate>2019-01-21T08:01:43+07:00</CreatedDate>
+            
             <CustomerId>$customerId</CustomerId>
             <CustomerProductId>$customerProductId</CustomerProductId>
             <DeviceId>$deviceId</DeviceId>
-            <ExternalReferenceId>$externalReferenceId</ExternalReferenceId>
-            <ExternalReferenceId1>$externalReferenceId1</ExternalReferenceId1>
-            <ExternalReferenceId2>$externalReferenceId2</ExternalReferenceId2>
-            <ExternalReferenceId3>$externalReferenceId3</ExternalReferenceId3>
-            <ExternalReferenceId4>$externalReferenceId4</ExternalReferenceId4>
-            <ExternalReferenceId5>$externalReferenceId5</ExternalReferenceId5>
-            <ExternalReferenceValue1>$externalReferenceValue1</ExternalReferenceValue1>
-            <ExternalReferenceValue2>$externalReferenceValue2</ExternalReferenceValue2>
-            <ExternalReferenceValue3>$externalReferenceValue3</ExternalReferenceValue3>
-            <ExternalReferenceValue4>$externalReferenceValue4</ExternalReferenceValue4>
-            <ExternalReferenceValue5>$externalReferenceValue5</ExternalReferenceValue5>
+            <ExternalReferenceId></ExternalReferenceId>
+            <ExternalReferenceId1>0</ExternalReferenceId1>
+            <ExternalReferenceId2>0</ExternalReferenceId2>
+            <ExternalReferenceId3>0</ExternalReferenceId3>
+            <ExternalReferenceId4>0</ExternalReferenceId4>
+            <ExternalReferenceId5>0</ExternalReferenceId5>
+            <ExternalReferenceValue1></ExternalReferenceValue1>
+            <ExternalReferenceValue2></ExternalReferenceValue2>
+            <ExternalReferenceValue3></ExternalReferenceValue3>
+            <ExternalReferenceValue4></ExternalReferenceValue4>
+            <ExternalReferenceValue5></ExternalReferenceValue5>
             <Id>0</Id>
             <InvoiceId>$invoiceId</InvoiceId>
             <LastUpdatedByUserId>$lastUpdatedByUserId</LastUpdatedByUserId>
@@ -357,10 +407,10 @@ const getTemplateforCreateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap
             <OrderId>$orderId</OrderId>
             <ProblemDescription>$problemDescription</ProblemDescription>
             <ProductId>$productId</ProductId>
-            <StampDate>2019-01-21T08:01:43+07:00</StampDate>
+            
             <StatusKey>$statusKey</StatusKey>
             <WorkOrderId>$workOrderId</WorkOrderId>
-            <Extended>$extended</Extended>
+            <Extended></Extended>
          </inContact>
          <inReason>$inReason</inReason>
          <byUser>
@@ -399,30 +449,86 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 
 	var sCustomerProductID string
 	var sOrderID string
+	var sProductID string
+	var sWorkOrderID string
+	var sDeviceID string
+	var sInvoiceID string
 
+	layoutForDatetime := "2006-01-02T15:04:05.000Z"
+
+	sActionDate := iReq.InContact.ActionDate.Format(layoutForDatetime)
 	sAllocatedToUser := strconv.FormatInt(iReq.InContact.AllocatedToUser, 10)
 	sCategoryKey := strconv.FormatInt(iReq.InContact.CategoryKey, 10)
 	sCreatedByUserKey := strconv.FormatInt(iReq.InContact.CreatedByUserKey, 10)
 	sCustomerID := strconv.FormatInt(iReq.InContact.CustomerID, 10)
-
-	if iReq.InContact.CustomerProductID == 0 {
-		sCustomerProductID = ""
-	} else {
-		sCustomerProductID = strconv.FormatInt(iReq.InContact.CustomerProductID, 10)
-	}
-
-	if iReq.InContact.OrderID == 0 {
-		sOrderID = ""
-	} else {
-		sOrderID = strconv.FormatInt(iReq.InContact.OrderID, 10)
-	}
+	sLastUpdateUserID := strconv.FormatInt(iReq.InContact.LastUpdatedByUserID, 10)
+	sInReason := strconv.FormatInt(iReq.InReason, 10)
+	sCustomerProductID = strconv.FormatInt(iReq.InContact.CustomerProductID, 10)
+	sOrderID = strconv.FormatInt(iReq.InContact.OrderID, 10)
+	sProductID = strconv.FormatInt(iReq.InContact.ProductID, 10)
+	sWorkOrderID = strconv.FormatInt(iReq.InContact.WorkOrderID, 10)
+	sDeviceID = strconv.FormatInt(iReq.InContact.DeviceID, 10)
+	sInvoiceID = strconv.FormatInt(iReq.InContact.InvoiceID, 10)
 
 	requestValue := s.Replace(getTemplateforCreateContact, "$actionTaken", iReq.InContact.ActionTaken, -1)
+	requestValue = s.Replace(requestValue, "$actionDate", sActionDate, -1)
 	requestValue = s.Replace(requestValue, "$allocatedToUserKey", sAllocatedToUser, -1)
 	requestValue = s.Replace(requestValue, "$categoryKey", sCategoryKey, -1)
 	requestValue = s.Replace(requestValue, "$createdByUserKey", sCreatedByUserKey, -1)
 	requestValue = s.Replace(requestValue, "$customerId", sCustomerID, -1)
 	requestValue = s.Replace(requestValue, "$customerProductId", sCustomerProductID, -1)
+	requestValue = s.Replace(requestValue, "$methodKey", iReq.InContact.MethodKey, -1)
+	requestValue = s.Replace(requestValue, "$orderId", sOrderID, -1)
+	requestValue = s.Replace(requestValue, "$problemDescription", iReq.InContact.ProblemDescription, -1)
+	requestValue = s.Replace(requestValue, "$productId", sProductID, -1)
+	requestValue = s.Replace(requestValue, "$statusKey", iReq.InContact.StatusKey, -1)
+	requestValue = s.Replace(requestValue, "$workOrderId", sWorkOrderID, -1)
+	requestValue = s.Replace(requestValue, "$externalReferenceId", iReq.InContact.ExternalReferenceID, -1)
+	requestValue = s.Replace(requestValue, "$deviceId", sDeviceID, -1)
+	requestValue = s.Replace(requestValue, "$invoiceId", sInvoiceID, -1)
+	requestValue = s.Replace(requestValue, "$lastUpdatedByUserId", sLastUpdateUserID, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sInReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	//log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/CreateContact"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	//log.Println(response.Body)
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	//log.Println("contents : " + string(contents[:]))
+	myResult := MyRespEnvelopeCreateContact{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VCreateContactResponse.VCreateContactResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VCreateContactResponse.VCreateContactResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VCreateContactResponse.VCreateContactResult.ErrorDesc
 
 	// Log#Stop
 	t1 := time.Now()
@@ -437,5 +543,175 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvscontactapplog.log", "CreateContact")
 
+	return oRes
+}
+
+const getTemplateforUpdateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+	<UpdateContact xmlns="http://tempuri.org/">
+         <inContact>
+            <ActionDate>$actionDate</ActionDate>
+            <ActionTaken>$actionTaken</ActionTaken>
+            <AllocatedToUserKey>$allocatedToUserKey</AllocatedToUserKey>
+            <CategoryKey>$categoryKey</CategoryKey>
+            <CreatedByUserKey>$createdByUserKey</CreatedByUserKey>
+            
+            <CustomerId>$customerId</CustomerId>
+            <CustomerProductId>$customerProductId</CustomerProductId>
+            <DeviceId>$deviceId</DeviceId>
+            <ExternalReferenceId></ExternalReferenceId>
+            <ExternalReferenceId1>0</ExternalReferenceId1>
+            <ExternalReferenceId2>0</ExternalReferenceId2>
+            <ExternalReferenceId3>0</ExternalReferenceId3>
+            <ExternalReferenceId4>0</ExternalReferenceId4>
+            <ExternalReferenceId5>0</ExternalReferenceId5>
+            <ExternalReferenceValue1></ExternalReferenceValue1>
+            <ExternalReferenceValue2></ExternalReferenceValue2>
+            <ExternalReferenceValue3></ExternalReferenceValue3>
+            <ExternalReferenceValue4></ExternalReferenceValue4>
+            <ExternalReferenceValue5></ExternalReferenceValue5>
+            <Id>$id</Id>
+            <InvoiceId>$invoiceId</InvoiceId>
+            <LastUpdatedByUserId>$lastUpdatedByUserId</LastUpdatedByUserId>
+            <MethodKey>$methodKey</MethodKey>
+            <OrderId>$orderId</OrderId>
+            <ProblemDescription>$problemDescription</ProblemDescription>
+            <ProductId>$productId</ProductId>
+            
+            <StatusKey>$statusKey</StatusKey>
+            <WorkOrderId>$workOrderId</WorkOrderId>
+            <Extended></Extended>
+         </inContact>
+         <inReason>$inReason</inReason>
+         <byUser>
+            <byUser>$byUser</byUser>
+            <byChannel>$byChannel</byChannel>
+            <byProject>$byProject</byProject>
+            <byHost>$byHost</byHost>
+         </byUser>
+      </CreateContact>
+</s:Body>
+</s:Envelope>`
+
+func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
+
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	var resp string
+	resp = "SUCCESS"
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSNote"
+	l.FunctionName = "UpdateContact"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Start = t0.String()
+	l.InsertappLog("./log/tvscontactapplog.log", "UpdateContact")
+
+	var oRes st.UpdateContactResponse
+	var AppServiceLnk cm.AppServiceURL
+	AppServiceLnk = cm.AppReadConfig("ENH")
+
+	url := AppServiceLnk.ICCServiceURL
+	client := &http.Client{}
+
+	var sCustomerProductID string
+	var sOrderID string
+	var sProductID string
+	var sWorkOrderID string
+	var sDeviceID string
+	var sInvoiceID string
+
+	layoutForDatetime := "2006-01-02T15:04:05.000Z"
+
+	sActionDate := iReq.InContact.ActionDate.Format(layoutForDatetime)
+	sAllocatedToUser := strconv.FormatInt(iReq.InContact.AllocatedToUser, 10)
+	sCategoryKey := strconv.FormatInt(iReq.InContact.CategoryKey, 10)
+	sCreatedByUserKey := strconv.FormatInt(iReq.InContact.CreatedByUserKey, 10)
+	sCustomerID := strconv.FormatInt(iReq.InContact.CustomerID, 10)
+	sLastUpdateUserID := strconv.FormatInt(iReq.InContact.LastUpdatedByUserID, 10)
+	sInReason := strconv.FormatInt(iReq.InReason, 10)
+	sCustomerProductID = strconv.FormatInt(iReq.InContact.CustomerProductID, 10)
+	sOrderID = strconv.FormatInt(iReq.InContact.OrderID, 10)
+	sProductID = strconv.FormatInt(iReq.InContact.ProductID, 10)
+	sWorkOrderID = strconv.FormatInt(iReq.InContact.WorkOrderID, 10)
+	sDeviceID = strconv.FormatInt(iReq.InContact.DeviceID, 10)
+	sInvoiceID = strconv.FormatInt(iReq.InContact.InvoiceID, 10)
+	sID := strconv.FormatInt(iReq.InContact.ContactID, 10)
+
+	requestValue := s.Replace(getTemplateforUpdateContact, "$actionTaken", iReq.InContact.ActionTaken, -1)
+	requestValue = s.Replace(requestValue, "$actionDate", sActionDate, -1)
+	requestValue = s.Replace(requestValue, "$allocatedToUserKey", sAllocatedToUser, -1)
+	requestValue = s.Replace(requestValue, "$categoryKey", sCategoryKey, -1)
+	requestValue = s.Replace(requestValue, "$createdByUserKey", sCreatedByUserKey, -1)
+	requestValue = s.Replace(requestValue, "$customerId", sCustomerID, -1)
+	requestValue = s.Replace(requestValue, "$customerProductId", sCustomerProductID, -1)
+	requestValue = s.Replace(requestValue, "$methodKey", iReq.InContact.MethodKey, -1)
+	requestValue = s.Replace(requestValue, "$orderId", sOrderID, -1)
+	requestValue = s.Replace(requestValue, "$problemDescription", iReq.InContact.ProblemDescription, -1)
+	requestValue = s.Replace(requestValue, "$productId", sProductID, -1)
+	requestValue = s.Replace(requestValue, "$statusKey", iReq.InContact.StatusKey, -1)
+	requestValue = s.Replace(requestValue, "$workOrderId", sWorkOrderID, -1)
+	requestValue = s.Replace(requestValue, "$externalReferenceId", iReq.InContact.ExternalReferenceID, -1)
+	requestValue = s.Replace(requestValue, "$deviceId", sDeviceID, -1)
+	requestValue = s.Replace(requestValue, "$invoiceId", sInvoiceID, -1)
+	requestValue = s.Replace(requestValue, "$id", sID, -1)
+	requestValue = s.Replace(requestValue, "$lastUpdatedByUserId", sLastUpdateUserID, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sInReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/UpdateContact"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	log.Println(response.Body)
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	log.Println("contents : " + string(contents[:]))
+	myResult := MyRespEnvelopeUpdateContact{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VUpdateContactResponse.VUpdateContactResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VUpdateContactResponse.VUpdateContactResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VUpdateContactResponse.VUpdateContactResult.ErrorDesc
+
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSNote"
+	l.FunctionName = "UpdateContact"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Response = resp
+	l.Start = t0.String()
+	l.End = t1.String()
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvscontactapplog.log", "UpdateContact")
 	return oRes
 }

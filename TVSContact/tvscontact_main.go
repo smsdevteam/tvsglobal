@@ -22,6 +22,7 @@ func main() {
 	mainRouter.HandleFunc("/tvscontact/getcontact/{contactid}", getContact)
 	mainRouter.HandleFunc("/tvscontact/getcontactlist/{customerid}", getContactList)
 	mainRouter.HandleFunc("/tvscontact/createcontact", createContact).Methods("POST")
+	mainRouter.HandleFunc("/tvscontact/updatecontact", updateContact).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 
@@ -64,6 +65,27 @@ func createContact(w http.ResponseWriter, r *http.Request) {
 
 	var res st.CreateContactResponse
 	res = CreateContact(req)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(res)
+}
+
+func updateContact(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	var req st.UpdateContactRequest
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		panic(err)
+	}
+
+	log.Println(req)
+
+	var res st.UpdateContactResponse
+	res = UpdateContact(req)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
 }
