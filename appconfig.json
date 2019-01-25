@@ -1,0 +1,7 @@
+{
+    "ENH": {
+        "service": {
+            "iccServiceURL": "http://172.22.203.68/ConvergenceIBSWCF4/ICCService.svc"
+        }
+    }
+}

@@ -1,20 +1,18 @@
 package main
 
 import (
-	"database/sql"
+ 	"database/sql"
 	"database/sql/driver"
 	"encoding/xml"
-
 	"fmt"
 	"io"
+ 	"log"
+ 	"strconv"
+ 	_ "gopkg.in/goracle.v2"
 
-	"log"
-
-	"strconv"
-
-	cm "github.com/smsdevteam/tvsglobal/common"
+	cm "github.com/smsdevteam/tvsglobal/common" //db
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
-	_ "gopkg.in/goracle.v2"
+ 
 )
 
 var p = fmt.Println
@@ -79,8 +77,9 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
-	var dbsource string
-	dbsource = cm.GetDatasourceName("ICC")
+	var dbsource string 
+	 dbsource =  cm.GetDatasourceName("ICC") 
+	 
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
 		log.Fatal(err)
