@@ -39,11 +39,15 @@ type Contact struct {
 }
 
 type ListContact struct {
-	Contacts []Contact `json:"contacts"`
+	Contacts  []Contact `json:"contacts"`
+	ErrorCode int       `json:"errorcode"`
+	ErrorDesc string    `json:"errordesc"`
 }
 
 type GetContactResponse struct {
-	GetContactResult ContactXML `xml:"GetContactResult" json:"GetContactResult"`
+	GetContactResult Contact `xml:"GetContactResult" json:"GetContactResult"`
+	ErrorCode        int     `json:"errorcode"`
+	ErrorDesc        string  `json:"errordesc"`
 }
 
 type ContactXML struct {

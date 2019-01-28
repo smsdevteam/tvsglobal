@@ -79,7 +79,7 @@ type updateNoteResult struct {
 }
 
 // GetNoteByNoteID get info
-func GetNoteByNoteID(iNoteID string) st.Note {
+func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -94,14 +94,18 @@ func GetNoteByNoteID(iNoteID string) st.Note {
 	l.Start = t0.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
 
+	var oRes st.GetNoteResult
 	var oNote st.Note
 
 	var dbsource string
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		resp = err.Error()
+		oRes.ErrorCode = 2
+		oRes.ErrorDesc = err.Error()
+		return oRes
 	} else {
 		defer db.Close()
 		var statement string
@@ -109,12 +113,18 @@ func GetNoteByNoteID(iNoteID string) st.Note {
 		var resultC driver.Rows
 		intNoteID, err := strconv.Atoi(iNoteID)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			resp = err.Error()
+			oRes.ErrorCode = 3
+			oRes.ErrorDesc = err.Error()
+			return oRes
 		} else {
 			if _, err := db.Exec(statement, intNoteID, sql.Out{Dest: &resultC}); err != nil {
-				log.Fatal(err)
+				log.Println(err)
 				resp = err.Error()
+				oRes.ErrorCode = 4
+				oRes.ErrorDesc = err.Error()
+				return oRes
 			}
 
 			defer resultC.Close()
@@ -127,6 +137,9 @@ func GetNoteByNoteID(iNoteID string) st.Note {
 					}
 					log.Println("error:", err)
 					resp = err.Error()
+					oRes.ErrorCode = 5
+					oRes.ErrorDesc = err.Error()
+					return oRes
 				}
 
 				if values[0] != nil {
@@ -155,6 +168,12 @@ func GetNoteByNoteID(iNoteID string) st.Note {
 
 	}
 
+	oRes.MyNote = oNote
+	if oRes.ErrorCode == 0 {
+		oRes.ErrorCode = 1
+		oRes.ErrorDesc = "Success"
+	}
+
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
@@ -168,11 +187,11 @@ func GetNoteByNoteID(iNoteID string) st.Note {
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
 	//test
-	return oNote
+	return oRes
 }
 
 // get list note by customer id
-func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
+func GetListNoteByCustomerID(iCustomerID string) st.GetListNoteResult {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -187,13 +206,17 @@ func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
 	l.Start = t0.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 
+	var oRes st.GetListNoteResult
 	var oListNote st.ListNote
 	var dbsource string
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Fatal(err)
+		log.Println(err)
 		resp = err.Error()
+		oRes.ErrorCode = 2
+		oRes.ErrorDesc = err.Error()
+		return oRes
 	} else {
 		defer db.Close()
 		var statement string
@@ -201,12 +224,18 @@ func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			resp = err.Error()
+			oRes.ErrorCode = 3
+			oRes.ErrorDesc = err.Error()
+			return oRes
 		} else {
 			if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
 				log.Fatal(err)
 				resp = err.Error()
+				oRes.ErrorCode = 4
+				oRes.ErrorDesc = err.Error()
+				return oRes
 			}
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
@@ -219,6 +248,9 @@ func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
 					}
 					log.Println("error:", err)
 					resp = err.Error()
+					oRes.ErrorCode = 5
+					oRes.ErrorDesc = err.Error()
+					return oRes
 				}
 				var oNote st.Note
 
@@ -248,6 +280,12 @@ func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
 			oListNote.Notes = oLNote
 		}
 	}
+	oRes.MyListNote = oListNote
+	if oRes.ErrorCode == 0 {
+		oRes.ErrorCode = 1
+		oRes.ErrorDesc = "Success"
+	}
+
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
@@ -261,7 +299,7 @@ func GetListNoteByCustomerID(iCustomerID string) st.ListNote {
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 	//test
-	return oListNote
+	return oRes
 }
 
 // Device : ICC API

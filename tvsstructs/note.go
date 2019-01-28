@@ -26,8 +26,20 @@ type GetNote struct {
 	CreateDateTime    string `json:"createdatetime"`
 }
 
+type GetNoteResult struct {
+	MyNote    Note   `json:"note"`
+	ErrorCode int    `json:"errorcode"`
+	ErrorDesc string `json:"errordesc"`
+}
+
 type ListNote struct {
 	Notes []Note `json:"notes"`
+}
+
+type GetListNoteResult struct {
+	MyListNote ListNote `json:"getlistnoteresult"`
+	ErrorCode  int      `json:"errorcode"`
+	ErrorDesc  string   `json:"errordesc"`
 }
 
 type CreateNoteRequest struct {

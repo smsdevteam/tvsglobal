@@ -30,7 +30,7 @@ func getContact(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	fmt.Println(params["contactid"])
 
-	var contactResult st.Contact
+	var contactResult st.GetContactResponse
 
 	contactResult = GetContactByContactID(params["contactid"])
 	w.Header().Set("Content-Type", "application/json")
