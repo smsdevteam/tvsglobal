@@ -125,7 +125,7 @@ const getTemplateforGetContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 </s:Envelope>`
 
 // GetContactByContactID get info
-func GetContactByContactID(iContactID string) st.Contact {
+func GetContactByContactID(iContactID string) st.GetContactResponse {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -140,6 +140,7 @@ func GetContactByContactID(iContactID string) st.Contact {
 	l.Start = t0.String()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContact")
 
+	var oRes st.GetContactResponse
 	var oContact st.Contact
 	var AppServiceLnk cm.AppServiceURL
 	AppServiceLnk = cm.AppReadConfig("ENH")
@@ -153,7 +154,11 @@ func GetContactByContactID(iContactID string) st.Contact {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
-		return oContact
+		log.Println(err)
+		resp = err.Error()
+		oRes.ErrorCode = 2
+		oRes.ErrorDesc = err.Error()
+		return oRes
 	}
 
 	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/GetContact"`)
@@ -161,19 +166,31 @@ func GetContactByContactID(iContactID string) st.Contact {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
-		return oContact
+		log.Println(err)
+		resp = err.Error()
+		oRes.ErrorCode = 3
+		oRes.ErrorDesc = err.Error()
+		return oRes
 	}
 	defer response.Body.Close()
 
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
-		return oContact
+		//log.Println(err)
+		resp = "response status code :" + strconv.Itoa(response.StatusCode)
+		oRes.ErrorCode = 4
+		oRes.ErrorDesc = "response status code :" + strconv.Itoa(response.StatusCode)
+		return oRes
 	}
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return oContact
+		log.Println(err)
+		resp = err.Error()
+		oRes.ErrorCode = 5
+		oRes.ErrorDesc = err.Error()
+		return oRes
 	}
 
 	//log.Println("contents : " + string(contents[:]))
@@ -213,6 +230,10 @@ func GetContactByContactID(iContactID string) st.Contact {
 	oContact.Status = myResult.Body.VGetContactResponse.VGetContactResult.StatusKey
 	oContact.WorkOrderID, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.WorkOrderID), 10, 64)
 
+	oRes.GetContactResult = oContact
+	oRes.ErrorCode = 1
+	oRes.ErrorDesc = "Success"
+
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
@@ -225,7 +246,7 @@ func GetContactByContactID(iContactID string) st.Contact {
 	l.End = t1.String()
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContact")
-	return oContact
+	return oRes
 }
 
 //GetContactListByCustomerID for find Contacts by Customer
@@ -251,8 +272,12 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Fatal(err)
+
+		log.Println(err)
 		resp = err.Error()
+		oLContact.ErrorCode = 2
+		oLContact.ErrorDesc = err.Error()
+		return oLContact
 	} else {
 		defer db.Close()
 		var statement string
@@ -260,12 +285,18 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
-			log.Fatal(err)
+			log.Println(err)
 			resp = err.Error()
+			oLContact.ErrorCode = 3
+			oLContact.ErrorDesc = err.Error()
+			return oLContact
 		} else {
 			if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
-				log.Fatal(err)
+				log.Println(err)
 				resp = err.Error()
+				oLContact.ErrorCode = 4
+				oLContact.ErrorDesc = err.Error()
+				return oLContact
 			}
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
@@ -276,8 +307,11 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 					if err == io.EOF {
 						break
 					}
-					log.Println("error:", err)
+					log.Println(err)
 					resp = err.Error()
+					oLContact.ErrorCode = 5
+					oLContact.ErrorDesc = err.Error()
+					return oLContact
 				}
 				var oContact st.Contact
 
@@ -357,7 +391,8 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 				oContacts = append(oContacts, oContact)
 			}
 			oLContact.Contacts = oContacts
-
+			oLContact.ErrorCode = 1
+			oLContact.ErrorDesc = "Success"
 		}
 	}
 
@@ -589,7 +624,7 @@ const getTemplateforUpdateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap
             <byProject>$byProject</byProject>
             <byHost>$byHost</byHost>
          </byUser>
-      </CreateContact>
+      </UpdateContact>
 </s:Body>
 </s:Envelope>`
 
@@ -664,7 +699,7 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
 	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
 
-	log.Println("requestValue: " + requestValue)
+	//log.Println("requestValue: " + requestValue)
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
@@ -684,7 +719,7 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 	}
 	defer response.Body.Close()
 
-	log.Println(response.Body)
+	//log.Println(response.Body)
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
@@ -693,10 +728,10 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 		return oRes
 	}
 
-	log.Println("contents : " + string(contents[:]))
+	//log.Println("contents : " + string(contents[:]))
 	myResult := MyRespEnvelopeUpdateContact{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	log.Println(myResult)
+	//log.Println(myResult)
 	oRes.ResultValue = myResult.Body.VUpdateContactResponse.VUpdateContactResult.ResultValue
 	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VUpdateContactResponse.VUpdateContactResult.ErrorCode)
 	oRes.ErrorDesc = myResult.Body.VUpdateContactResponse.VUpdateContactResult.ErrorDesc
