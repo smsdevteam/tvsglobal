@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -32,7 +33,6 @@ type MyRespEnvelope struct {
 type body struct {
 	XMLName                      xml.Name
 	Fault                        fault
-	ResponseGetDevice            responseGetDevice            `xml:"GetDeviceBySerialNumberResponse"`
 	ResponseCreateStockRecv      responseCreateStockRecv      `xml:"CreateStockReceiveDetailsResponse"`
 	ResponseCreateBuildList      responseCreateBuildList      `xml:"CreateBuildListResponse"`
 	ResponseAddDeviceToBuildList responseAddDeviceToBuildList `xml:"AddDeviceToBuildListManuallyResponse"`
@@ -43,39 +43,6 @@ type fault struct {
 	Code   string `xml:"faultcode"`
 	String string `xml:"faultstring"`
 	Detail string `xml:"detail"`
-}
-
-type responseGetDevice struct {
-	XMLName         xml.Name        `xml:"GetDeviceBySerialNumberResponse"`
-	GetDeviceResult getDeviceResult `xml:"GetDeviceBySerialNumberResult"`
-}
-
-type getDeviceResult struct {
-	CaReferenceNumber string `xml:"CaReferenceNumber"`
-	CustomFields      struct {
-		Text string `xml:",chardata"`
-		A    string `xml:"a,attr"`
-	} `xml:"CustomFields"`
-	Extended struct {
-		Text string `xml:",chardata"`
-		Nil  string `xml:"nil,attr"`
-	} `xml:"Extended"`
-	ExternalId            string `xml:"ExternalId"`
-	FinanceOptionId       string `xml:"FinanceOptionId"`
-	FromStockHandlerId    string `xml:"FromStockHandlerId"`
-	ID                    string `xml:"Id"`
-	MACAddress1           string `xml:"MACAddress1"`
-	MACAddress2           string `xml:"MACAddress2"`
-	ModelId               string `xml:"ModelId"`
-	OrderId               string `xml:"OrderId"`
-	PalletId              string `xml:"PalletId"`
-	Provisioned           string `xml:"Provisioned"`
-	SerialNumber          string `xml:"SerialNumber"`
-	ShipDate              string `xml:"ShipDate"`
-	StatusId              string `xml:"StatusId"`
-	StockHandlerId        string `xml:"StockHandlerId"`
-	StockReceiveDetailsId string `xml:"StockReceiveDetailsId"`
-	WarrantyEndDate       string `xml:"WarrantyEndDate"`
 }
 
 type responseCreateStockRecv struct {
@@ -195,8 +162,8 @@ type performBuildListActionResult struct {
 	UseRange                      string `xml:"UseRange"`
 }
 
-// GetDataSerialNumber
-func GetDataSerialNumber(iSN string) st.DeviceInfo {
+// Get Device By SN
+func GetDeviceBySerialNumber(iSN string) st.Device {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -211,7 +178,7 @@ func GetDataSerialNumber(iSN string) st.DeviceInfo {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
 
-	var odv st.DeviceInfo
+	var odv st.Device
 
 	// Database
 	//db, err := sql.Open("goracle", "bgweb/bgweb#1@//tv-uat62-dq.tvsit.co.th:1521/UAT62")
@@ -297,128 +264,6 @@ const getTemplateAuthenHD = `<s:Header>
   </h:AuthenticationHeader>
 </s:Header>`
 
-// getAuthenHD : Replace header string
-func getAuthenHD(iExtAgent string) (string, cm.ServiceURL) {
-	var ICCAuthen cm.ICCAuthenHD
-	var ServiceLnk cm.ServiceURL
-	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
-
-	token, err := cm.GetICCAuthenToken("ICC")
-	if err != nil {
-		return "", ServiceLnk
-	}
-
-	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
-	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
-	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
-	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
-	requestHD = s.Replace(requestHD, "$token", token, -1)
-	if len(strings.Trim(iExtAgent, " ")) != 0 {
-		extAgentTag := "<h:ExternalAgent>" + iExtAgent + "</h:ExternalAgent>"
-		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
-	}
-
-	return requestHD, ServiceLnk
-}
-
-// ----------------- GetDeviceBySerialNumber
-const getTemplateforGetDeviceBySerialNumber = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-$TemplateHD
-<s:Body>
-	<GetDeviceBySerialNumber xmlns="http://ibs.entriq.net/Devices">
-		<serialNumber>$sn</serialNumber>
-	</GetDeviceBySerialNumber>
-</s:Body>
-</s:Envelope>`
-
-// GetDeviceBySerialNumber ---
-func GetDeviceBySerialNumber(iSN string, iExtAgent string) st.GetDeviceResponse {
-	var sn st.Device
-	var oRes st.ResponseResult
-	var result st.GetDeviceResponse
-
-	requestHD, ServiceLnk := getAuthenHD(iExtAgent)
-	if requestHD == "" {
-		oRes.ErrorCode = 100
-		oRes.ErrorDesc = "Cannot get token from ICC API"
-		result.ProcessResult = oRes
-		return result
-	}
-
-	url := ServiceLnk.DeviceURL
-	client := &http.Client{}
-
-	requestValue := s.Replace(getTemplateforGetDeviceBySerialNumber, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$sn", iSN, -1)
-
-	//p(requestValue)
-	requestContent := []byte(requestValue)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
-	if err != nil {
-		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
-		result.ProcessResult = oRes
-		return result
-	}
-	req.Header.Add("SOAPAction", `"http://ibs.entriq.net/Devices/IDevicesService/GetDeviceBySerialNumber"`)
-	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
-	req.Header.Add("Accept", "text/xml")
-	resp, err := client.Do(req)
-	if err != nil {
-		oRes.ErrorCode = 300
-		oRes.ErrorDesc = err.Error()
-		result.ProcessResult = oRes
-		return result
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		oRes.ErrorCode = resp.StatusCode
-		oRes.ErrorDesc = resp.Status
-		result.ProcessResult = oRes
-		return result
-	}
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
-		result.ProcessResult = oRes
-		return result
-	}
-
-	//p(string(contents))
-
-	myRes := MyRespEnvelope{}
-	xml.Unmarshal([]byte(contents), &myRes)
-	sn.CaReferenceNumber = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.CaReferenceNumber)
-	sn.ExternalID = myRes.Body.ResponseGetDevice.GetDeviceResult.ExternalId
-	sn.FinanceOptionID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.FinanceOptionId)
-	sn.FromStockHandlerID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.FromStockHandlerId)
-	sn.ID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.ID)
-	sn.MACAddress1 = myRes.Body.ResponseGetDevice.GetDeviceResult.MACAddress1
-	sn.MACAddress2 = myRes.Body.ResponseGetDevice.GetDeviceResult.MACAddress2
-	sn.ModelID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.ModelId)
-	sn.OrderID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.OrderId)
-	sn.PalletID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.PalletId)
-	sn.Provisioned = cm.StrToBool(myRes.Body.ResponseGetDevice.GetDeviceResult.Provisioned)
-	sn.SerialNumber = myRes.Body.ResponseGetDevice.GetDeviceResult.SerialNumber
-	sn.ShipDate = myRes.Body.ResponseGetDevice.GetDeviceResult.ShipDate
-	sn.StatusID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.StatusId)
-	sn.StockHandlerID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.StockHandlerId)
-	sn.StockReceiveDetailsID = cm.StrToInt(myRes.Body.ResponseGetDevice.GetDeviceResult.StockReceiveDetailsId)
-	sn.WarrantyEndDate = myRes.Body.ResponseGetDevice.GetDeviceResult.WarrantyEndDate
-	p(sn)
-
-	oRes.ErrorCode = 1
-	oRes.ErrorDesc = "SUCCESS"
-	result.ProcessResult = oRes
-	result.DeviceResult = sn
-
-	return result
-}
-
-// ----------------- GetDeviceBySerialNumber
-
-// ----------------- PairOneDeviceToAnother
 const getTemplateforPairingDevice = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 $TemplateHD
 <s:Body>
@@ -430,14 +275,17 @@ $TemplateHD
 </s:Body>
 </s:Envelope>`
 
-// PairOneDeviceToAnother
 func PairOneDeviceToAnother(deviceFromid int64, deviceToId int64, reasonnr int64, byusername string) st.ResponseResult {
 	var oRes st.ResponseResult
 
-	requestHD, ServiceLnk := getAuthenHD(byusername)
-	if requestHD == "" {
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
 		oRes.ErrorCode = 100
-		oRes.ErrorDesc = "Cannot get token from ICC API"
+		oRes.ErrorDesc = err.Error()
 		return oRes
 	}
 
@@ -446,10 +294,19 @@ func PairOneDeviceToAnother(deviceFromid int64, deviceToId int64, reasonnr int64
 	p(deviceFromid)
 	p(deviceToId)
 
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+	if len(strings.Trim(byusername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
 	requestValue := s.Replace(getTemplateforPairingDevice, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$devicefromid", cm.Int64ToStr(deviceFromid), -1)
-	requestValue = s.Replace(requestValue, "$devicetoid", cm.Int64ToStr(deviceToId), -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "$devicefromid", strconv.FormatInt(int64(deviceFromid), 10), -1)
+	requestValue = s.Replace(requestValue, "$devicetoid", strconv.FormatInt(int64(deviceToId), 10), -1)
+	requestValue = s.Replace(requestValue, "$reason", strconv.FormatInt(int64(reasonnr), 10), -1)
 
 	//p(requestValue)
 	requestContent := []byte(requestValue)
@@ -483,13 +340,11 @@ func PairOneDeviceToAnother(deviceFromid int64, deviceToId int64, reasonnr int64
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	oRes.ErrorCode = cm.StrToInt(myResult.Body.Fault.Code)
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.Fault.Code)
 	oRes.ErrorDesc = myResult.Body.Fault.String
 
 	return oRes
 }
-
-// ----------------- PairOneDeviceToAnother
 
 /*
 func main() {
@@ -517,24 +372,48 @@ $TemplateHD
 </s:Envelope>`
 
 // MoveDevice
-func MoveDevice(ideviceid int64, idepotto int64, reasonnr int64, byusername string) st.ResponseResult {
+func MoveDevice(iSN string, iDepotTo int64, reasonnr int64, byusername string) st.ResponseResult {
 	var oRes st.ResponseResult
-	requestHD, ServiceLnk := getAuthenHD(byusername)
-	if requestHD == "" {
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+	//p(ICCAuthen)
+	//fmt.Println(ServiceLnk)
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
 		oRes.ErrorCode = 100
-		oRes.ErrorDesc = "Cannot get token from ICC API"
+		oRes.ErrorDesc = err.Error()
 		return oRes
 	}
+	p(token)
+	//fmt.Scanln()
+
+	dv := GetDeviceBySerialNumber(iSN)
+	//p(dv)
 
 	url := ServiceLnk.DeviceURL
 	client := &http.Client{}
 
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+
+	if len(strings.Trim(byusername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
+
 	requestValue := s.Replace(getTemplateforMoveDevice, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$deviceid", cm.Int64ToStr(ideviceid), -1)
-	requestValue = s.Replace(requestValue, "$stockhandlerid", cm.Int64ToStr(idepotto), -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "$deviceid", strconv.FormatInt(int64(dv.DeviceID), 10), -1)
+	requestValue = s.Replace(requestValue, "$stockhandlerid", strconv.FormatInt(int64(iDepotTo), 10), -1)
+	requestValue = s.Replace(requestValue, "$reason", strconv.FormatInt(int64(reasonnr), 10), -1)
 	requestValue = s.Replace(requestValue, "$effectivedate", time.Now().Format("2006-01-02T15:04:05"), -1)
 
+	//p(requestValue)
+	//fmt.Scanln()
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
@@ -587,21 +466,38 @@ $TemplateHD
 </s:Envelope>`
 
 // SendCommandToDevice
-func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.ResponseResult {
+func SendCommandToDevice(iSN string, reasonnr int64, byusername string) st.ResponseResult {
 	var oRes st.ResponseResult
-	requestHD, ServiceLnk := getAuthenHD(byusername)
-	if requestHD == "" {
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
 		oRes.ErrorCode = 100
-		oRes.ErrorDesc = "Cannot get token from ICC API"
+		oRes.ErrorDesc = err.Error()
 		return oRes
 	}
+
+	dv := GetDeviceBySerialNumber(iSN)
 
 	url := ServiceLnk.DeviceURL
 	client := &http.Client{}
 
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+
+	if len(strings.Trim(byusername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
+
 	requestValue := s.Replace(getTemplateforsendcmd, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$deviceid", cm.Int64ToStr(deviceid), -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "$deviceid", strconv.FormatInt(int64(dv.DeviceID), 10), -1)
+	requestValue = s.Replace(requestValue, "$reason", strconv.FormatInt(int64(reasonnr), 10), -1)
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
@@ -645,35 +541,46 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 }
 
 // CreateNewSerialNumber
-func CreateNewSerialNumber(iNewSNs st.NewDeviceReq) st.NewDeviceRes {
+func CreateNewSerialNumber(iNewSNs st.NewDeviceReq) (st.ResponseResult, []st.NewDeviceRes) {
 	var oRes st.ResponseResult
-	var oSNRes []st.CreateSNRes
-	var oSNReturn st.NewDeviceRes
+	var oSNRes []st.NewDeviceRes
 
 	// 1. Get Token
-	requestHD, ServiceLnk := getAuthenHD(iNewSNs.ByUser)
-	if requestHD == "" {
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
 		oRes.ErrorCode = 100
-		oRes.ErrorDesc = "Cannot get token from ICC API"
-		oSNReturn.ProcessRes = oRes
-		return oSNReturn
+		oRes.ErrorDesc = err.Error()
+		return oRes, oSNRes
 	}
 
 	url := ServiceLnk.DeviceURL
 
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+
+	if len(strings.Trim(iNewSNs.ByUser, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + iNewSNs.ByUser + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
+
 	// 2. createStockReceiveDetails
 	oRes = CreateStockReceiveDetails(requestHD, url, iNewSNs.StockReceiveDetail, iNewSNs.Reason, iNewSNs.ByUser)
 	if oRes.ErrorCode != 1 {
-		oSNReturn.ProcessRes = oRes
-		return oSNReturn
+		return oRes, oSNRes
 	}
 
 	// 3. CreateBuildList
 	iNewSNs.StockReceiveDetail.StockReceiveDetailsID = int64(oRes.CustomNum)
 	oRes = CreateBuildList(requestHD, url, iNewSNs.StockReceiveDetail, iNewSNs.Reason, iNewSNs.ByUser)
 	if oRes.ErrorCode != 1 {
-		oSNReturn.ProcessRes = oRes
-		return oSNReturn
+		return oRes, oSNRes
 	}
 
 	// 4. AddDeviceToBuildListManually
@@ -681,14 +588,14 @@ func CreateNewSerialNumber(iNewSNs st.NewDeviceReq) st.NewDeviceRes {
 	for i := 0; i < len(iNewSNs.SerialNumber); i++ {
 		oRes = AddDeviceToBuildListManually(requestHD, url, buildlstid, iNewSNs.SerialNumber[i], iNewSNs.ByUser)
 		if oRes.ErrorCode == 1 { // Success
-			var iSNRes st.CreateSNRes
+			var iSNRes st.NewDeviceRes
 			iSNRes.SerialNumber = iNewSNs.SerialNumber[i]
 			iSNRes.ResultCode = oRes.ErrorCode
 			iSNRes.ResultDesc = oRes.ErrorDesc
 			oSNRes = append(oSNRes, iSNRes)
 			p(iSNRes)
 		} else {
-			var iSNRes st.CreateSNRes
+			var iSNRes st.NewDeviceRes
 			iSNRes.SerialNumber = iNewSNs.SerialNumber[i]
 			iSNRes.ResultCode = oRes.ErrorCode
 			iSNRes.ResultDesc = oRes.ErrorDesc
@@ -700,10 +607,7 @@ func CreateNewSerialNumber(iNewSNs st.NewDeviceReq) st.NewDeviceRes {
 	// 5. PerformBuildListAction
 	oRes = PerformBuildListAction(requestHD, url, buildlstid, iNewSNs.ByUser)
 
-	oSNReturn.ProcessRes = oRes
-	oSNReturn.NewSNRes = oSNRes
-
-	return oSNReturn
+	return oRes, oSNRes
 }
 
 const getTemplateforcreatestock = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -742,10 +646,10 @@ func CreateStockReceiveDetails(requestHD string, url string, iST st.StockReceive
 	// 2. XML for CreateStockReceiveDetails
 	requestValue := s.Replace(getTemplateforcreatestock, "$TemplateHD", requestHD, -1)
 	requestValue = s.Replace(requestValue, "$batchnumber", iST.BatchNumber, -1)
-	requestValue = s.Replace(requestValue, "$fromdepotid", cm.Int64ToStr(iST.FromStockHanderID), -1)
-	requestValue = s.Replace(requestValue, "$todepotid", cm.Int64ToStr(iST.ToStockHanderID), -1)
+	requestValue = s.Replace(requestValue, "$fromdepotid", strconv.FormatInt(int64(iST.FromStockHanderId), 10), -1)
+	requestValue = s.Replace(requestValue, "$todepotid", strconv.FormatInt(int64(iST.ToStockHanderId), 10), -1)
 	requestValue = s.Replace(requestValue, "$wrenddate", iST.WarrantyEndDate, -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "$reason", strconv.FormatInt(int64(reasonnr), 10), -1)
 
 	requestContent := []byte(requestValue)
 	//p(requestValue)
@@ -783,7 +687,7 @@ func CreateStockReceiveDetails(requestHD string, url string, iST st.StockReceive
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		stockrecid = cm.StrToInt(myResult.Body.ResponseCreateStockRecv.CreateStockReceiveDetailsResult.ID)
+		stockrecid, _ = strconv.Atoi(myResult.Body.ResponseCreateStockRecv.CreateStockReceiveDetailsResult.ID)
 		oRes.ErrorCode = 1
 		oRes.ErrorDesc = "SUCCESS"
 		oRes.CustomNum = stockrecid
@@ -828,9 +732,9 @@ func CreateBuildList(requestHD string, url string, iST st.StockReceiveDetails, r
 
 	// 3. CreateBuildList
 	requestValue := s.Replace(getTemplateforcreatebuildlist, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$modelid", cm.Int64ToStr(iST.IBSModelID), -1)
-	requestValue = s.Replace(requestValue, "$stockreceiveid", cm.Int64ToStr(iST.StockReceiveDetailsID), -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "$modelid", strconv.FormatInt(int64(iST.IBSModelId), 10), -1)
+	requestValue = s.Replace(requestValue, "$stockreceiveid", strconv.FormatInt(int64(iST.StockReceiveDetailsID), 10), -1)
+	requestValue = s.Replace(requestValue, "$reason", strconv.FormatInt(int64(reasonnr), 10), -1)
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
@@ -867,7 +771,7 @@ func CreateBuildList(requestHD string, url string, iST st.StockReceiveDetails, r
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		buildlstid = cm.StrToInt(myResult.Body.ResponseCreateBuildList.CreateBuildListResult.ID)
+		buildlstid, _ = strconv.Atoi(myResult.Body.ResponseCreateBuildList.CreateBuildListResult.ID)
 		oRes.ErrorCode = 1
 		oRes.ErrorDesc = "SUCCESS"
 		oRes.CustomNum = buildlstid
@@ -893,7 +797,7 @@ func AddDeviceToBuildListManually(requestHD string, url string, buildlstid int64
 
 	// 4. AddDeviceToBuildListManually
 	requestValue := s.Replace(getTemplateforadddevicetobuildlist, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$blistid", cm.Int64ToStr(buildlstid), -1)
+	requestValue = s.Replace(requestValue, "$blistid", strconv.FormatInt(buildlstid, 10), -1)
 	requestValue = s.Replace(requestValue, "$sn", newsn, -1)
 
 	requestContent := []byte(requestValue)
@@ -960,7 +864,7 @@ func PerformBuildListAction(requestHD string, url string, buildlstid int64, byus
 
 	// 5. PerformBuildListAction
 	requestValue := s.Replace(getTemplateforperformbuildlist, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$blistid", cm.Int64ToStr(buildlstid), -1)
+	requestValue = s.Replace(requestValue, "$blistid", strconv.FormatInt(buildlstid, 10), -1)
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
@@ -999,7 +903,7 @@ func PerformBuildListAction(requestHD string, url string, buildlstid int64, byus
 	} else {
 		oRes.ErrorCode = 1
 		oRes.ErrorDesc = "SUCCESS"
-		oRes.CustomNum = cm.StrToInt(myResult.Body.ResponsePerformBuildList.PerformBuildListActionResult.ID)
+		oRes.CustomNum, _ = strconv.Atoi(myResult.Body.ResponsePerformBuildList.PerformBuildListActionResult.ID)
 	}
 
 	return oRes
@@ -1196,72 +1100,3 @@ func createStockReceiveDetailsA(requestHD string, url string, iST st.StockReceiv
 	return oRes
 }
 */
-
-const getTemplatereceiveexchangedevice = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-$TemplateHD
-  <s:Body>
-    <ReceiveExchangeDevice xmlns="http://ibs.entriq.net/Devices">
-      <deviceId>$deviceid</deviceId>
-      <stockHandlerId>$stockhandlerid</stockHandlerId>
-      <palletId>$palletid</palletId>
-      <reasonId>$reason</reasonId>
-      <deviceExchangeReasonId>$deviceexreason</deviceExchangeReasonId>
-      <shipDate>$shipdate</shipDate>
-    </ReceiveExchangeDevice>
-  </s:Body>
-</s:Envelope>`
-
-func ReceiveExchangeDevice(requestHD string, url string, iReq st.ReceiveExchangeDeviceReq, byusername string) st.ResponseResult {
-	var oRes st.ResponseResult
-
-	client := &http.Client{}
-
-	requestValue := s.Replace(getTemplatereceiveexchangedevice, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$deviceid", cm.Int64ToStr(iReq.DeviceID), -1)
-	requestValue = s.Replace(requestValue, "$stockhandlerid", cm.Int64ToStr(iReq.StockHandlerID), -1)
-	requestValue = s.Replace(requestValue, "$palletid", cm.Int64ToStr(iReq.PalletID), -1)
-	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(iReq.ReasonID), -1)
-	requestValue = s.Replace(requestValue, "$deviceexreason", cm.Int64ToStr(iReq.DeviceExchangeReasonID), -1)
-	requestValue = s.Replace(requestValue, "$shipdate", iReq.ShipDate, -1)
-
-	requestContent := []byte(requestValue)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
-	if err != nil {
-		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
-		return oRes
-	}
-	req.Header.Add("SOAPAction", `"http://ibs.entriq.net/Devices/IDevicesService/ReceiveExchangeDevice"`)
-	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
-	req.Header.Add("Accept", "text/xml")
-	resp, err := client.Do(req)
-	if err != nil {
-		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
-		return oRes
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != 200 {
-		oRes.ErrorCode = resp.StatusCode
-		oRes.ErrorDesc = resp.Status
-	}
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
-		return oRes
-	}
-	//p(string(contents))
-
-	myResult := MyRespEnvelope{}
-	xml.Unmarshal([]byte(contents), &myResult)
-	if resp.StatusCode != 200 {
-		oRes.ErrorCode = 600
-		oRes.ErrorDesc = myResult.Body.Fault.String
-	} else {
-		oRes.ErrorCode = 1
-		oRes.ErrorDesc = "SUCCESS"
-	}
-
-	return oRes
-}

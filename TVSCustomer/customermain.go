@@ -4,7 +4,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -12,29 +11,25 @@ import (
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
-type TVS_Customer_request struct {
-	customer_obj c.Customerinfo
-	Orderno      string
-}
-type TVS_Customer_response struct {
-	customer_obj c.Customerinfo
-	Orderno      string
-	Resultcode   string
-}
-
-func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
+/* func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
 	resulttvsresponse := TVS_Customer_response{}
 	resulttvsresponse.Orderno = tvscustreq.Orderno
 	return resulttvsresponse
+} */
+func index(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Welcome to TVS Customer Restful")
 }
-
 func main() {
-	fmt.Println("start service")
 
-	router := mux.NewRouter()
-	router.HandleFunc("/getcustomerinfo", addTVS).Methods("POST")
+	fmt.Println("start service...")
+	mainRouter := mux.NewRouter().StrictSlash(true)
+	mainRouter.HandleFunc("/tvscustomer", index)
+	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
+	//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
+	//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
+	//	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
 
-	log.Fatal(http.ListenAndServe(":8000", router))
+	log.Fatal(http.ListenAndServe(":8080", mainRouter))
 	//	tvscustreq := TVS_Customer_request{}
 	//	tvscustreq.Orderno="100"
 	// tvscustreq.customer_obj.
@@ -48,7 +43,17 @@ func main() {
 
 }
 
-func addTVS(w http.ResponseWriter, r *http.Request) {
+func getCustomer(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	var cusotmerResult c.CustomerInfo
+
+	cusotmerResult = GetCustomerByCustomerID(params["customerid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cusotmerResult)
+}
+
+/* func addTVS(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -72,4 +77,4 @@ func addTVS(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
-}
+} */
