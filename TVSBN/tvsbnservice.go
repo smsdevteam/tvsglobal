@@ -4,9 +4,9 @@ import (
 	"database/sql"
 	"database/sql/driver"
 
-	"strconv"
 	"fmt"
 	"io"
+	"strconv"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
 
@@ -66,13 +66,15 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		TVSBNP.Oldccbssubno = values[21].(string)
 		TVSBNP.AddSOCLevelOU = values[22].(string)
 		fmt.Println(TVSBNP)
+		TVSBNP.TVSBNCCBSOfferPropertylist= getccbsoffer(TVSBNP.TRNSEQNO)
 	}
 
 	return TVSBNP
 }
-func getccbsoffer(trnseqno string) st.TVSBNProperty{
+func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 	var resultI driver.Rows
-	 
+	var TVSBNCCBSOfferPropertylist []st.TVSBNCCBSOfferProperty
+	var TVSBNCCBSOfferPropertyobj st.TVSBNCCBSOfferProperty
 	var err error
 	cm.ExcutestoreDS("ICC", ` begin tvs_ccbsbn.Get_CCBSOFFER(:p_TRNSEQNO,:p_rs); end; `, trnseqno, sql.Out{Dest: &resultI})
 	defer resultI.Close()
@@ -86,6 +88,28 @@ func getccbsoffer(trnseqno string) st.TVSBNProperty{
 		} else {
 			break
 		}
+	 	TVSBNCCBSOfferPropertyobj.ccbs_offername = values[0].(string)
+		TVSBNCCBSOfferPropertyobj.offerInstanceId = values[1].(string)
+		TVSBNCCBSOfferPropertyobj.processtype =values[2].(string)
+		TVSBNCCBSOfferPropertyobj.action = values[30].(string)
+		TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = values[4].(string)
+		If TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = 1 {
+		TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = values[5].(string)
+			TVSBNCCBSOfferPropertyobj.effective_date =  values[6].(string)
+		}
+
+		//If IsDate(ds.Tables(0).Rows(i)("expirationdate")) Then
+		TVSBNCCBSOfferPropertyobj.expirationdate =  values[0].(string)
+		//End If
+
+		TVSBNCCBSOfferPropertyobj.targetPayChannelId =  values[7].(string)
+		TVSBNCCBSOfferPropertyobj.targetPayChannelId =  values[8].(string)
+		TVSBNCCBSOfferPropertyobj.Override_RC_Amount =  values[9].(string)
+		TVSBNCCBSOfferPropertyobj.Override_RC_Description = values[10].(string)
+		TVSBNCCBSOfferPropertyobj.New_period_ind =  values[11].(string)
+		TVSBNCCBSOfferPropertyobj.extendedinfo_name =  values[12].(string)
+		TVSBNCCBSOfferPropertyobj.extendedinfo_value =  values[13].(string)
+		TVSBNCCBSOfferPropertyobj.ccbs_servicetype =  values[14].(string)
 	}
 
 	return nil

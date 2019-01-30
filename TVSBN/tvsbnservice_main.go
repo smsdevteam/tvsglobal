@@ -19,7 +19,7 @@ func main() {
 	fmt.Println("Service Start...")
 	changepackage(108210979)
 	//mainRouter := mux.NewRouter().StrictSlash(true)
-	//mainRouter.HandleFunc("/tvsbn/getft/{ftid}", getft)
+	//mainRouter.HandleFunc("/tgovsbn/getft/{ftid}", getft)
 	//log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 
