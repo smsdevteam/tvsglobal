@@ -4,11 +4,12 @@ import (
 	"database/sql"
 	"database/sql/driver"
 
-	"strconv"
 	"fmt"
 	"io"
-	cm "tvsglobal/common"
-	st "tvsglobal/tvsstructs"
+	"strconv"
+
+	cm "github.com/smsdevteam/tvsglobal/Common"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
 	_ "gopkg.in/goracle.v2"
 )
@@ -70,9 +71,9 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 
 	return TVSBNP
 }
-func getccbsoffer(trnseqno string) st.TVSBNProperty{
+func getccbsoffer(trnseqno string) st.TVSBNProperty {
 	var resultI driver.Rows
-	 
+
 	var err error
 	cm.ExcutestoreDS("ICC", ` begin tvs_ccbsbn.Get_CCBSOFFER(:p_TRNSEQNO,:p_rs); end; `, trnseqno, sql.Out{Dest: &resultI})
 	defer resultI.Close()
