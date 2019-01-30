@@ -1,8 +1,6 @@
-package struct
+package tvsstructs
 
-import (
-	"fmt"
-)
+ 
 
 // นำเข้า package fmt มาใช้งาน
 
@@ -50,7 +48,7 @@ type Customerinfo struct {
 	ReferrnceNumberIv        string
 	ReferrnceNumberHash      string
 	BirthDateKey             string
-	ENTITY_ID
+	ENTITY_ID                string
 }
 
  
