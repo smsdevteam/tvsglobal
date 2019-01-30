@@ -1,0 +1,16 @@
+{
+    "ICC": {
+        "authen": {
+            "ServiceDSN": "UAT62",
+            "ServiceLocationURL" : "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/ServiceLocation.svc",
+            "ServiceUser": "ICCAPI",
+            "ServiceUserIdentity": "iccdemon@1"
+        },
+        "service": {
+            "agreementURL": "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/AgreementManagement.svc",
+            "authenURL": "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/Authentication.svc",
+            "deviceURL": "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/Devices.svc", 
+            "shippingorderURL" : "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/OrderManagement.svc"
+        }
+    }
+}
