@@ -6,10 +6,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 
-	cm "github.com/smsdevteam/tvsglobal/Common"     // util
 	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
@@ -17,20 +17,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to TVS Device Restful")
 }
 
-func getDeviceBySerialNumber(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	fmt.Println(params["sn"])
-	var odv st.GetDeviceResponse
-	odv = GetDeviceBySerialNumber(params["sn"], params["by"])
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(odv)
-}
-
 func getDeviceData(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	fmt.Println(params["sn"])
-	var odv st.DeviceInfo
-	odv = GetDataSerialNumber(params["sn"])
+	var odv st.Device
+	odv = GetDeviceBySerialNumber(params["sn"])
 	/*var odv st.ResponseResult
 	odv = GetDeviceFromAPI(params["sn"])*/
 
@@ -40,13 +31,17 @@ func getDeviceData(w http.ResponseWriter, r *http.Request) {
 
 func moveDepot(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	var deviceid, depotid, reason int64
-	deviceid = cm.StrToInt64(params["deviceid"])
-	depotid = cm.StrToInt64(params["depottoid"])
-	reason = cm.StrToInt64(params["reason"])
+	//fmt.Println(params["sn"])
+	//fmt.Println(params["depottoid"])
+	//fmt.Println(params["reason"])
+	var sn string
+	var depotid, reason int64
 
+	sn = params["sn"]
+	depotid, _ = strconv.ParseInt(params["depottoid"], 10, 64)
+	reason, _ = strconv.ParseInt(params["reason"], 10, 64)
 	var oRes st.ResponseResult
-	oRes = MoveDevice(deviceid, depotid, reason, params["by"])
+	oRes = MoveDevice(sn, depotid, reason, params["by"])
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(oRes)
@@ -54,12 +49,18 @@ func moveDepot(w http.ResponseWriter, r *http.Request) {
 
 func pairingDevice(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-
+	//fmt.Println(params["sn"])
+	//fmt.Println(params["depottoid"])
+	//fmt.Println(params["reason"])
 	var devicefrom, deviceto, reason int64
-	devicefrom = cm.StrToInt64(params["devicefrom"])
-	deviceto = cm.StrToInt64(params["deviceto"])
-	reason = cm.StrToInt64(params["reason"])
-
+	var odv st.Device
+	odv = GetDeviceBySerialNumber(params["devicefrom"])
+	devicefrom = odv.DeviceID
+	odv = GetDeviceBySerialNumber(params["deviceto"])
+	deviceto = odv.DeviceID
+	reason, _ = strconv.ParseInt(params["reason"], 10, 64)
+	//fmt.Println(devicefrom)
+	//fmt.Println(deviceto)
 	var oRes st.ResponseResult
 	oRes = PairOneDeviceToAnother(devicefrom, deviceto, reason, params["by"])
 
@@ -69,16 +70,21 @@ func pairingDevice(w http.ResponseWriter, r *http.Request) {
 
 func sendCmd(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
+	//fmt.Println(params["sn"])
+	//fmt.Println(params["reason"])
+	var reason int64
 
-	var deviceid, reason int64
-
-	deviceid = cm.StrToInt64(params["deviceid"])
-	reason = cm.StrToInt64(params["reason"])
+	reason, _ = strconv.ParseInt(params["reason"], 10, 64)
 	var oRes st.ResponseResult
-	oRes = SendCommandToDevice(deviceid, reason, params["by"])
+	oRes = SendCommandToDevice(params["sn"], reason, params["by"])
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(oRes)
+}
+
+type NewSNResponse struct {
+	ProcessRes st.ResponseResult `json:"processres"`
+	NewSNRes   []st.NewDeviceRes `json:"newsnres"`
 }
 
 func createNewSN(w http.ResponseWriter, r *http.Request) {
@@ -94,24 +100,25 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	var oRes st.NewDeviceRes
+	var oRes st.ResponseResult
+	var oSNRes []st.NewDeviceRes
 
-	oRes = CreateNewSerialNumber(req)
+	oRes, oSNRes = CreateNewSerialNumber(req)
+	oSNReturn := NewSNResponse{oRes, oSNRes}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(oRes)
+	json.NewEncoder(w).Encode(oSNReturn)
+	//json.NewEncoder(w).Encode(oRes)
 }
 
 func main() {
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsdevice", index)
-	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}/{by}", getDeviceBySerialNumber)
-	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}", getDeviceBySerialNumber)
-	mainRouter.HandleFunc("/tvsdevice/getdevicedata/{sn}", getDeviceData)
-	mainRouter.HandleFunc("/tvsdevice/movedevice/{deviceid}/{depottoid}/{reason}/{by}", moveDepot)
+	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}", getDeviceData)
+	mainRouter.HandleFunc("/tvsdevice/movedevice/{sn}/{depottoid}/{reason}/{by}", moveDepot)
 	mainRouter.HandleFunc("/tvsdevice/paironedevicetoanother/{devicefrom}/{deviceto}/{reason}/{by}", pairingDevice)
-	mainRouter.HandleFunc("/tvsdevice/sendcmdtodevice/{deviceid}/{reason}/{by}", sendCmd)
+	mainRouter.HandleFunc("/tvsdevice/sendcmdtodevice/{sn}/{reason}/{by}", sendCmd)
 	mainRouter.HandleFunc("/tvsdevice/createnewserialnumber", createNewSN).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8081", mainRouter))
