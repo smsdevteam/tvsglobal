@@ -37,11 +37,17 @@ func Connecttodb(profilename string) (*sql.DB, error) {
 	var username = ""
 	var password = ""
 	var connectionstring = ""
+
 	fmt.Print(connectionstring)
 	dbname, username, password, connectionstring = readconfig(profilename)
-	db, err := sql.Open("goracle", username+"/"+password+"@"+dbname)
+	if dbname != " " {
+		db, err := sql.Open("goracle", username+"/"+password+"@"+dbname)
+		return db, err
+	} else {
+		err := fmt.Errorf("Not Found config")
+		return nil, err
+	}
 
-	return db, err
 }
 
 //ExcutestoreDS is function excute sql command
