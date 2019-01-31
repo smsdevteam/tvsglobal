@@ -88,8 +88,13 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		} else {
 			break
 		}
-		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[0].(string)
-		//TVSBNCCBSOfferPropertyobj.OfferInstanceId = values[1].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[4].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[5].(string)
+		TVSBNCCBSOfferPropertyobj.Expirationdate = values[6].(time.Time)
+		TVSBNCCBSOfferPropertyobj.TargetPayChannelID =  values[8].(string)
+		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[9].(string))
+		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[10].(string)
+		
 		TVSBNCCBSOfferPropertyobj.Processtype = values[2].(string)
 		TVSBNCCBSOfferPropertyobj.Action = values[30].(string)
 		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[4].(string))
@@ -99,13 +104,12 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		}
 
 		//If IsDate(ds.Tables(0).Rows(i)("expirationdate")) Then
-		TVSBNCCBSOfferPropertyobj.Expirationdate = values[0].(time.Time)
+		
 		//End If
 
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[7].(string)
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[8].(string)
-		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[9].(string))
-		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[10].(string)
+		
 		TVSBNCCBSOfferPropertyobj.Newperiodind = values[11].(string)
 		TVSBNCCBSOfferPropertyobj.Extendedinfoname = values[12].(string)
 		TVSBNCCBSOfferPropertyobj.Extendedinfovalue = values[13].(string)
