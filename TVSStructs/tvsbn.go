@@ -183,25 +183,25 @@ type TVSBNProperty struct {
 }
 
 type TVSBNCCBSOfferProperty struct {
-	action                   string
-	ccbsoffername            string
-	ccbssocid                string
-	offerInstanceID          string
-	effectivedate            time.Time
-	effectiveDateSpecified   int
-	expirationdate           time.Time
-	processtype              string
-	targetPayChannelID       string
-	OverrideRCAmount         float32
+	Action                   string
+	Ccbsoffername            string
+	Ccbssocid                string
+	OfferInstanceID          string
+	Effectivedate            time.Time
+	EffectiveDateSpecified   int
+	Expirationdate           time.Time
+	Processtype              string
+	TargetPayChannelID       string
+	OverrideRCAmount         float64
 	OverrideRCDescription    string
 	OverrideRCDescriptionEng string
-	OverrideRCSpecified      float32
-	OverrideOCAmount         float32
+	OverrideRCSpecified      float64
+	OverrideOCAmount         float64
 	OverrideOCDescription    string
 	OverrideOCDescriptionEng string
 	OverrideOCSpecified      int
 	Newperiodind             string
-	extendedinfoname         string
-	extendedinfovalue        string
-	ccbsservicetype          string
+	Extendedinfoname         string
+	Extendedinfovalue        string
+	Ecbsservicetype          string
 }

@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"database/sql/driver"
-
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
 
@@ -66,7 +66,7 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		TVSBNP.Oldccbssubno = values[21].(string)
 		TVSBNP.AddSOCLevelOU = values[22].(string)
 		fmt.Println(TVSBNP)
-		TVSBNP.TVSBNCCBSOfferPropertylist= getccbsoffer(TVSBNP.TRNSEQNO)
+		TVSBNP.TVSBNCCBSOfferPropertylist = getccbsoffer(TVSBNP.TRNSEQNO)
 	}
 
 	return TVSBNP
@@ -88,31 +88,36 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		} else {
 			break
 		}
-	 	TVSBNCCBSOfferPropertyobj.ccbs_offername = values[0].(string)
-		TVSBNCCBSOfferPropertyobj.offerInstanceId = values[1].(string)
-		TVSBNCCBSOfferPropertyobj.processtype =values[2].(string)
-		TVSBNCCBSOfferPropertyobj.action = values[30].(string)
-		TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = values[4].(string)
-		If TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = 1 {
-		TVSBNCCBSOfferPropertyobj.effectiveDateSpecified = values[5].(string)
-			TVSBNCCBSOfferPropertyobj.effective_date =  values[6].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[4].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[5].(string)
+		TVSBNCCBSOfferPropertyobj.Expirationdate = values[6].(time.Time)
+		TVSBNCCBSOfferPropertyobj.TargetPayChannelID =  values[8].(string)
+		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[9].(string))
+		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[10].(string)
+		
+		TVSBNCCBSOfferPropertyobj.Processtype = values[2].(string)
+		TVSBNCCBSOfferPropertyobj.Action = values[30].(string)
+		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[4].(string))
+		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
+			TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[5].(string))
+			TVSBNCCBSOfferPropertyobj.Effectivedate = values[6].(time.Time)
 		}
 
 		//If IsDate(ds.Tables(0).Rows(i)("expirationdate")) Then
-		TVSBNCCBSOfferPropertyobj.expirationdate =  values[0].(string)
+		
 		//End If
 
-		TVSBNCCBSOfferPropertyobj.targetPayChannelId =  values[7].(string)
-		TVSBNCCBSOfferPropertyobj.targetPayChannelId =  values[8].(string)
-		TVSBNCCBSOfferPropertyobj.Override_RC_Amount =  values[9].(string)
-		TVSBNCCBSOfferPropertyobj.Override_RC_Description = values[10].(string)
-		TVSBNCCBSOfferPropertyobj.New_period_ind =  values[11].(string)
-		TVSBNCCBSOfferPropertyobj.extendedinfo_name =  values[12].(string)
-		TVSBNCCBSOfferPropertyobj.extendedinfo_value =  values[13].(string)
-		TVSBNCCBSOfferPropertyobj.ccbs_servicetype =  values[14].(string)
+		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[7].(string)
+		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[8].(string)
+		
+		TVSBNCCBSOfferPropertyobj.Newperiodind = values[11].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfoname = values[12].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfovalue = values[13].(string)
+		TVSBNCCBSOfferPropertylist = append(TVSBNCCBSOfferPropertylist, TVSBNCCBSOfferPropertyobj)
+		//TVSBNCCBSOfferPropertyobj.Ccbsservicetype =  values[14].(string)
 	}
 
-	return nil
+	return TVSBNCCBSOfferPropertylist
 }
 func changepackage(customerid int) string {
 	var TVSBNP st.TVSBNProperty
