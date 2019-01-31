@@ -26,6 +26,16 @@ func StrToInt64(iStr string) int64 {
 	}
 	return i
 }
+// StrTofloat64 : Convert string to float   (base 64)
+// error : return 0
+func StrTofloat64(iStr string) float64 {
+	i, err := strconv.ParseFloat(iStr, 64)
+	if err != nil {
+		fmt.Println(err)
+		return 0
+	}
+	return i
+}
 
 // IntToStr : Convert int (base 10) to string
 func IntToStr(iNum int) string {
