@@ -104,6 +104,20 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	fmt.Println("Service Start...")
+
+	// var tRes st.ResponseResult
+	tRes := st.NewResponseResult()
+	log.Println(*tRes)
+	tRes.ErrorCode = 0
+	tRes.ErrorDesc = "TEST"
+	log.Println(*tRes)
+
+	var nRes st.ResponseResult
+	log.Println(nRes)
+	nRes.ErrorCode = 100
+	nRes.ErrorDesc = "Test#2"
+	log.Println(nRes)
+
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsdevice", index)
 	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}/{by}", getDeviceBySerialNumber)

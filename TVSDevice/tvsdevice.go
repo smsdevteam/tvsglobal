@@ -408,7 +408,7 @@ func GetDeviceBySerialNumber(iSN string, iExtAgent string) st.GetDeviceResponse 
 	sn.WarrantyEndDate = myRes.Body.ResponseGetDevice.GetDeviceResult.WarrantyEndDate
 	p(sn)
 
-	oRes.ErrorCode = 1
+	oRes.ErrorCode = 0
 	oRes.ErrorDesc = "SUCCESS"
 	result.ProcessResult = oRes
 	result.DeviceResult = sn
@@ -569,7 +569,7 @@ func MoveDevice(ideviceid int64, idepotto int64, reasonnr int64, byusername stri
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 	}
 
@@ -637,7 +637,7 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 	}
 
@@ -784,7 +784,7 @@ func CreateStockReceiveDetails(requestHD string, url string, iST st.StockReceive
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
 		stockrecid = cm.StrToInt(myResult.Body.ResponseCreateStockRecv.CreateStockReceiveDetailsResult.ID)
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 		oRes.CustomNum = stockrecid
 	}
@@ -868,7 +868,7 @@ func CreateBuildList(requestHD string, url string, iST st.StockReceiveDetails, r
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
 		buildlstid = cm.StrToInt(myResult.Body.ResponseCreateBuildList.CreateBuildListResult.ID)
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 		oRes.CustomNum = buildlstid
 	}
@@ -937,7 +937,7 @@ func AddDeviceToBuildListManually(requestHD string, url string, buildlstid int64
 			oRes.ErrorDesc = myResult.Body.ResponseAddDeviceToBuildList.AddDeviceToBuildListManuallyResult.Error
 			return oRes
 		} else {
-			oRes.ErrorCode = 1
+			oRes.ErrorCode = 0
 			oRes.ErrorDesc = "SUCCESS"
 		}
 	}
@@ -997,7 +997,7 @@ func PerformBuildListAction(requestHD string, url string, buildlstid int64, byus
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 		oRes.CustomNum = cm.StrToInt(myResult.Body.ResponsePerformBuildList.PerformBuildListActionResult.ID)
 	}
@@ -1259,7 +1259,7 @@ func ReceiveExchangeDevice(requestHD string, url string, iReq st.ReceiveExchange
 		oRes.ErrorCode = 600
 		oRes.ErrorDesc = myResult.Body.Fault.String
 	} else {
-		oRes.ErrorCode = 1
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 	}
 
