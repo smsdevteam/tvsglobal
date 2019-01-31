@@ -3,10 +3,10 @@ package main
 import (
 	"database/sql"
 	"database/sql/driver"
-	"time"
 	"fmt"
 	"io"
 	"strconv"
+	"time"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
 
@@ -66,7 +66,7 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		TVSBNP.Oldccbssubno = values[21].(string)
 		TVSBNP.AddSOCLevelOU = values[22].(string)
 		fmt.Println(TVSBNP)
-		TVSBNP.TVSBNCCBSOfferPropertylist= getccbsoffer(TVSBNP.TRNSEQNO)
+		TVSBNP.TVSBNCCBSOfferPropertylist = getccbsoffer(TVSBNP.TRNSEQNO)
 	}
 
 	return TVSBNP
@@ -88,31 +88,32 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		} else {
 			break
 		}
-	 	TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[0].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[0].(string)
 		//TVSBNCCBSOfferPropertyobj.OfferInstanceId = values[1].(string)
-		TVSBNCCBSOfferPropertyobj.Processtype =values[2].(string)
+		TVSBNCCBSOfferPropertyobj.Processtype = values[2].(string)
 		TVSBNCCBSOfferPropertyobj.Action = values[30].(string)
-		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt( values[4].(string))
+		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[4].(string))
 		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
-			TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified =cm.StrToInt( values[5].(string))
-			TVSBNCCBSOfferPropertyobj.Effectivedate =  values[6].(time.Time)
+			TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[5].(string))
+			TVSBNCCBSOfferPropertyobj.Effectivedate = values[6].(time.Time)
 		}
 
 		//If IsDate(ds.Tables(0).Rows(i)("expirationdate")) Then
-		TVSBNCCBSOfferPropertyobj.Expirationdate =  values[0].(time.Time)
+		TVSBNCCBSOfferPropertyobj.Expirationdate = values[0].(time.Time)
 		//End If
 
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[7].(string)
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[8].(string)
-		TVSBNCCBSOfferPropertyobj.OverrideRCAmount =cm.StrTofloat64 (values[9].(string))
+		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[9].(string))
 		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[10].(string)
-		TVSBNCCBSOfferPropertyobj.Newperiodind =  values[11].(string)
-		TVSBNCCBSOfferPropertyobj.Extendedinfoname =  values[12].(string)
-		TVSBNCCBSOfferPropertyobj.Extendedinfovalue =  values[13].(string)
+		TVSBNCCBSOfferPropertyobj.Newperiodind = values[11].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfoname = values[12].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfovalue = values[13].(string)
+		TVSBNCCBSOfferPropertylist = append(TVSBNCCBSOfferPropertylist, TVSBNCCBSOfferPropertyobj)
 		//TVSBNCCBSOfferPropertyobj.Ccbsservicetype =  values[14].(string)
 	}
 
-	return nil
+	return TVSBNCCBSOfferPropertylist
 }
 func changepackage(customerid int) string {
 	var TVSBNP st.TVSBNProperty
