@@ -85,7 +85,7 @@ func updateNote(w http.ResponseWriter, r *http.Request) {
 	//log.Println(req)
 
 	var res st.UpdateNoteResponse
-	oLNote = append(oLNote, oNote)
+	//oLNote = append(oLNote, oNote)
 	res = UpdateNote(req)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
