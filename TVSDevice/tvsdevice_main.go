@@ -105,11 +105,11 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fmt.Println("Service Start...")
 
-	tRes := st.NewResponseResult()
-	log.Println(*tRes)
-	tRes.ErrorCode = 0
-	tRes.ErrorDesc = "TEST"
-	log.Println(*tRes)
+	// tRes := st.NewResponseResult()
+	// log.Println(*tRes)
+	// tRes.ErrorCode = 0
+	// tRes.ErrorDesc = "TEST"
+	// log.Println(*tRes)
 
 	// var nRes st.ResponseResult
 	// log.Println(nRes)
