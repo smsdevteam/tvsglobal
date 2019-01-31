@@ -16,7 +16,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Service Start...oood")
+	fmt.Println("Service Start...ood")
 	changepackage(108210979)
 	//mainRouter := mux.NewRouter().StrictSlash(true)
 	//mainRouter.HandleFunc("/tgovsbn/getft/{ftid}", getft)
