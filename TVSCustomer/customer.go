@@ -77,8 +77,9 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
-	var dbsource string 
-	 dbsource =  cm.GetDatasourceName("ICC") 
+	//var dbsource string 
+	
+	dbsource :=  cm.GetDatasourceName("ICC") 
 	 
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
