@@ -79,7 +79,7 @@ type updateNoteResult struct {
 }
 
 // GetNoteByNoteID get info
-func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
+func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -91,10 +91,10 @@ func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "GetNote"
 	l.Request = "NoteID=" + iNoteID
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
 
-	var oRes st.GetNoteResult
+	oRes := st.NewGetNoteResult()
 	var oNote st.Note
 
 	var dbsource string
@@ -169,8 +169,8 @@ func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
 	}
 
 	oRes.MyNote = oNote
-	if oRes.ErrorCode == 0 {
-		oRes.ErrorCode = 1
+	if oRes.ErrorCode == 1 {
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "Success"
 	}
 
@@ -182,8 +182,8 @@ func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
 	l.FunctionName = "GetNote"
 	l.Request = "NoteID=" + iNoteID
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
 	//test
@@ -191,7 +191,7 @@ func GetNoteByNoteID(iNoteID string) st.GetNoteResult {
 }
 
 // get list note by customer id
-func GetListNoteByCustomerID(iCustomerID string) st.GetListNoteResult {
+func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -203,10 +203,10 @@ func GetListNoteByCustomerID(iCustomerID string) st.GetListNoteResult {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "GetListNoteByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 
-	var oRes st.GetListNoteResult
+	oRes := st.NewGetListNoteResult()
 	var oListNote st.ListNote
 	var dbsource string
 	dbsource = cm.GetDatasourceName("ICC")
@@ -281,8 +281,8 @@ func GetListNoteByCustomerID(iCustomerID string) st.GetListNoteResult {
 		}
 	}
 	oRes.MyListNote = oListNote
-	if oRes.ErrorCode == 0 {
-		oRes.ErrorCode = 1
+	if oRes.ErrorCode == 1 {
+		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "Success"
 	}
 
@@ -294,30 +294,13 @@ func GetListNoteByCustomerID(iCustomerID string) st.GetListNoteResult {
 	l.FunctionName = "GetListNoteByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 	//test
 	return oRes
 }
-
-// Device : ICC API
-const getTemplateAuthenHD = `<s:Header>
-  <h:CacheControlHeader i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://ibs.entriq.net/Core" />
-  <h:AuthenticationHeader xmlns:i="http://www.w3.org/2001/XMLSchema-instance" xmlns:h="http://ibs.entriq.net/Security">
-	<h:ClientName i:nil="true" />
-	<h:ClientProof i:nil="true" />
-	<h:Culture i:nil="true" />
-	<h:Dsn>$dsn</h:Dsn>
-	<h:Extended i:nil="true" />
-	<h:ExternalAgent i:nil="true" />
-	<h:Proof>$password</h:Proof>
-	<h:ServerTime>$servicetime</h:ServerTime>
-	<h:Token>$token</h:Token>
-	<h:UserName>$username</h:UserName>
-  </h:AuthenticationHeader>
-</s:Header>`
 
 const getTemplateforCreateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 <s:Body>
@@ -345,7 +328,7 @@ const getTemplateforCreateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 </s:Envelope>`
 
 //CreateNote for icc microservice
-func CreateNote(iReq st.CreateNoteRequest) st.CreateNoteResponse {
+func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	// Log#Start
 	var l cm.Applog
@@ -358,10 +341,10 @@ func CreateNote(iReq st.CreateNoteRequest) st.CreateNoteResponse {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "CreateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 
-	var oRes st.CreateNoteResponse
+	oRes := st.NewCreateNoteResponse()
 	var AppServiceLnk cm.AppServiceURL
 	AppServiceLnk = cm.AppReadConfig("ENH")
 
@@ -444,8 +427,8 @@ func CreateNote(iReq st.CreateNoteRequest) st.CreateNoteResponse {
 	l.FunctionName = "CreateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 	return oRes
@@ -476,6 +459,7 @@ const getTemplateforUpdateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 </s:Body>
 </s:Envelope>`
 
+// UpdateNote to
 func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	// Log#Start
 	var l cm.Applog
@@ -488,7 +472,7 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "UpdateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	var oRes st.UpdateNoteResponse
@@ -571,8 +555,8 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	l.FunctionName = "UpdateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 

@@ -28,9 +28,9 @@ func main() {
 
 func getContact(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	fmt.Println(params["contactid"])
+	//fmt.Println(params["contactid"])
 
-	var contactResult st.GetContactResponse
+	var contactResult *st.GetContactResponse
 
 	contactResult = GetContactByContactID(params["contactid"])
 	w.Header().Set("Content-Type", "application/json")
@@ -39,9 +39,9 @@ func getContact(w http.ResponseWriter, r *http.Request) {
 
 func getContactList(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	fmt.Println(params["customerid"])
+	//fmt.Println(params["customerid"])
 
-	var lContactResult st.ListContact
+	var lContactResult *st.ListContact
 
 	lContactResult = GetContactListByCustomerID(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")

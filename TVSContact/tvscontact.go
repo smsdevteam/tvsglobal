@@ -125,7 +125,7 @@ const getTemplateforGetContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 </s:Envelope>`
 
 // GetContactByContactID get info
-func GetContactByContactID(iContactID string) st.GetContactResponse {
+func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -140,7 +140,7 @@ func GetContactByContactID(iContactID string) st.GetContactResponse {
 	l.Start = t0.String()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContact")
 
-	var oRes st.GetContactResponse
+	oRes := st.NewGetContactResponse()
 	var oContact st.Contact
 	var AppServiceLnk cm.AppServiceURL
 	AppServiceLnk = cm.AppReadConfig("ENH")
@@ -231,7 +231,7 @@ func GetContactByContactID(iContactID string) st.GetContactResponse {
 	oContact.WorkOrderID, _ = strconv.ParseInt((myResult.Body.VGetContactResponse.VGetContactResult.WorkOrderID), 10, 64)
 
 	oRes.GetContactResult = oContact
-	oRes.ErrorCode = 1
+	oRes.ErrorCode = 0
 	oRes.ErrorDesc = "Success"
 
 	// Log#Stop
@@ -250,7 +250,7 @@ func GetContactByContactID(iContactID string) st.GetContactResponse {
 }
 
 //GetContactListByCustomerID for find Contacts by Customer
-func GetContactListByCustomerID(iCustomerID string) st.ListContact {
+func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 
 	// Log#Start
 	var l cm.Applog
@@ -267,7 +267,7 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContactListByCustomerID")
 
 	//log.Println("getContactList")
-	var oLContact st.ListContact
+	oLContact := st.NewListContactResponse()
 	var dbsource string
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
@@ -391,7 +391,7 @@ func GetContactListByCustomerID(iCustomerID string) st.ListContact {
 				oContacts = append(oContacts, oContact)
 			}
 			oLContact.Contacts = oContacts
-			oLContact.ErrorCode = 1
+			oLContact.ErrorCode = 0
 			oLContact.ErrorDesc = "Success"
 		}
 	}

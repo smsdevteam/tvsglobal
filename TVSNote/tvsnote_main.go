@@ -30,7 +30,7 @@ func getNote(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	//fmt.Println(params["noteid"])
 
-	var noteResult st.GetNoteResult
+	var noteResult *st.GetNoteResult
 
 	noteResult = GetNoteByNoteID(params["noteid"])
 	w.Header().Set("Content-Type", "application/json")
@@ -41,7 +41,7 @@ func getListNote(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	//fmt.Println(params["noteid"])
 
-	var listNoteResult st.GetListNoteResult
+	var listNoteResult *st.GetListNoteResult
 
 	listNoteResult = GetListNoteByCustomerID(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
@@ -50,7 +50,7 @@ func getListNote(w http.ResponseWriter, r *http.Request) {
 
 func createNote(w http.ResponseWriter, r *http.Request) {
 
-	body, err := ioutil.ReadAll(r.Body) 
+	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
 	}
@@ -63,7 +63,7 @@ func createNote(w http.ResponseWriter, r *http.Request) {
 
 	//log.Println(req)
 
-	var res st.CreateNoteResponse
+	var res *st.CreateNoteResponse
 	res = CreateNote(req)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
