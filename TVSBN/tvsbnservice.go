@@ -9,10 +9,17 @@ import (
 	"time"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
-
+	
 	_ "gopkg.in/goracle.v2"
 )
+func getomxorderinfo(TVSBNP st.TVSBNProperty){
+	var resultI driver.Rows
+	cm.ExcutestoreDS("ICC", ` Begin  tvs_ccbsbn.get_orderinfo(:p_trnseqno,
+	:p_suhistorno,:p_ccbsfnname,:p_ccbbssubfn,:p_rs); 
+	end;`,TVSBNP.TRNSEQNO,0,TVSBNP.CCBSFN,TVSBNP.CCBSSUBFN, sql.Out{Dest: &resultI})
 
+	
+}
 func preparejobdata(customerid int, ccbsfn string) string {
 	var trnseqno string
 	cm.ExcutestoreDS("ICC", ` begin :result := tvs_goccbsbn.create_omxjob(:p_custno,
@@ -88,21 +95,20 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		} else {
 			break
 		}
-		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[4].(string)
-		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[5].(string)
-		TVSBNCCBSOfferPropertyobj.Expirationdate = values[6].(time.Time)
-		TVSBNCCBSOfferPropertyobj.TargetPayChannelID =  values[8].(string)
-		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[9].(string))
-		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[10].(string)
 		
-		TVSBNCCBSOfferPropertyobj.Processtype = values[2].(string)
-		TVSBNCCBSOfferPropertyobj.Action = values[30].(string)
-		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[4].(string))
-		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
-			TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[5].(string))
-			TVSBNCCBSOfferPropertyobj.Effectivedate = values[6].(time.Time)
+		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[3].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[4].(string)
+		TVSBNCCBSOfferPropertyobj.Expirationdate = values[5].(time.Time)
+		TVSBNCCBSOfferPropertyobj.TargetPayChannelID = values[7].(int64) 
+		if values[8].(int64)>0{
+		TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[8].(string))
+		TVSBNCCBSOfferPropertyobj.OverrideRCDescription = values[9].(string)
 		}
-
+		TVSBNCCBSOfferPropertyobj.Processtype = values[10].(string)
+		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = values[11].(int64) 
+		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
+		 	TVSBNCCBSOfferPropertyobj.Effectivedate = values[12].(time.Time)
+		}
 		//If IsDate(ds.Tables(0).Rows(i)("expirationdate")) Then
 		
 		//End If
@@ -110,9 +116,10 @@ func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[7].(string)
 		//TVSBNCCBSOfferPropertyobj.TargetPayChannelId =  values[8].(string)
 		
-		TVSBNCCBSOfferPropertyobj.Newperiodind = values[11].(string)
-		TVSBNCCBSOfferPropertyobj.Extendedinfoname = values[12].(string)
-		TVSBNCCBSOfferPropertyobj.Extendedinfovalue = values[13].(string)
+		TVSBNCCBSOfferPropertyobj.Newperiodind = values[14].(string)
+		TVSBNCCBSOfferPropertyobj.Action = values[15].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfoname = values[16].(string)
+		TVSBNCCBSOfferPropertyobj.Extendedinfovalue = values[17].(string)
 		TVSBNCCBSOfferPropertylist = append(TVSBNCCBSOfferPropertylist, TVSBNCCBSOfferPropertyobj)
 		//TVSBNCCBSOfferPropertyobj.Ccbsservicetype =  values[14].(string)
 	}

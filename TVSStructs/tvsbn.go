@@ -188,10 +188,10 @@ type TVSBNCCBSOfferProperty struct {
 	Ccbssocid                string
 	OfferInstanceID          string
 	Effectivedate            time.Time
-	EffectiveDateSpecified   int
+	EffectiveDateSpecified   int64
 	Expirationdate           time.Time
 	Processtype              string
-	TargetPayChannelID       string
+	TargetPayChannelID       int64
 	OverrideRCAmount         float64
 	OverrideRCDescription    string
 	OverrideRCDescriptionEng string
@@ -199,7 +199,7 @@ type TVSBNCCBSOfferProperty struct {
 	OverrideOCAmount         float64
 	OverrideOCDescription    string
 	OverrideOCDescriptionEng string
-	OverrideOCSpecified      int
+	OverrideOCSpecified      int64
 	Newperiodind             string
 	Extendedinfoname         string
 	Extendedinfovalue        string
