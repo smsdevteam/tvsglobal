@@ -18,7 +18,7 @@ type DatabaseInfo struct {
 func DBReadConfig(profilename string) DatabaseInfo {
 	var dbInfo DatabaseInfo
 	config.Load(file.NewSource(
-		file.WithPath("../dbconfig.json"),
+		file.WithPath("../common/dbconfig.json"),
 	))
 
 	dbInfo.DBName = config.Get("hosts", profilename, "dbname").String("")
