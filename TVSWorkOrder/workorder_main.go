@@ -29,9 +29,9 @@ func main() {
 func getWorkorder(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	var cusotmerResult c.CustomerInfo
+	var workorderResult c.WorkorderInfo
 
-	cusotmerResult = GetWorkorderByCustomerID(params["customerid"])
+	workorderResult = GetWorkorderByCustomerID(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(cusotmerResult)
+	json.NewEncoder(w).Encode(workorderResult)
 }

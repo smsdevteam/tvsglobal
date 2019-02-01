@@ -12,7 +12,6 @@ import (
 
 	cm "github.com/smsdevteam/tvsglobal/common" //db
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
- 
 )
 
 var p = fmt.Println
@@ -75,7 +74,7 @@ func GetWorkorderByCustomerID(iCustomerID string) c.WorkorderInfo {
 	} else {
 		defer db.Close()
 		var statement string
-		statement = "begin TVS_customer.getCustomerINFO(:0,:1); end;"
+		statement = "begin tvs_manualupdate.getworkorderbycustomerid(:0,:1); end;"
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
@@ -101,10 +100,9 @@ func GetWorkorderByCustomerID(iCustomerID string) c.WorkorderInfo {
 				//var oCustomer c.CustomerInfo
 				if values[0] != nil {
 					oWorkorderinfo.ID = values[0].(string)
-				}
-				oWorkorderinfo. = values[0].(string) 
+				} 
 			}
 		}
 	}
-	return ocustomerInfo
+	return oWorkorderinfo
 }
