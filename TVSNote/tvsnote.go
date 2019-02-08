@@ -53,7 +53,7 @@ type createNoteResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
-// MyRespEnvelope for UpdateNote
+// MyRespEnvelopeUpdateNote for UpdateNote
 type MyRespEnvelopeUpdateNote struct {
 	XMLName xml.Name       `xml:"Envelope"`
 	Body    bodyUpdateNote `xml:"Body"`
@@ -130,6 +130,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
 			for {
+
+				colmap := CreateMapCol(resultC.Columns())
+				//log.Println(colmap)
+
 				err = resultC.Next(values)
 				if err != nil {
 					if err == io.EOF {
@@ -142,25 +146,25 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 					return oRes
 				}
 
-				if values[0] != nil {
-					oNote.CustomerID = values[0].(int64)
+				if values[colmap["CUSTOMER_ID"]] != nil {
+					oNote.CustomerID = values[colmap["CUSTOMER_ID"]].(int64)
 				}
-				if values[1] != nil {
-					oNote.CreatedByUserID = values[1].(int64)
+				if values[colmap["CREATED_BY_USER_ID"]] != nil {
+					oNote.CreatedByUserID = values[colmap["CREATED_BY_USER_ID"]].(int64)
 				}
-				if values[2] != nil {
-					oNote.ActionUserID = values[2].(int64)
+				if values[colmap["ACTION_USER_ID"]] != nil {
+					oNote.ActionUserID = values[colmap["ACTION_USER_ID"]].(int64)
 				}
 
-				oNote.CategoryID = values[3].(string)
-				oNote.CompletionStageID = values[4].(string)
-				oNote.Body = values[5].(string)
+				oNote.CategoryID = values[colmap["CATEGORY_ID"]].(string)
+				oNote.CompletionStageID = values[colmap["COMPLETION_STAGE_ID"]].(string)
+				oNote.Body = values[colmap["BODY"]].(string)
 
 				if values[6] != nil {
-					oNote.NoteID = values[6].(int64)
+					oNote.NoteID = values[colmap["ID"]].(int64)
 				}
 				if values[7] != nil {
-					oNote.CreateDateTime = values[7].(time.Time)
+					oNote.CreateDateTime = values[colmap["CREATE_DATETIME"]].(time.Time)
 				}
 			}
 
@@ -190,7 +194,7 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	return oRes
 }
 
-// get list note by customer id
+//GetListNoteByCustomerID get list note by customer id
 func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	// Log#Start
 	var l cm.Applog
@@ -241,6 +245,9 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 			values := make([]driver.Value, len(resultC.Columns()))
 			var oLNote []st.Note
 			for {
+
+				colmap := CreateMapCol(resultC.Columns())
+
 				err = resultC.Next(values)
 				if err != nil {
 					if err == io.EOF {
@@ -254,25 +261,25 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 				}
 				var oNote st.Note
 
-				if values[0] != nil {
-					oNote.CustomerID = values[0].(int64)
+				if values[colmap["CUSTOMER_ID"]] != nil {
+					oNote.CustomerID = values[colmap["CUSTOMER_ID"]].(int64)
 				}
-				if values[1] != nil {
-					oNote.CreatedByUserID = values[1].(int64)
+				if values[colmap["CREATED_BY_USER_ID"]] != nil {
+					oNote.CreatedByUserID = values[colmap["CREATED_BY_USER_ID"]].(int64)
 				}
-				if values[2] != nil {
-					oNote.ActionUserID = values[2].(int64)
+				if values[colmap["ACTION_USER_ID"]] != nil {
+					oNote.ActionUserID = values[colmap["ACTION_USER_ID"]].(int64)
 				}
 
-				oNote.CategoryID = values[3].(string)
-				oNote.CompletionStageID = values[4].(string)
-				oNote.Body = values[5].(string)
+				oNote.CategoryID = values[colmap["CATEGORY_ID"]].(string)
+				oNote.CompletionStageID = values[colmap["COMPLETION_STAGE_ID"]].(string)
+				oNote.Body = values[colmap["BODY"]].(string)
 
 				if values[6] != nil {
-					oNote.NoteID = values[6].(int64)
+					oNote.NoteID = values[colmap["ID"]].(int64)
 				}
 				if values[7] != nil {
-					oNote.CreateDateTime = values[7].(time.Time)
+					oNote.CreateDateTime = values[colmap["CREATE_DATETIME"]].(time.Time)
 				}
 
 				oLNote = append(oLNote, oNote)
@@ -561,4 +568,14 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	return oRes
+}
+
+//CreateMapCol for use column name to point
+func CreateMapCol(data []string) map[string]int {
+	var colmap = map[string]int{}
+
+	for k, v := range data {
+		colmap[v] = k
+	}
+	return colmap
 }

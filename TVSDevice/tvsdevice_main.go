@@ -117,6 +117,8 @@ func main() {
 	// nRes.ErrorDesc = "Test#2"
 	// log.Println(nRes)
 
+	//log.Println("Waiting...")
+
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsdevice", index)
 	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}/{by}", getDeviceBySerialNumber)
@@ -128,4 +130,5 @@ func main() {
 	mainRouter.HandleFunc("/tvsdevice/createnewserialnumber", createNewSN).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8081", mainRouter))
+
 }

@@ -5,7 +5,6 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"encoding/xml"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -21,7 +20,7 @@ import (
 	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
-var p = fmt.Println
+var p = log.Println
 
 // MyRespEnvelope
 type MyRespEnvelope struct {
