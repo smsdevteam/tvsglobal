@@ -1,8 +1,12 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/xml"
+	"errors"
+	"io/ioutil"
 
 	//"fmt"
 	"io"
@@ -12,6 +16,8 @@ import (
 	st "tvsglobal/tvsstructs"
 
 	//"github.com/jmoiron/sqlx"
+	"net/http"
+
 	_ "gopkg.in/goracle.v2"
 )
 
@@ -57,7 +63,7 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		} else {
 			break
 		}
-		TVSBNP.TRNSEQNO =values[cm.Getcolindex(colmap,"TRNSEQNO")].(string)// values[colmap["TRNSEQNO"]].(string)
+		TVSBNP.TRNSEQNO = values[cm.Getcolindex(colmap, "TRNSEQNO")].(string) // values[colmap["TRNSEQNO"]].(string)
 		TVSBNP.CCBSorderno = values[colmap["CCBS_ORDERNO"]].(string)
 		custno, err := strconv.Atoi(values[colmap["TVS_CUSTOMERNO"]].(string)) // strconv.ParseInt( values[2].(string), 10, 64)
 		if err != nil {
@@ -144,8 +150,13 @@ func changepackage(customerid int) string {
 	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
 	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
 	omxRequest = mappingvalueomx(TVSBNP)
-	print(omxRequest.Text)
+	print(omxRequest.Customer.CustomerId.Text)
+	result,err :=inboundtoomx(TVSBNP,omxRequest)
+	if err==nil{
+	print(result)
+	}
 	return TVSBNP.TRNSEQNO
+
 }
 func mappingvalueomx(TVSBNP st.TVSBNProperty) st.SubmitOrderOpRequest {
 	var omxreq st.SubmitOrderOpRequest
@@ -171,6 +182,35 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		//append(omxreq.Customer.OU.Subscriber.Offers,offer)
 	}
 
+}
+func inboundtoomx(TVSBNP st.TVSBNProperty, omxreq st.SubmitOrderOpRequest) (string, error) {
+	url := TVSBNP.CCBSURLSERVICE
+	client := &http.Client{}
+	output, err := xml.MarshalIndent(omxreq, "  ", "    ")
+	a := string(output)
+	requestContent := []byte(a)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Add("SOAPAction", `"http://services.omx.truecorp.co.th/SubmitOrder"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		return "", errors.New("Error Respose " + resp.Status)
+	}
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	return string(contents), nil
 }
 func getftid(ftid string) st.FinancialTransaction {
 	var ftobj st.FinancialTransaction
