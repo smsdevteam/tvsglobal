@@ -44,10 +44,26 @@ type ListContact struct {
 	ErrorDesc string    `json:"errordesc"`
 }
 
+// NewListContactResponse Obj
+func NewListContactResponse() *ListContact {
+	return &ListContact{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
+
 type GetContactResponse struct {
 	GetContactResult Contact `xml:"GetContactResult" json:"GetContactResult"`
 	ErrorCode        int     `json:"errorcode"`
 	ErrorDesc        string  `json:"errordesc"`
+}
+
+// NewGetContactResponse Obj
+func NewGetContactResponse() *GetContactResponse {
+	return &GetContactResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
 }
 
 type ContactXML struct {

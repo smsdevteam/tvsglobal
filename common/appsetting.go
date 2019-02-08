@@ -13,7 +13,7 @@ func AppReadConfig(profilename string) AppServiceURL {
 
 	var appServiceURL AppServiceURL
 	config.Load(file.NewSource(
-		file.WithPath("../appconfig.json"),
+		file.WithPath("../common/appconfig.json"),
 	))
 
 	appServiceURL.ICCServiceURL = config.Get(profilename, "service", "iccServiceURL").String("")
