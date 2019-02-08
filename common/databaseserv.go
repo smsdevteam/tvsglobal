@@ -172,7 +172,7 @@ func Getcolindex(colmap map[string]int, colname string) int {
 	}
 
 }
-func createmapcol(data []string) map[string]int {
+func Createmapcol(data []string) map[string]int {
 	var colmap = map[string]int{}
 
 	for k, v := range data {
