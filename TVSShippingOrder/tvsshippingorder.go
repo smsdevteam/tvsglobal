@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strconv"
 	s "strings"
 	"time"
 
@@ -339,7 +338,7 @@ func CreateShippingOrder(iSO st.ShippingOrderReq) (st.ResponseResult, st.Shippin
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.Fault.Code)
+	oRes.ErrorCode = cm.StrToInt(myResult.Body.Fault.Code)
 	oRes.ErrorDesc = myResult.Body.Fault.String
 
 	return oRes, oSORes
@@ -419,7 +418,7 @@ func CancelShippingOrder(soid int64, reasonnr int64, byusername string) st.Respo
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.Fault.Code)
+	oRes.ErrorCode = cm.StrToInt(myResult.Body.Fault.Code)
 	oRes.ErrorDesc = myResult.Body.Fault.String
 
 	return oRes
