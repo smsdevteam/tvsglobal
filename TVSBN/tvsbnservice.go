@@ -57,7 +57,7 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		} else {
 			break
 		}
-		TVSBNP.TRNSEQNO = values[colmap["TRNSEQNO"]].(string)
+		TVSBNP.TRNSEQNO =values[cm.Getcolindex(colmap,"TRNSEQNO")].(string)// values[colmap["TRNSEQNO"]].(string)
 		TVSBNP.CCBSorderno = values[colmap["CCBS_ORDERNO"]].(string)
 		custno, err := strconv.Atoi(values[colmap["TVS_CUSTOMERNO"]].(string)) // strconv.ParseInt( values[2].(string), 10, 64)
 		if err != nil {
