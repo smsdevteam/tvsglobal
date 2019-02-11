@@ -107,7 +107,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 	var TVSBNCCBSOfferPropertylist []st.TVSBNCCBSOfferProperty
 	var TVSBNCCBSOfferPropertyobj st.TVSBNCCBSOfferProperty
 	var err error
-	if TVSBNP.CCBSSubNo > 0 {
+	if TVSBNP.CCBSSubNo != "0" {
 		tg.Getccbssubinfo(TVSBNP.CCBSSubNo)
 	}
 	cm.ExcutestoreDS("ICC", ` begin tvs_ccbsbn.Get_CCBSOFFER(:p_TRNSEQNO,:p_rs); end; `, TVSBNP.TRNSEQNO, sql.Out{Dest: &resultI})
