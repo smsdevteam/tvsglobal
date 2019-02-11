@@ -6,11 +6,12 @@ import (
 	"database/sql/driver"
 	"encoding/xml"
 	"errors"
+	"fmt"
 	"io/ioutil"
 
 	//"fmt"
 	"io"
-	"strconv"
+	//"strconv"
 	"time"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
@@ -65,10 +66,10 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		}
 		TVSBNP.TRNSEQNO = values[cm.Getcolindex(colmap, "TRNSEQNO")].(string) // values[colmap["TRNSEQNO"]].(string)
 		TVSBNP.CCBSorderno = values[colmap["CCBS_ORDERNO"]].(string)
-		custno, err := strconv.Atoi(values[colmap["TVS_CUSTOMERNO"]].(string)) // strconv.ParseInt( values[2].(string), 10, 64)
-		if err != nil {
-			TVSBNP.TVSCUSTOMERNO = custno
-		}
+		//custno, err := strconv.Atoi(values[colmap["TVS_CUSTOMERNO"]].(string)) // strconv.ParseInt( values[2].(string), 10, 64)
+		//if err != nil {
+		//	TVSBNP.TVSCUSTOMERNO = custno
+		//	}
 
 		TVSBNP.TVSAccountno = values[colmap["TVS_ACCOUNTNO"]].(string)
 		TVSBNP.SHNO = values[colmap["SHNO"]].(string)
@@ -92,6 +93,8 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		TVSBNP.AddSOCLevelOU = values[colmap["ADDSOC_LEVEL_OU"]].(string)
 		TVSBNP.TVSBNOMXPropertyobj.Channel = values[colmap["CHANNEL"]].(string)
 		TVSBNP.TVSBNOMXPropertyobj.DealerCode = values[colmap["DEALERCODE"]].(string)
+		TVSBNP.TVSBNOMXPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[colmap["EFFECTIVEDATESPECIFIED"]].(string))
+		TVSBNP.TVSBNOMXPropertyobj.EffectiveDate = values[colmap["EFFECTIVEDATE"]].(string)
 
 		TVSBNP.TVSBNCCBSOfferPropertylist = getccbsoffer(TVSBNP.TRNSEQNO)
 	}
@@ -149,11 +152,12 @@ func changepackage(customerid int) string {
 	TVSBNP.CCBSFN = "CHANGEPACKAGE"
 	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
 	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
+	TVSBNP.TVSCUSTOMERNO = customerid
 	omxRequest = mappingvalueomx(TVSBNP)
 	print(omxRequest.Customer.CustomerId.Text)
-	result,err :=inboundtoomx(TVSBNP,omxRequest)
-	if err==nil{
-	print(result)
+	result, err := inboundtoomx(TVSBNP, omxRequest)
+	if err == nil {
+		print(result)
 	}
 	return TVSBNP.TRNSEQNO
 
@@ -161,9 +165,25 @@ func changepackage(customerid int) string {
 func mappingvalueomx(TVSBNP st.TVSBNProperty) st.SubmitOrderOpRequest {
 	var omxreq st.SubmitOrderOpRequest
 	//
+	mappingvalueomxorderinfo(TVSBNP, &omxreq)
 	mappingvalueomxexistingsub(TVSBNP, &omxreq)
 	mappingvalueomxoffer(TVSBNP, &omxreq)
 	return omxreq
+}
+func mappingvalueomxorderinfo(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpRequest) {
+	omxreq.S = "http://services.omx.truecorp.co.th/SubmitOrder"
+	omxreq.SE = "http://schemas.xmlsoap.org/soap/envelope/"
+	omxreq.XSD = "http://www.w3.org/2001/XMLSchema"
+
+	omxreq.Order.Channel.Text = TVSBNP.TVSBNOMXPropertyobj.Channel
+	omxreq.Order.OrderId.Text = TVSBNP.CCBSorderno
+	omxreq.Order.OrderType.Text = TVSBNP.OMXOrderType
+	omxreq.Order.DealerCode.Text = TVSBNP.TVSBNOMXPropertyobj.DealerCode
+	if TVSBNP.TVSBNOMXPropertyobj.EffectiveDateSpecified == 1 {
+		omxreq.Order.EffectiveDate.Text = TVSBNP.TVSBNOMXPropertyobj.EffectiveDate //"2016-06-02T00:00:00"
+	} else {
+		omxreq.Order.EffectiveDate.Text = ""
+	}
 }
 func mappingvalueomxexistingsub(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpRequest) {
 
@@ -171,7 +191,14 @@ func mappingvalueomxexistingsub(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderO
 	omxreq.Customer.Account.AccountId = TVSBNP.CCBSAccountno
 	omxreq.Customer.OU.OuId = TVSBNP.CCBSOUNo
 	omxreq.Customer.OU.Subscriber.SubscriberId = TVSBNP.CCBSSubNo
+	omxreq.Customer.OU.Subscriber.Status = "65"
+	omxreq.Customer.OU.Subscriber.SubscriberNumber = cm.IntToStr(TVSBNP.TVSCUSTOMERNO)
+	omxreq.Customer.OU.Subscriber.SubscriberType = "VC"
+	omxreq.Customer.OU.Subscriber.PayChannelIdPrimary = TVSBNP.CCBSAccountno
+	omxreq.Customer.OU.Subscriber.PayChannelIdSecondary = TVSBNP.CCBSAccountno
+	omxreq.Customer.OU.Subscriber.ActivityInfo.ActivityReason = TVSBNP.CCBSACTIVITYREON
 	omxreq.Customer.CustomerId.Text = TVSBNP.CCBSCustomerno
+	//omxreq.Customer.OU.Subscriber.SubscriberAddress=nil
 
 }
 func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpRequest) {
@@ -188,28 +215,34 @@ func inboundtoomx(TVSBNP st.TVSBNProperty, omxreq st.SubmitOrderOpRequest) (stri
 	client := &http.Client{}
 	output, err := xml.MarshalIndent(omxreq, "  ", "    ")
 	a := string(output)
+	a = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sub="http://services.omx.truecorp.co.th/SubmitOrder">
+	<soapenv:Header/>
+	<soapenv:Body> ` + a + ` </soapenv:Body>
+	</soapenv:Envelope> `
+	fmt.Println(a)
+	fmt.Println("********************************************************")
 	requestContent := []byte(a)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
-		return "", err
+		fmt.Println(err)
 	}
-
-	req.Header.Add("SOAPAction", `"http://services.omx.truecorp.co.th/SubmitOrder"`)
+	req.Header.Add("SOAPAction", `"/Services/SubmitOrderOp"`)
 	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
 	req.Header.Add("Accept", "text/xml")
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", err
+		fmt.Println(err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
-		return "", errors.New("Error Respose " + resp.Status)
+		fmt.Println(errors.New("Error Respose " + resp.Status))
 	}
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return "", err
+		fmt.Println(err)
 	}
-
+	//m, _ := mxj.NewMapXml(contents, true)
+	//fmt.Println(&m)
 	return string(contents), nil
 }
 func getftid(ftid string) st.FinancialTransaction {

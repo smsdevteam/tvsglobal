@@ -6,47 +6,41 @@ import (
 )
 
 type SubmitOrderOpRequest struct {
-	XMLName xml.Name `xml:"SubmitOrderOpRequest"`
+	XMLName xml.Name `xml:"submitOrderRequest"`
 	Text    string   `xml:",chardata"`
-	Xsi     string   `xml:"xsi,attr"`
-	Xsd     string   `xml:"xsd,attr"`
-	Order   struct {
+	S       string   `xml:"xmlns,attr"`
+	SE      string   `xml:"xmlns:SOAP-ENV,attr"`
+	XSD     string   `xml:"xmlns:xsd,attr"`
+
+	Order struct {
 		Text    string `xml:",chardata"`
 		Channel struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"channel"`
 		OrderId struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"orderId"`
 		OrderType struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"orderType"`
 		EffectiveDate struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"effectiveDate"`
 		DealerCode struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"dealerCode"`
 	} `xml:"Order"`
 	Customer struct {
 		Text       string `xml:",chardata"`
 		CustomerId struct {
-			Text  string `xml:",chardata"`
-			Xmlns string `xml:"xmlns,attr"`
+			Text string `xml:",chardata"`
 		} `xml:"customerId"`
 		Account struct {
 			Text      string `xml:",chardata"`
-			Xmlns     string `xml:"xmlns,attr"`
 			AccountId string `xml:"accountId"`
 		} `xml:"Account"`
 		OU struct {
 			Text       string `xml:",chardata"`
-			Xmlns      string `xml:"xmlns,attr"`
 			OuId       string `xml:"ouId"`
 			Subscriber struct {
 				Text         string `xml:",chardata"`
@@ -56,7 +50,7 @@ type SubmitOrderOpRequest struct {
 					ActivityReason string `xml:"activityReason"`
 					UserText       string `xml:"userText"`
 				} `xml:"activityInfo"`
-				Offers     []Omxccbsoffer `xml:"offers"`
+				Offers []Omxccbsoffer `xml:"offers"`
 				/*Offers []struct {
 					Text               string `xml:",chardata"`
 					Action             string `xml:"action"`
@@ -209,8 +203,10 @@ type TVSBNCCBSOfferProperty struct {
 	Ecbsservicetype          string
 }
 type TVSBNOMXProperty struct {
-	Channel    string
-	DealerCode string
+	Channel                string
+	DealerCode             string
+	EffectiveDateSpecified int
+	EffectiveDate          string
 }
 type Omxccbsoffer struct {
 	Text               string `xml:",chardata"`
