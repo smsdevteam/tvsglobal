@@ -1,4 +1,4 @@
-package main
+package tvsccglobal
 
 import (
 	"bytes"
@@ -10,20 +10,18 @@ import (
 	//"fmt"
 
 	//"strconv"
-	cm "tvsglobal/common"
+
 	st "tvsglobal/tvsstructs"
 
 	//"github.com/jmoiron/sqlx"
 	"net/http"
-
-	_ "gopkg.in/goracle.v2"
 )
 
-func osbgetsubinfo(ccbssubno int) (string, error) {
+func Getccbssubinfo(ccbssubno string) (string, error) {
 	url := "http://172.22.203.63/TVS_GlobalWCFuat/CCBS_OSB_FinanceService.svc"
 	client := &http.Client{}
 	var subinfo st.GetCCBSSubscriberInfo
-	subinfo.SubscriberId.Text = cm.IntToStr(ccbssubno)
+	subinfo.SubscriberId.Text = ccbssubno
 	output, err := xml.MarshalIndent(subinfo, "  ", "    ")
 	a := string(output)
 	a = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/" xmlns:tvs="http://schemas.datacontract.org/2004/07/TVS_GlobalProperty.CommonProperty" xmlns:tvs1="http://schemas.datacontract.org/2004/07/TVS_Public">
@@ -46,7 +44,7 @@ func osbgetsubinfo(ccbssubno int) (string, error) {
 			 </tvs:ClientUserInfo>
 			 <tvs:CustomerNo>?</tvs:CustomerNo>
 		  </tem:ClientInformation>
-		  <tem:SubscriberId>` + cm.IntToStr(ccbssubno) + `</tem:SubscriberId>
+		  <tem:SubscriberId>` + ccbssubno + `</tem:SubscriberId>
 		  </tem:GetCCBSSubscriberInfo>
 	   </soapenv:Body>
 	</soapenv:Envelope>`
@@ -75,8 +73,4 @@ func osbgetsubinfo(ccbssubno int) (string, error) {
 	//m, _ := mxj.NewMapXml(contents, true)
 	//fmt.Println(&m)
 	return string(contents), nil
-}
-func main() {
-	osbgetsubinfo(1337981)
-	print("aaa")
 }

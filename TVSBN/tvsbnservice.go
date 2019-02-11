@@ -14,6 +14,7 @@ import (
 	//"strconv"
 	"time"
 	cm "tvsglobal/common"
+	tg "tvsglobal/tvsccglobal"
 	st "tvsglobal/tvsstructs"
 
 	//"github.com/jmoiron/sqlx"
@@ -96,17 +97,20 @@ func getjobinfo(trnseqno string) st.TVSBNProperty {
 		TVSBNP.TVSBNOMXPropertyobj.EffectiveDateSpecified = cm.StrToInt(values[colmap["EFFECTIVEDATESPECIFIED"]].(string))
 		TVSBNP.TVSBNOMXPropertyobj.EffectiveDate = values[colmap["EFFECTIVEDATE"]].(string)
 
-		TVSBNP.TVSBNCCBSOfferPropertylist = getccbsoffer(TVSBNP.TRNSEQNO)
+		TVSBNP.TVSBNCCBSOfferPropertylist = getccbsoffer(TVSBNP)
 	}
 
 	return TVSBNP
 }
-func getccbsoffer(trnseqno string) []st.TVSBNCCBSOfferProperty {
+func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 	var resultI driver.Rows
 	var TVSBNCCBSOfferPropertylist []st.TVSBNCCBSOfferProperty
 	var TVSBNCCBSOfferPropertyobj st.TVSBNCCBSOfferProperty
 	var err error
-	cm.ExcutestoreDS("ICC", ` begin tvs_ccbsbn.Get_CCBSOFFER(:p_TRNSEQNO,:p_rs); end; `, trnseqno, sql.Out{Dest: &resultI})
+	if TVSBNP.CCBSSubNo > 0 {
+		tg.Getccbssubinfo(TVSBNP.CCBSSubNo)
+	}
+	cm.ExcutestoreDS("ICC", ` begin tvs_ccbsbn.Get_CCBSOFFER(:p_TRNSEQNO,:p_rs); end; `, TVSBNP.TRNSEQNO, sql.Out{Dest: &resultI})
 	defer resultI.Close()
 	values := make([]driver.Value, len(resultI.Columns()))
 	colmap := createmapcol(resultI.Columns())
