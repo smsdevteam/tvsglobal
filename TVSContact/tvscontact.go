@@ -19,6 +19,7 @@ import (
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
+//MyRespEnvelopeGetContact is for get contact
 type MyRespEnvelopeGetContact struct {
 	XMLName xml.Name    `xml:"Envelope"`
 	Body    bodyContact `xml:"Body"`
@@ -70,6 +71,7 @@ type getContactResult struct {
 	Extended                string   `xml:"Extended" json:"Extended"`
 }
 
+//MyRespEnvelopeCreateContact is for Create Contact
 type MyRespEnvelopeCreateContact struct {
 	XMLName xml.Name          `xml:"Envelope"`
 	Body    bodyCreateContact `xml:"Body"`
@@ -93,6 +95,7 @@ type createContactResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
+//MyRespEnvelopeUpdateContact is for update Contact
 type MyRespEnvelopeUpdateContact struct {
 	XMLName xml.Name          `xml:"Envelope"`
 	Body    bodyUpdateContact `xml:"Body"`
