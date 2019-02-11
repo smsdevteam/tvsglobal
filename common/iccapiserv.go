@@ -167,9 +167,7 @@ const getTemplate = `<Envelope xmlns ="http://schemas.xmlsoap.org/soap/envelope/
 	   </s:Body>
 	   </s:Envelope>`
 //Getauthentication is Getauthentication
-func Createxmlstruct(filename str ){
-	
-}
+
 func Getauthentication() (string, error) {
 	url := "http://tv-uatibs62-w01.ubc.co.th/ASM/ALL/Authentication.svc"
 	client := &http.Client{}

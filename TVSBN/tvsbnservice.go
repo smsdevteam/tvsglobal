@@ -219,8 +219,8 @@ func inboundtoomx(TVSBNP st.TVSBNProperty, omxreq st.SubmitOrderOpRequest) (stri
 	<soapenv:Header/>
 	<soapenv:Body> ` + a + ` </soapenv:Body>
 	</soapenv:Envelope> `
-	fmt.Println(a)
-	fmt.Println("********************************************************")
+	//fmt.Println(a)
+	//fmt.Println("********************************************************")
 	requestContent := []byte(a)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
