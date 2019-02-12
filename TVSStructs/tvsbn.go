@@ -209,12 +209,11 @@ type TVSBNOMXProperty struct {
 	EffectiveDate          string
 }
 type Omxccbsoffer struct {
-	Text               string `xml:",chardata"`
-	Action             string `xml:"action"`
-	EffectiveDate      string `xml:"effectiveDate"`
-	ExpirationDate     string `xml:"expirationDate"`
-	OfferName          string `xml:"offerName"`
-	OfferInstanceId    string `xml:"offerInstanceId"`
-	ServiceType        string `xml:"serviceType"`
-	TargetPayChannelId string `xml:"targetPayChannelId"`
+	Text            string `xml:",chardata"`
+	Action          string `xml:"action"`
+	//EffectiveDate   time.Time `xml:"effectiveDate"`
+	//ExpirationDate  time.Time `xml:"expirationDate"`
+	OfferName       string `xml:"offerName"`
+	OfferInstanceId string `xml:"offerInstanceId"`
+	ServiceType     string `xml:"serviceType"`
 }

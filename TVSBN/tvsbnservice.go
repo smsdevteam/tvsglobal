@@ -30,6 +30,17 @@ func preparejobdata(customerid int, ccbsfn string) string {
 	 		 :p_allowsendomx,:p_ccbs_activityreason); end;`, sql.Out{Dest: &trnseqno}, customerid, ccbsfn, 0, 0, 1, 1, "CREQ")
 	return trnseqno
 }
+func saveinboundomxlog(TVSBNP st.TVSBNProperty, requstd string, responsed string, startdate time.Time, stopdate time.Time) string {
+	var trnseqno string
+	cm.ExcutestoreDS("ICC", `  "Begin  tvs_ccbsbn.save_inboundlog(:p_tvs_custno,:p_trnseqno,:p_ccbs_fn,:p_ccbs_subfn,:p_url_service,
+		:p_processflag,:p_error_code,:p_error_desc, 
+	 :p_omxorderno,:p_omxtrackingid,:p_omx_repcode,:p_omx_repmsg,:p_requestdata,:p_responsedata,
+	 :p_omxurl,:p_startdare,:p_stopdate,:p_ExternalRefno); end; 
+	`, TVSBNP.TVSCUSTOMERNO, TVSBNP.TRNSEQNO, TVSBNP.CCBSFN, TVSBNP.CCBSSUBFN, TVSBNP.CCBSarURLSERVICE,
+		1, " ", "  ",
+		TVSBNP.CCBSarURLSERVICE, startdate, stopdate, " ")
+	return trnseqno
+}
 func indexOf(word string, data []string) int {
 	for k, v := range data {
 		if word == v {
@@ -210,7 +221,13 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 	//omxreq.Customer.OU.Subscriber.Offers := []Omxccbsoffer //[]Omxccbsoffer
 	for i := 0; i < len(TVSBNP.TVSBNCCBSOfferPropertylist); i++ {
 		offer.OfferName = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbsoffername
-		//append(omxreq.Customer.OU.Subscriber.Offers,offer)
+		offer.Action = TVSBNP.TVSBNCCBSOfferPropertylist[0].Action
+		//offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		//	offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate //"2019-02-11T00:00:01"
+		offer.ServiceType = "80" //TVSBNP.TVSBNCCBSOfferPropertylist[0].Ecbsservicetype
+		//offer.TargetPayChannelId = nil
+		offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
+		omxreq.Customer.OU.Subscriber.Offers = append(omxreq.Customer.OU.Subscriber.Offers, offer)
 	}
 
 }
@@ -223,8 +240,8 @@ func inboundtoomx(TVSBNP st.TVSBNProperty, omxreq st.SubmitOrderOpRequest) (stri
 	<soapenv:Header/>
 	<soapenv:Body> ` + a + ` </soapenv:Body>
 	</soapenv:Envelope> `
-	//fmt.Println(a)
-	//fmt.Println("********************************************************")
+	fmt.Println(a)
+	fmt.Println("********************************************************")
 	requestContent := []byte(a)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
