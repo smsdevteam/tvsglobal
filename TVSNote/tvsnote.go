@@ -131,7 +131,7 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 			values := make([]driver.Value, len(resultC.Columns()))
 			for {
 
-				colmap := CreateMapCol(resultC.Columns())
+				colmap := cm.Createmapcol(resultC.Columns())
 				//log.Println(colmap)
 
 				err = resultC.Next(values)
@@ -146,25 +146,25 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 					return oRes
 				}
 
-				if values[colmap["CUSTOMER_ID"]] != nil {
-					oNote.CustomerID = values[colmap["CUSTOMER_ID"]].(int64)
+				if values[cm.Getcolindex(colmap, "CUSTOMER_ID")] != nil {
+					oNote.CustomerID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
 				}
-				if values[colmap["CREATED_BY_USER_ID"]] != nil {
-					oNote.CreatedByUserID = values[colmap["CREATED_BY_USER_ID"]].(int64)
+				if values[cm.Getcolindex(colmap, "CREATED_BY_USER_ID")] != nil {
+					oNote.CreatedByUserID = values[cm.Getcolindex(colmap, "CREATED_BY_USER_ID")].(int64)
 				}
-				if values[colmap["ACTION_USER_ID"]] != nil {
-					oNote.ActionUserID = values[colmap["ACTION_USER_ID"]].(int64)
+				if values[cm.Getcolindex(colmap, "ACTION_USER_ID")] != nil {
+					oNote.ActionUserID = values[cm.Getcolindex(colmap, "ACTION_USER_ID")].(int64)
 				}
 
-				oNote.CategoryID = values[colmap["CATEGORY_ID"]].(string)
-				oNote.CompletionStageID = values[colmap["COMPLETION_STAGE_ID"]].(string)
-				oNote.Body = values[colmap["BODY"]].(string)
+				oNote.CategoryID = values[cm.Getcolindex(colmap, "CATEGORY_ID")].(string)
+				oNote.CompletionStageID = values[cm.Getcolindex(colmap, "COMPLETION_STAGE_ID")].(string)
+				oNote.Body = values[cm.Getcolindex(colmap, "BODY")].(string)
 
-				if values[6] != nil {
-					oNote.NoteID = values[colmap["ID"]].(int64)
+				if values[cm.Getcolindex(colmap, "ID")] != nil {
+					oNote.NoteID = values[cm.Getcolindex(colmap, "ID")].(int64)
 				}
-				if values[7] != nil {
-					oNote.CreateDateTime = values[colmap["CREATE_DATETIME"]].(time.Time)
+				if values[cm.Getcolindex(colmap, "CREATE_DATETIME")] != nil {
+					oNote.CreateDateTime = values[cm.Getcolindex(colmap, "CREATE_DATETIME")].(time.Time)
 				}
 			}
 

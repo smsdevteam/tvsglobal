@@ -19,6 +19,7 @@ import (
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
+//MyRespEnvelopeGetContact is for get contact
 type MyRespEnvelopeGetContact struct {
 	XMLName xml.Name    `xml:"Envelope"`
 	Body    bodyContact `xml:"Body"`
@@ -70,6 +71,7 @@ type getContactResult struct {
 	Extended                string   `xml:"Extended" json:"Extended"`
 }
 
+//MyRespEnvelopeCreateContact is for Create Contact
 type MyRespEnvelopeCreateContact struct {
 	XMLName xml.Name          `xml:"Envelope"`
 	Body    bodyCreateContact `xml:"Body"`
@@ -93,6 +95,7 @@ type createContactResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
+//MyRespEnvelopeUpdateContact is for update Contact
 type MyRespEnvelopeUpdateContact struct {
 	XMLName xml.Name          `xml:"Envelope"`
 	Body    bodyUpdateContact `xml:"Body"`
@@ -302,6 +305,10 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 			values := make([]driver.Value, len(resultC.Columns()))
 			var oContacts []st.Contact
 			for {
+
+				colmap := cm.Createmapcol(resultC.Columns())
+				//log.Println(colmap)
+
 				err = resultC.Next(values)
 				if err != nil {
 					if err == io.EOF {
@@ -315,78 +322,78 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 				}
 				var oContact st.Contact
 
-				if values[0] != nil {
-					oContact.ContactID = values[0].(int64)
+				if values[cm.Getcolindex(colmap, "ID")] != nil {
+					oContact.ContactID = values[cm.Getcolindex(colmap, "ID")].(int64)
 				}
-				if values[1] != nil {
-					oContact.ActionDate = values[1].(time.Time)
+				if values[cm.Getcolindex(colmap, "ACTION_DATE")] != nil {
+					oContact.ActionDate = values[cm.Getcolindex(colmap, "ACTION_DATE")].(time.Time)
 				}
 
-				oContact.ActionTaken = values[2].(string)
+				oContact.ActionTaken = values[cm.Getcolindex(colmap, "ACTION_TAKEN")].(string)
 
-				if values[3] != nil {
+				if values[cm.Getcolindex(colmap, "ALLOCATED_TO_USER")] != nil {
 					oContact.AllocatedToUser = values[3].(int64)
 				}
-				if values[4] != nil {
-					oContact.Category = values[4].(int64)
+				if values[cm.Getcolindex(colmap, "CATEGORY")] != nil {
+					oContact.Category = values[cm.Getcolindex(colmap, "CATEGORY")].(int64)
 				}
-				if values[5] != nil {
-					oContact.CreatedByUser = values[5].(int64)
+				if values[cm.Getcolindex(colmap, "CREATED_BY_USER")] != nil {
+					oContact.CreatedByUser = values[cm.Getcolindex(colmap, "CREATED_BY_USER")].(int64)
 				}
-				if values[6] != nil {
-					oContact.CustomerID = values[6].(int64)
+				if values[cm.Getcolindex(colmap, "CUSTOMER_ID")] != nil {
+					oContact.CustomerID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
 				}
-				if values[7] != nil {
-					oContact.CustomerProductID = values[7].(int64)
+				if values[cm.Getcolindex(colmap, "CUSTOMER_PRODUCT_ID")] != nil {
+					oContact.CustomerProductID = values[cm.Getcolindex(colmap, "CUSTOMER_PRODUCT_ID")].(int64)
 				}
-				oContact.Method = values[8].(string)
-				if values[9] != nil {
-					oContact.OrderID = values[9].(int64)
+				oContact.Method = values[cm.Getcolindex(colmap, "METHOD")].(string)
+				if values[cm.Getcolindex(colmap, "ORDER_ID")] != nil {
+					oContact.OrderID = values[cm.Getcolindex(colmap, "ORDER_ID")].(int64)
 				}
-				oContact.ProblemDesc = values[10].(string)
-				if values[11] != nil {
-					oContact.ProductID = values[11].(int64)
+				oContact.ProblemDesc = values[cm.Getcolindex(colmap, "PROBLEM_DESC")].(string)
+				if values[cm.Getcolindex(colmap, "PRODUCT_ID")] != nil {
+					oContact.ProductID = values[cm.Getcolindex(colmap, "PRODUCT_ID")].(int64)
 				}
-				if values[12] != nil {
-					oContact.StampDate = values[12].(time.Time)
+				if values[cm.Getcolindex(colmap, "STAMP_DATE")] != nil {
+					oContact.StampDate = values[cm.Getcolindex(colmap, "STAMP_DATE")].(time.Time)
 				}
-				oContact.Status = values[13].(string)
-				if values[14] != nil {
-					oContact.WorkOrderID = values[14].(int64)
+				oContact.Status = values[cm.Getcolindex(colmap, "STATUS")].(string)
+				if values[cm.Getcolindex(colmap, "WORK_ORDER_ID")] != nil {
+					oContact.WorkOrderID = values[cm.Getcolindex(colmap, "WORK_ORDER_ID")].(int64)
 				}
-				if values[15] != nil {
-					oContact.CreatedDate = values[15].(time.Time)
+				if values[cm.Getcolindex(colmap, "CREATED_DATE")] != nil {
+					oContact.CreatedDate = values[cm.Getcolindex(colmap, "CREATED_DATE")].(time.Time)
 				}
-				oContact.ExternalReferenceID = values[16].(string)
-				if values[17] != nil {
-					oContact.DeviceID = values[16].(int64)
+				oContact.ExternalReferenceID = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID")].(string)
+				if values[cm.Getcolindex(colmap, "DEVICE_ID")] != nil {
+					oContact.DeviceID = values[cm.Getcolindex(colmap, "DEVICE_ID")].(int64)
 				}
-				if values[18] != nil {
-					oContact.InvoiceID = values[18].(int64)
+				if values[cm.Getcolindex(colmap, "INVOICE_ID")] != nil {
+					oContact.InvoiceID = values[cm.Getcolindex(colmap, "INVOICE_ID")].(int64)
 				}
-				if values[19] != nil {
-					oContact.LastUpdatedUserID = values[19].(int64)
+				if values[cm.Getcolindex(colmap, "LAST_UPDATED_USER_ID")] != nil {
+					oContact.LastUpdatedUserID = values[cm.Getcolindex(colmap, "LAST_UPDATED_USER_ID")].(int64)
 				}
-				if values[20] != nil {
-					oContact.ExternalReferenceID1 = values[20].(int64)
+				if values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID1")] != nil {
+					oContact.ExternalReferenceID1 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID1")].(int64)
 				}
-				if values[21] != nil {
-					oContact.ExternalReferenceID2 = values[21].(int64)
+				if values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID2")] != nil {
+					oContact.ExternalReferenceID2 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID2")].(int64)
 				}
-				if values[22] != nil {
-					oContact.ExternalReferenceID3 = values[22].(int64)
+				if values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID3")] != nil {
+					oContact.ExternalReferenceID3 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID3")].(int64)
 				}
-				if values[23] != nil {
-					oContact.ExternalReferenceID4 = values[23].(int64)
+				if values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID4")] != nil {
+					oContact.ExternalReferenceID4 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID4")].(int64)
 				}
-				if values[24] != nil {
-					oContact.ExternalReferenceID5 = values[24].(int64)
+				if values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID5")] != nil {
+					oContact.ExternalReferenceID5 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_ID5")].(int64)
 				}
-				oContact.ExternalReferenceValue1 = values[25].(string)
-				oContact.ExternalReferenceValue2 = values[26].(string)
-				oContact.ExternalReferenceValue3 = values[27].(string)
-				oContact.ExternalReferenceValue4 = values[28].(string)
-				oContact.ExternalReferenceValue5 = values[29].(string)
+				oContact.ExternalReferenceValue1 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_VALUE1")].(string)
+				oContact.ExternalReferenceValue2 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_VALUE2")].(string)
+				oContact.ExternalReferenceValue3 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_VALUE3")].(string)
+				oContact.ExternalReferenceValue4 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_VALUE4")].(string)
+				oContact.ExternalReferenceValue5 = values[cm.Getcolindex(colmap, "EXTERNAL_REFERENCE_VALUE5")].(string)
 
 				oContacts = append(oContacts, oContact)
 			}
