@@ -105,18 +105,19 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 func main() {
 	fmt.Println("Service Start...")
 
-	// var tRes st.ResponseResult
-	tRes := st.NewResponseResult()
-	log.Println(*tRes)
-	tRes.ErrorCode = 0
-	tRes.ErrorDesc = "TEST"
-	log.Println(*tRes)
+	// tRes := st.NewResponseResult()
+	// log.Println(*tRes)
+	// tRes.ErrorCode = 0
+	// tRes.ErrorDesc = "TEST"
+	// log.Println(*tRes)
 
-	var nRes st.ResponseResult
-	log.Println(nRes)
-	nRes.ErrorCode = 100
-	nRes.ErrorDesc = "Test#2"
-	log.Println(nRes)
+	// var nRes st.ResponseResult
+	// log.Println(nRes)
+	// nRes.ErrorCode = 100
+	// nRes.ErrorDesc = "Test#2"
+	// log.Println(nRes)
+
+	//log.Println("Waiting...")
 
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsdevice", index)
@@ -129,4 +130,5 @@ func main() {
 	mainRouter.HandleFunc("/tvsdevice/createnewserialnumber", createNewSN).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8081", mainRouter))
+
 }

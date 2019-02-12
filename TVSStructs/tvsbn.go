@@ -56,7 +56,8 @@ type SubmitOrderOpRequest struct {
 					ActivityReason string `xml:"activityReason"`
 					UserText       string `xml:"userText"`
 				} `xml:"activityInfo"`
-				Offers []struct {
+				Offers     []Omxccbsoffer `xml:"offers"`
+				/*Offers []struct {
 					Text               string `xml:",chardata"`
 					Action             string `xml:"action"`
 					EffectiveDate      string `xml:"effectiveDate"`
@@ -66,6 +67,7 @@ type SubmitOrderOpRequest struct {
 					ServiceType        string `xml:"serviceType"`
 					TargetPayChannelId string `xml:"targetPayChannelId"`
 				} `xml:"offers"`
+				*/
 				PayChannelIdPrimary   string `xml:"payChannelIdPrimary"`
 				PayChannelIdSecondary string `xml:"payChannelIdSecondary"`
 				ResourceInfo          struct {
@@ -171,15 +173,16 @@ type TVSBNProperty struct {
 	TVSBNCCBSOfferPropertylist []TVSBNCCBSOfferProperty
 	//TVS_BN_CCBSOffer_OU  List(Of TVS_BN_CCBSOfferProperty)
 	//TVS_BN_CCBSOffer_Prepaid  List(Of TVS_BN_CCBSOfferProperty)
-	ExternalRefno    string
-	FINDEXISTSCUST   string
-	LEGACYBAN        string
-	INITREON         string
-	OLDBANDATE       string
-	FoundTVSonCCBS   bool
-	ToCCBSCustomerno string
-	Oldccbssubno     string
-	AddSOCLevelOU    string
+	ExternalRefno       string
+	FINDEXISTSCUST      string
+	LEGACYBAN           string
+	INITREON            string
+	OLDBANDATE          string
+	FoundTVSonCCBS      bool
+	ToCCBSCustomerno    string
+	Oldccbssubno        string
+	AddSOCLevelOU       string
+	TVSBNOMXPropertyobj TVSBNOMXProperty
 }
 
 type TVSBNCCBSOfferProperty struct {
@@ -188,10 +191,10 @@ type TVSBNCCBSOfferProperty struct {
 	Ccbssocid                string
 	OfferInstanceID          string
 	Effectivedate            time.Time
-	EffectiveDateSpecified   int
+	EffectiveDateSpecified   int64
 	Expirationdate           time.Time
 	Processtype              string
-	TargetPayChannelID       string
+	TargetPayChannelID       int64
 	OverrideRCAmount         float64
 	OverrideRCDescription    string
 	OverrideRCDescriptionEng string
@@ -199,9 +202,23 @@ type TVSBNCCBSOfferProperty struct {
 	OverrideOCAmount         float64
 	OverrideOCDescription    string
 	OverrideOCDescriptionEng string
-	OverrideOCSpecified      int
+	OverrideOCSpecified      int64
 	Newperiodind             string
 	Extendedinfoname         string
 	Extendedinfovalue        string
 	Ecbsservicetype          string
+}
+type TVSBNOMXProperty struct {
+	Channel    string
+	DealerCode string
+}
+type Omxccbsoffer struct {
+	Text               string `xml:",chardata"`
+	Action             string `xml:"action"`
+	EffectiveDate      string `xml:"effectiveDate"`
+	ExpirationDate     string `xml:"expirationDate"`
+	OfferName          string `xml:"offerName"`
+	OfferInstanceId    string `xml:"offerInstanceId"`
+	ServiceType        string `xml:"serviceType"`
+	TargetPayChannelId string `xml:"targetPayChannelId"`
 }
