@@ -10,6 +10,11 @@ type TVSQueuSubmitOrderRequest struct {
 	TVSCustNo   int64
 	Custinfo    CustomerInfo
 }
+type TVSSubmitOrderToQueue struct {
+	Trackingno        string
+	TVSOrdReq TVSQueuSubmitOrderRequest
+
+}
 
 type TVSQueueSubmitOrderReponse struct {
 	Orderid           string
