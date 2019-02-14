@@ -54,3 +54,25 @@ func NewGetListKeywordResult() *GetListKeywordResult {
 		ErrorDesc: "Unexpected Error",
 	}
 }
+
+//CreateKeywordRequest obj
+type CreateKeywordRequest struct {
+	ByUser struct {
+		ByChannel string `json:"bychannel"`
+		ByHost    string `json:"byhost"`
+		ByProject string `json:"byproject"`
+		ByUser    string `json:"byuser"`
+	} `json:"byuser"`
+	InKeyword struct {
+		Attribute     string    `json:"attribute"`
+		Count         int64     `json:"count"`
+		CustomerID    int64     `json:"customerid"`
+		Date          time.Time `json:"date"`
+		Extended      string    `json:"extended"`
+		ID            int64     `json:"id"`
+		KeywordID     int64     `json:"keywordid"`
+		KeywordTypeID int64     `json:"keywordtypeid"`
+		Name          string    `json:"name"`
+	} `json:"inkeyword"`
+	InReason int64 `json:"inreason"`
+}
