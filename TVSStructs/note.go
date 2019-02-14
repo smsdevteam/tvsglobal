@@ -32,6 +32,14 @@ type GetNoteResult struct {
 	ErrorDesc string `json:"errordesc"`
 }
 
+// NewGetNoteResult Obj
+func NewGetNoteResult() *GetNoteResult {
+	return &GetNoteResult{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
+
 type ListNote struct {
 	Notes []Note `json:"notes"`
 }
@@ -40,6 +48,14 @@ type GetListNoteResult struct {
 	MyListNote ListNote `json:"getlistnoteresult"`
 	ErrorCode  int      `json:"errorcode"`
 	ErrorDesc  string   `json:"errordesc"`
+}
+
+// NewGetListNoteResult Obj
+func NewGetListNoteResult() *GetListNoteResult {
+	return &GetListNoteResult{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
 }
 
 type CreateNoteRequest struct {
@@ -69,6 +85,14 @@ type CreateNoteResponse struct {
 	ResultValue string `json:"resultvalue"`
 }
 
+// NewCreateNoteResponse Obj
+func NewCreateNoteResponse() *CreateNoteResponse {
+	return &CreateNoteResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
+
 type UpdateNoteRequest struct {
 	InNote struct {
 		ActionUserKey      int64     `json:"ActionUserKey"`
@@ -94,4 +118,12 @@ type UpdateNoteResponse struct {
 	ErrorCode   int    `json:"errorcode"`
 	ErrorDesc   string `json:"errordesc"`
 	ResultValue string `json:"resultvalue"`
+}
+
+// NewUpdateNoteResponse Obj
+func NewUpdateNoteResponse() *UpdateNoteResponse {
+	return &UpdateNoteResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
 }

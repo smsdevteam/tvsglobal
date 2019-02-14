@@ -152,3 +152,31 @@ func Excutestore(profilename string, sqlStmnt string) (string, error) {
 	}
 	return "!", err
 }
+func Getvalue(value []driver.Value, colmap map[string]int, colname string) interface{} {
+
+	i, err := colmap[colname]
+	if err == true {
+		return value[i]
+	} else {
+		return ""
+	}
+
+}
+func Getcolindex(colmap map[string]int, colname string) int {
+
+	i, err := colmap[colname]
+	if err == true {
+		return i
+	} else {
+		return -1
+	}
+
+}
+func Createmapcol(data []string) map[string]int {
+	var colmap = map[string]int{}
+
+	for k, v := range data {
+		colmap[v] = k
+	}
+	return colmap
+}

@@ -92,24 +92,6 @@ func ICCReadConfig(profilename string) (ICCAuthenHD, ServiceURL) {
 	return authenInfo, serviceLnk
 }
 
-const getTemplate = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-       <s:Body><AuthenticateByProof xmlns="http://ibs.entriq.net/Authentication">
-        <userIdentity xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-        <Dsns>
-         <Dsn>
-          <Extended i:nil="true"/>
-          <Name>$DSN</Name>
-         </Dsn>
-        </Dsns>
-        <Extended i:nil="true"/>
-        <UserName>$username</UserName>
-        </userIdentity>
-        <proof>$password</proof>
-        <module i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance"/>
-        </AuthenticateByProof>
-       </s:Body>
-       </s:Envelope>`
-
 // GetICCAuthenToken
 func GetICCAuthenToken(profilename string) (string, error) {
 	var authenInfo ICCAuthenHD
