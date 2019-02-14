@@ -60,7 +60,7 @@ type updateCustomerResult struct {
 }
 
 // GetCustomerByCustomerID get info
-func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
+func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	// Log#Start
 	/*var l cm.Applog
 	var trackingno string
@@ -77,6 +77,8 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
+	var oCustomerRespon c.Customerrespon
+	var  oCustomerinfocolection   []c.CustomerInfo
 	//var dbsource string 
 	
 	dbsource :=  cm.GetDatasourceName("ICC") 
@@ -115,17 +117,21 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 				if values[0] != nil {
 					ocustomerInfo.ID = values[0].(string)
 				}
-
-				ocustomerInfo.BusinessUnitID = values[0].(string)
-
+                
+				ocustomerInfo.BusinessUnitID = values[1].(string)
+              oCustomerinfocolection =append(oCustomerinfocolection,ocustomerInfo)
+			
 			}
-
+				  
+			  
+			//oCustomerRespon.Customerrespon =ocustomerInfo
 			//ocustomerInfo = oCustomer
-
+         log.Println(oCustomerinfocolection)
 		}
 
 	}
-
+	
+        oCustomerRespon.CustomerInfocollection =oCustomerinfocolection
 	// Log#Stop
 	/* 	t1 := time.Now()
 	   	t2 := t1.Sub(t0)
@@ -139,5 +145,5 @@ func GetCustomerByCustomerID(iCustomerID string) c.CustomerInfo {
 	   	l.Duration = t2.String()
 	   	l.InsertappLog("./log/tvscustomerapplog.log", "GetCustomer") */
 	//test
-	return ocustomerInfo
+	return oCustomerRespon
 }
