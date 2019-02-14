@@ -5,10 +5,11 @@ import (
 	"database/sql/driver"
 	"io"
 	"log"
-	"strconv" 
-	_ "gopkg.in/goracle.v2" 
+	"strconv"
+
 	cm "github.com/smsdevteam/tvsglobal/common"
 	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	_ "gopkg.in/goracle.v2"
 )
 
 // GetWorkorderByCustomerID get info
@@ -41,8 +42,8 @@ func GetWorkorderByCustomerID(iCustomerID string) c.WorkorderInfo {
 			values := make([]driver.Value, len(resultC.Columns()))
 
 			for {
-				 //colmap := cm.createmapcol(resultC.Columns())
-				//print(colmap)
+				colmap := cm.Createmapcol(resultC.Columns())
+				print(colmap)
 				err = resultC.Next(values)
 				if err == nil {
 					if err == io.EOF {
@@ -51,7 +52,10 @@ func GetWorkorderByCustomerID(iCustomerID string) c.WorkorderInfo {
 				} else {
 					break
 				}
-				oWorkorderinfo.Id = cm.StrToInt64(values[1].(string))
+				//oWorkorderinfo.Id = cm.StrToInt64(values[1].(string))
+				//print(values[cm.Getcolindex(colmap, "PROBLEM_DESCRIPTION")].(string))
+				oWorkorderinfo.Id = values[cm.Getcolindex(colmap, "ID")].(int64)
+				//oWorkorderinfo.ProblemDesc = values[cm.Getcolindex(colmap, "Problem_Description")].(string)
 			}
 		}
 	}

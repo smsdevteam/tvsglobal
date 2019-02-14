@@ -1,5 +1,6 @@
 package tvsstructs
- 
+
 type WorkorderInfo struct {
-	Id	int64 
+	Id          int64
+	ProblemDesc string
 }
