@@ -101,10 +101,13 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 				log.Fatal(err)
 				//resp = err.Error()
 			}
-
+              
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
+		   colmap :=cm.Createmapcol(resultC.Columns())
+		   
 			for {
+					
 				err = resultC.Next(values)
 				if err != nil {
 					if err == io.EOF {
@@ -118,12 +121,12 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 					ocustomerInfo.ID = values[0].(string)
 				}
                 
-				ocustomerInfo.BusinessUnitID = values[1].(string)
+				ocustomerInfo.BusinessUnitID =  values[colmap["BusinessUnitID"]].(string)
               oCustomerinfocolection =append(oCustomerinfocolection,ocustomerInfo)
-			
+			   	print(ocustomerInfo.BusinessUnitID)
 			}
 				  
-			  
+			
 			//oCustomerRespon.Customerrespon =ocustomerInfo
 			//ocustomerInfo = oCustomer
          log.Println(oCustomerinfocolection)
