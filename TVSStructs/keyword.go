@@ -34,3 +34,23 @@ func NewGetKeywordResult() *GetKeywordResult {
 		ErrorDesc: "Unexpected Error",
 	}
 }
+
+//ListKeyword obj
+type ListKeyword struct {
+	Keywords []Keyword `json:"keywords"`
+}
+
+//GetListKeywordResult obj
+type GetListKeywordResult struct {
+	MyListKeyword ListKeyword `json:"getlistkeywordresult"`
+	ErrorCode     int         `json:"errorcode"`
+	ErrorDesc     string      `json:"errordesc"`
+}
+
+// NewGetListKeywordResult Obj
+func NewGetListKeywordResult() *GetListKeywordResult {
+	return &GetListKeywordResult{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
