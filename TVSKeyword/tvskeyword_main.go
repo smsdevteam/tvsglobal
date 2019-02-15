@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"net/http"
 
@@ -20,6 +21,7 @@ func main() {
 	mainRouter.HandleFunc("/tvskeyword", index)
 	mainRouter.HandleFunc("/tvskeyword/getkeyword/{keywordid}", getKeyword)
 	mainRouter.HandleFunc("/tvskeyword/getlistkeyword/{customerid}", getListKeyword)
+	mainRouter.HandleFunc("/tvskeyword/createkeyword", createKeyword).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 
@@ -41,4 +43,22 @@ func getListKeyword(w http.ResponseWriter, r *http.Request) {
 	listKeywordResult = GetListKeywordByCustomerID(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(listKeywordResult)
+}
+
+func createKeyword(w http.ResponseWriter, r *http.Request) {
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	var req st.CreateKeywordRequest
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		panic(err)
+	}
+	var res *st.CreateKeywordResponse
+	res = CreateKeyword(req)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(res)
 }

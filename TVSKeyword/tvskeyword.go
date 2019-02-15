@@ -1,11 +1,16 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/xml"
 	"io"
+	"io/ioutil"
 	"log"
+	"net/http"
 	"strconv"
+	s "strings"
 	"time"
 
 	_ "gopkg.in/goracle.v2"
@@ -13,6 +18,32 @@ import (
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
+
+// MyRespEnvelopeCreateKeyword obj
+type MyRespEnvelopeCreateKeyword struct {
+	XMLName xml.Name          `xml:"Envelope"`
+	Body    bodyCreateKeyword `xml:"Body"`
+}
+
+//bodyCreateKeyword obj
+type bodyCreateKeyword struct {
+	XMLName                xml.Name              `xml:"Body"`
+	VCreateKeywordResponse createKeywordResponse `xml:"CreateKeywordResponse"`
+}
+
+//createKeywordResponse obj
+type createKeywordResponse struct {
+	XMLName              xml.Name            `xml:"CreateKeywordResponse"`
+	VCreateKeywordResult createKeywordResult `xml:"CreateKeywordResult"`
+}
+
+//createKeywordResult obj
+type createKeywordResult struct {
+	XMLName     xml.Name `xml:"CreateKeywordResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
 
 //GetKeywordByKeywordID function
 func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
@@ -242,5 +273,137 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListKeywordByCustomerID")
 	//test
+	return oRes
+}
+
+//getTemplateforCreateKeyword is xmltemplate for post to ICC service
+const getTemplateforCreateKeyword = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+	<CreateKeyword xmlns="http://tempuri.org/">
+		<inKeyword>
+			<Attribute>$attribute</Attribute>
+			<Count>$count</Count>
+			<CustomerId>$customerId</CustomerId>
+			<Date>$date</Date>
+            <Id>0</Id>
+            <KeywordId>$keywordId</KeywordId>
+            <KeywordTypeId>$keywordTypeId</KeywordTypeId>
+			<Name>$name</Name>
+			<Extended>$extended</Extended>
+		</inKeyword>
+		<inReason>$inReason</inReason>
+		<byUser>
+			<byUser>$byUser</byUser>
+            <byChannel>$byChannel</byChannel>
+            <byProject>$byProject</byProject>
+            <byHost>$byHost</byHost>
+		</byUser>
+	</CreateKeyword>
+</s:Body>
+</s:Envelope>`
+
+//CreateKeyword function
+func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
+
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	var resp string
+	resp = "SUCCESS"
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSKeyword"
+	l.FunctionName = "CreateKeyword"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
+
+	oRes := st.NewCreateKeywordResponse()
+
+	var AppServiceLnk cm.AppServiceURL
+	AppServiceLnk = cm.AppReadConfig("ENH")
+
+	url := AppServiceLnk.ICCServiceURL
+	client := &http.Client{}
+
+	sCount := strconv.FormatInt(iReq.InKeyword.Count, 10)
+	sCustomerID := strconv.FormatInt(iReq.InKeyword.CustomerID, 10)
+	sDate := (iReq.InKeyword.Date).Format("2006-01-02T15:04:05")
+	sKeywordID := strconv.FormatInt(iReq.InKeyword.KeywordID, 10)
+	sKeywordTypeID := strconv.FormatInt(iReq.InKeyword.KeywordTypeID, 10)
+	sReason := strconv.FormatInt(iReq.InReason, 10)
+
+	requestValue := s.Replace(getTemplateforCreateKeyword, "$attribute", iReq.InKeyword.Attribute, -1)
+	requestValue = s.Replace(requestValue, "$count", sCount, -1)
+	requestValue = s.Replace(requestValue, "$customerId", sCustomerID, -1)
+	requestValue = s.Replace(requestValue, "$date", sDate, -1)
+	requestValue = s.Replace(requestValue, "$keywordId", sKeywordID, -1)
+	requestValue = s.Replace(requestValue, "$keywordTypeId", sKeywordTypeID, -1)
+	requestValue = s.Replace(requestValue, "$name", iReq.InKeyword.Name, -1)
+	requestValue = s.Replace(requestValue, "$extended", iReq.InKeyword.Extended, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	//log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/CreateKeyword"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	//log.Println(response.Body)
+
+	if response.StatusCode != 200 {
+		oRes.ErrorCode = response.StatusCode
+		oRes.ErrorDesc = response.Status
+		return oRes
+	}
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	//log.Println("contents : " + string(contents[:]))
+
+	myResult := MyRespEnvelopeCreateKeyword{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VCreateKeywordResponse.VCreateKeywordResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VCreateKeywordResponse.VCreateKeywordResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VCreateKeywordResponse.VCreateKeywordResult.ErrorDesc
+
+	//log.Println(oRes)
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSKeyword"
+	l.FunctionName = "CreateKeyword"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	l.Response = resp
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
 	return oRes
 }

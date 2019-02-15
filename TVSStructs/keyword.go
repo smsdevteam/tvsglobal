@@ -76,3 +76,18 @@ type CreateKeywordRequest struct {
 	} `json:"inkeyword"`
 	InReason int64 `json:"inreason"`
 }
+
+//CreateKeywordResponse obj
+type CreateKeywordResponse struct {
+	ErrorCode   int    `json:"errorcode"`
+	ErrorDesc   string `json:"errordesc"`
+	ResultValue string `json:"resultvalue"`
+}
+
+// NewCreateKeywordResponse Obj
+func NewCreateKeywordResponse() *CreateKeywordResponse {
+	return &CreateKeywordResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
