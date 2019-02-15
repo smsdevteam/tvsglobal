@@ -420,7 +420,7 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	log.Println(myResult)
+	//log.Println(myResult)
 	oRes.ResultValue = myResult.Body.GetResponse.MyCreateNoteResult.ResultValue
 	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.GetResponse.MyCreateNoteResult.ErrorCode)
 

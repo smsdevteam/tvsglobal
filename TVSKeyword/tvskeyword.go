@@ -45,6 +45,32 @@ type createKeywordResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
+// MyRespEnvelopeDeleteKeyword obj
+type MyRespEnvelopeDeleteKeyword struct {
+	XMLName xml.Name          `xml:"Envelope"`
+	Body    bodyDeleteKeyword `xml:"Body"`
+}
+
+//bodyDeleteKeyword obj
+type bodyDeleteKeyword struct {
+	XMLName                xml.Name              `xml:"Body"`
+	VDeleteKeywordResponse deleteKeywordResponse `xml:"DeleteKeywordResponse"`
+}
+
+//deleteKeywordResponse obj
+type deleteKeywordResponse struct {
+	XMLName              xml.Name            `xml:"DeleteKeywordResponse"`
+	VDeleteKeywordResult deleteKeywordResult `xml:"DeleteKeywordResult"`
+}
+
+//deleteKeywordResult obj
+type deleteKeywordResult struct {
+	XMLName     xml.Name `xml:"DeleteKeywordResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
+
 //GetKeywordByKeywordID function
 func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 	// Log#Start
@@ -405,5 +431,117 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
+	return oRes
+}
+
+//getTemplateforDeleteKeyword is xmltemplate for post to ICC service
+const getTemplateforDeleteKeyword = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+	<DeleteKeyword xmlns="http://tempuri.org/">
+		<inKeywordId>$inKeywordId</inKeywordId>
+		<inReason>$inReason</inReason>
+		<byUser>
+			<byUser>$byUser</byUser>
+            <byChannel>$byChannel</byChannel>
+            <byProject>$byProject</byProject>
+            <byHost>$byHost</byHost>
+		</byUser>
+	</DeleteKeyword>
+</s:Body>
+</s:Envelope>`
+
+//DeleteKeyword function
+func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
+
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	var resp string
+	resp = "SUCCESS"
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSKeyword"
+	l.FunctionName = "DeleteKeyword"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.InsertappLog("./log/tvsnoteapplog.log", "DeleteKeyword")
+
+	oRes := st.NewDeleteKeywordResponse()
+	var AppServiceLnk cm.AppServiceURL
+	AppServiceLnk = cm.AppReadConfig("ENH")
+
+	url := AppServiceLnk.ICCServiceURL
+	client := &http.Client{}
+
+	sInKeywordID := strconv.FormatInt(iReq.InKeywordID, 10)
+	sInReason := strconv.FormatInt(iReq.InReason, 10)
+
+	requestValue := s.Replace(getTemplateforDeleteKeyword, "$inKeywordId", sInKeywordID, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sInReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	//log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/DeleteKeyword"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	//log.Println(response.Body)
+
+	if response.StatusCode != 200 {
+		oRes.ErrorCode = response.StatusCode
+		oRes.ErrorDesc = response.Status
+		return oRes
+	}
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	log.Println("contents : " + string(contents[:]))
+
+	myResult := MyRespEnvelopeDeleteKeyword{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	//log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VDeleteKeywordResponse.VDeleteKeywordResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VDeleteKeywordResponse.VDeleteKeywordResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VDeleteKeywordResponse.VDeleteKeywordResult.ErrorDesc
+
+	//log.Println(oRes)
+
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSKeyword"
+	l.FunctionName = "DeleteKeyword"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	l.Response = resp
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvsnoteapplog.log", "DeleteKeyword")
+
 	return oRes
 }
