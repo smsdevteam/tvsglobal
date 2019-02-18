@@ -23,6 +23,7 @@ func main() {
 	mainRouter.HandleFunc("/tvskeyword/getlistkeyword/{customerid}", getListKeyword)
 	mainRouter.HandleFunc("/tvskeyword/createkeyword", createKeyword).Methods("POST")
 	mainRouter.HandleFunc("/tvskeyword/deletekeyword", deleteKeyword).Methods("POST")
+	mainRouter.HandleFunc("/tvskeyword/updatekeyword", updateKeyword).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 
@@ -77,6 +78,23 @@ func deleteKeyword(w http.ResponseWriter, r *http.Request) {
 	}
 	var res *st.DeleteKeywordResponse
 	res = DeleteKeyword(req)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(res)
+}
+
+func updateKeyword(w http.ResponseWriter, r *http.Request) {
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		panic(err)
+	}
+
+	var req st.UpdateKeywordRequest
+	err = json.Unmarshal(body, &req)
+	if err != nil {
+		panic(err)
+	}
+	var res *st.UpdateKeywordResponse
+	res = UpdateKeyword(req)
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
 }

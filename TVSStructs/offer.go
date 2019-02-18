@@ -5,7 +5,7 @@ import (
 )
 
 type Offer struct {
-	Active                bool      `json:"Active"`
+	Active                string    `json:"Active"`
 	AgreementDetailID     int64     `json:"AgreementDetailId"`
 	AgreementID           int64     `json:"AgreementId"`
 	ApplyToLevel          string    `json:"ApplyToLevel"`

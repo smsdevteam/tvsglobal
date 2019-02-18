@@ -118,3 +118,40 @@ func NewDeleteKeywordResponse() *DeleteKeywordResponse {
 		ErrorDesc: "Unexpected Error",
 	}
 }
+
+//UpdateKeywordRequest obj
+type UpdateKeywordRequest struct {
+	ByUser struct {
+		ByChannel string `json:"byChannel"`
+		ByHost    string `json:"byHost"`
+		ByProject string `json:"byProject"`
+		ByUser    string `json:"byUser"`
+	} `json:"byUser"`
+	InKeyword struct {
+		Attribute     string    `json:"Attribute"`
+		Count         int64     `json:"Count"`
+		CustomerID    int64     `json:"CustomerId"`
+		Date          time.Time `json:"Date"`
+		Extended      string    `json:"Extended"`
+		ID            int64     `json:"Id"`
+		KeywordID     int64     `json:"KeywordId"`
+		KeywordTypeID int64     `json:"KeywordTypeId"`
+		Name          string    `json:"Name"`
+	} `json:"inKeyword"`
+	InReason int64 `json:"inReason"`
+}
+
+//UpdateKeywordResponse obj
+type UpdateKeywordResponse struct {
+	ResultValue string `json:"resultvalue"`
+	ErrorCode   int    `json:"errorcode"`
+	ErrorDesc   string `json:"errordesc"`
+}
+
+// NewUpdateKeywordResponse Obj
+func NewUpdateKeywordResponse() *UpdateKeywordResponse {
+	return &UpdateKeywordResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
