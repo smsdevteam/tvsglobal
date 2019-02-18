@@ -423,6 +423,7 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	//log.Println(myResult)
 	oRes.ResultValue = myResult.Body.GetResponse.MyCreateNoteResult.ResultValue
 	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.GetResponse.MyCreateNoteResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.GetResponse.MyCreateNoteResult.ErrorDesc
 
 	//log.Println(oRes)
 
