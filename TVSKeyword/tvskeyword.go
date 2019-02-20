@@ -304,9 +304,10 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 		}
 
 		oLKeyword = append(oLKeyword, oKeyword)
-		oListKeyword.Keywords = oLKeyword
+
 	}
 
+	oListKeyword.Keywords = oLKeyword
 	oRes.MyListKeyword = oListKeyword
 	if oRes.ErrorCode == 1 {
 		oRes.ErrorCode = 0
