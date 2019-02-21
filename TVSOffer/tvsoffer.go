@@ -74,6 +74,52 @@ type createOfferResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
+// MyRespEnvelopeDeleteOffer for GetOffer
+type MyRespEnvelopeDeleteOffer struct {
+	XMLName xml.Name        `xml:"Envelope"`
+	Body    bodyDeleteOffer `xml:"Body"`
+}
+
+type bodyDeleteOffer struct {
+	XMLName              xml.Name            `xml:"Body"`
+	VDeleteOfferResponse deleteOfferResponse `xml:"DeleteOfferResponse"`
+}
+
+type deleteOfferResponse struct {
+	XMLName            xml.Name          `xml:"DeleteOfferResponse"`
+	VDeleteOfferResult deleteOfferResult `xml:"DeleteOfferResult"`
+}
+
+type deleteOfferResult struct {
+	XMLName     xml.Name `xml:"DeleteOfferResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
+
+// MyRespEnvelopeUpdateOffer for GetOffer
+type MyRespEnvelopeUpdateOffer struct {
+	XMLName xml.Name        `xml:"Envelope"`
+	Body    bodyUpdateOffer `xml:"Body"`
+}
+
+type bodyUpdateOffer struct {
+	XMLName              xml.Name            `xml:"Body"`
+	VUpdateOfferResponse updateOfferResponse `xml:"UpdateOfferResponse"`
+}
+
+type updateOfferResponse struct {
+	XMLName            xml.Name          `xml:"UpdateOfferResponse"`
+	VUpdateOfferResult updateOfferResult `xml:"UpdateOfferResult"`
+}
+
+type updateOfferResult struct {
+	XMLName     xml.Name `xml:"UpdateOfferResult"`
+	ResultValue string   `xml:"ResultValue"`
+	ErrorCode   string   `xml:"ErrorCode"`
+	ErrorDesc   string   `xml:"ErrorDesc"`
+}
+
 const getTemplateforGetOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 <s:Body>
 	<GetOffer xmlns="http://tempuri.org/">
@@ -474,5 +520,272 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsofferapplog.log", "CreateOffer")
+	return oRes
+}
+
+const getTemplateforDeleteOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+	<DeleteOffer xmlns="http://tempuri.org/">
+		<inOfferId>$inOfferId</inOfferId>
+		<inReason>$inReason</inReason>
+		<byUser>
+			<byUser>$byUser</byUser>
+            <byChannel>$byChannel</byChannel>
+            <byProject>$byProject</byProject>
+            <byHost>$byHost</byHost>
+		</byUser>
+	</DeleteOffer>
+</s:Body>
+</s:Envelope>`
+
+//DeleteOffer for icc microservice
+func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
+
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	var resp string
+	resp = "SUCCESS"
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSOffer"
+	l.FunctionName = "DeleteOffer"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
+
+	oRes := st.NewDeleteOfferResponse()
+
+	var AppServiceLnk cm.AppServiceURL
+	AppServiceLnk = cm.AppReadConfig("ENH")
+
+	url := AppServiceLnk.ICCServiceURL
+	client := &http.Client{}
+
+	sInOfferID := strconv.FormatInt(iReq.InOfferID, 10)
+	sInReason := strconv.FormatInt(iReq.InReason, 10)
+
+	requestValue := s.Replace(getTemplateforDeleteOffer, "$inOfferId", sInOfferID, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sInReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	//log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/DeleteOffer"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	//log.Println(response.Body)
+
+	if response.StatusCode != 200 {
+		oRes.ErrorCode = response.StatusCode
+		oRes.ErrorDesc = response.Status
+		return oRes
+	}
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	//log.Println("contents : " + string(contents[:]))
+
+	myResult := MyRespEnvelopeDeleteOffer{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	//log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VDeleteOfferResponse.VDeleteOfferResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VDeleteOfferResponse.VDeleteOfferResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VDeleteOfferResponse.VDeleteOfferResult.ErrorDesc
+
+	//log.Println(oRes)
+
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSOffer"
+	l.FunctionName = "DeleteOffer"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	l.Response = resp
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
+	return oRes
+}
+
+const getTemplateforUpdateOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+<s:Body>
+	<UpdateOffer xmlns="http://tempuri.org/">
+		<inOffer>
+			<Active>$active</Active>
+			<AgreementDetailId>$agreementDetailId</AgreementDetailId>
+			<AgreementId>$agreementId</AgreementId>
+			<CustomerId>$customerId</CustomerId>
+			$endDate
+			<FinancialAccountId>$financialAccountId</FinancialAccountId>
+			<Id>$id</Id>
+			<OfferDefinitionId>$offerDefinitionId</OfferDefinitionId>
+			<SandboxId>$sandboxId</SandboxId>
+			<StartDate>$startDate</StartDate>
+			<Extended>$extended</Extended>
+		</inOffer>
+		<inReason>$inReason</inReason>
+		<byUser>
+			<byUser>$byUser</byUser>
+            <byChannel>$byChannel</byChannel>
+            <byProject>$byProject</byProject>
+            <byHost>$byHost</byHost>
+		</byUser>
+	</UpdateOffer>
+</s:Body>
+</s:Envelope>`
+
+//UpdateOffer for icc microservice
+func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
+
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	var resp string
+	resp = "SUCCESS"
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSOffer"
+	l.FunctionName = "UpdateOffer"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
+
+	oRes := st.NewUpdateOfferResponse()
+
+	var AppServiceLnk cm.AppServiceURL
+	AppServiceLnk = cm.AppReadConfig("ENH")
+
+	url := AppServiceLnk.ICCServiceURL
+	client := &http.Client{}
+
+	sAgreementDetailID := strconv.FormatInt(iReq.InOffer.AgreementDetailID, 10)
+	sAgreementID := strconv.FormatInt(iReq.InOffer.AgreementID, 10)
+	sCustomerID := strconv.FormatInt(iReq.InOffer.CustomerID, 10)
+	//checkTime
+	var sEndDate string
+	if iReq.InOffer.EndDate != "" {
+		layoutForDatetime := "2006-01-02T15:04:05Z"
+		tEndDate, err := time.Parse(layoutForDatetime, iReq.InOffer.EndDate)
+		if err != nil {
+			oRes.ErrorCode = 2
+			oRes.ErrorDesc = err.Error()
+			return oRes
+		}
+		sEndDate = "<EndDate>" + (tEndDate).Format("2006-01-02T15:04:05") + "</EndDate>"
+	}
+
+	sFinancialAccountID := strconv.FormatInt(iReq.InOffer.FinancialAccountID, 10)
+	sOfferDefinitionID := strconv.FormatInt(iReq.InOffer.OfferDefinitionID, 10)
+	sSandboxID := strconv.FormatInt(iReq.InOffer.SandboxID, 10)
+	//sSandboxSkipValidation := strconv.FormatInt(iReq.InOffer.SandboxSkipValidation, 10)
+	sStartDate := (iReq.InOffer.StartDate).Format("2006-01-02T15:04:05")
+	sID := strconv.FormatInt(iReq.InOffer.ID, 10)
+	sinReason := strconv.FormatInt(iReq.InReason, 10)
+
+	requestValue := s.Replace(getTemplateforCreateOffer, "$active", iReq.InOffer.Active, -1)
+	requestValue = s.Replace(requestValue, "$agreementDetailId", sAgreementDetailID, -1)
+	requestValue = s.Replace(requestValue, "$agreementId", sAgreementID, -1)
+	//requestValue = s.Replace(requestValue, "$applyToLevel", iReq.InOffer.ApplyToLevel, -1)
+	requestValue = s.Replace(requestValue, "$customerId", sCustomerID, -1)
+	requestValue = s.Replace(requestValue, "$endDate", sEndDate, -1)
+	requestValue = s.Replace(requestValue, "$financialAccountId", sFinancialAccountID, -1)
+	requestValue = s.Replace(requestValue, "$offerDefinitionId", sOfferDefinitionID, -1)
+	requestValue = s.Replace(requestValue, "$sandboxId", sSandboxID, -1)
+	//requestValue = s.Replace(requestValue, "$sandboxSkipValidation", iReq.InOffer.SandboxSkipValidation, -1)
+	requestValue = s.Replace(requestValue, "$startDate", sStartDate, -1)
+	requestValue = s.Replace(requestValue, "$extended", iReq.InOffer.Extended, -1)
+	requestValue = s.Replace(requestValue, "$id", sID, -1)
+	requestValue = s.Replace(requestValue, "$inReason", sinReason, -1)
+	requestValue = s.Replace(requestValue, "$byUser", iReq.ByUser.ByUser, -1)
+	requestValue = s.Replace(requestValue, "$byChannel", iReq.ByUser.ByChannel, -1)
+	requestValue = s.Replace(requestValue, "$byProject", iReq.ByUser.ByProject, -1)
+	requestValue = s.Replace(requestValue, "$byHost", iReq.ByUser.ByHost, -1)
+
+	//log.Println("requestValue: " + requestValue)
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://tempuri.org/IICCServiceInterface/UpdateOffer"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	response, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer response.Body.Close()
+
+	//log.Println(response.Body)
+
+	if response.StatusCode != 200 {
+		oRes.ErrorCode = response.StatusCode
+		oRes.ErrorDesc = response.Status
+		return oRes
+	}
+
+	contents, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	//log.Println("contents : " + string(contents[:]))
+
+	myResult := MyRespEnvelopeUpdateOffer{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	//log.Println(myResult)
+	oRes.ResultValue = myResult.Body.VUpdateOfferResponse.VUpdateOfferResult.ResultValue
+	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VUpdateOfferResponse.VUpdateOfferResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.VUpdateOfferResponse.VUpdateOfferResult.ErrorDesc
+
+	//log.Println(oRes)
+
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSOffer"
+	l.FunctionName = "UpdateOffer"
+	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	l.Response = resp
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
 	return oRes
 }

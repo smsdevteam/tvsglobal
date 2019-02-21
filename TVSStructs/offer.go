@@ -104,6 +104,62 @@ type DeleteOfferRequest struct {
 		ByProject string `json:"byProject"`
 		ByUser    string `json:"byUser"`
 	} `json:"byUser"`
-	InOfferID string `json:"inOfferId"`
-	InReason  string `json:"inReason"`
+	InOfferID int64 `json:"inOfferId"`
+	InReason  int64 `json:"inReason"`
+}
+
+//DeleteOfferResponse Obj
+type DeleteOfferResponse struct {
+	ErrorCode   int    `json:"errorcode"`
+	ErrorDesc   string `json:"errordesc"`
+	ResultValue string `json:"resultvalue"`
+}
+
+// NewDeleteOfferResponse Obj
+func NewDeleteOfferResponse() *DeleteOfferResponse {
+	return &DeleteOfferResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
+
+//UpdateOfferRequest obj
+type UpdateOfferRequest struct {
+	ByUser struct {
+		ByChannel string `json:"byChannel"`
+		ByHost    string `json:"byHost"`
+		ByProject string `json:"byProject"`
+		ByUser    string `json:"byUser"`
+	} `json:"byUser"`
+	InOffer struct {
+		Active            string `json:"Active"`
+		AgreementDetailID int64  `json:"AgreementDetailId"`
+		AgreementID       int64  `json:"AgreementId"`
+		//ApplyToLevel          string    `json:"ApplyToLevel"`
+		CustomerID         int64  `json:"CustomerId"`
+		EndDate            string `json:"EndDate"`
+		Extended           string `json:"Extended"`
+		FinancialAccountID int64  `json:"FinancialAccountId"`
+		ID                 int64  `json:"Id"`
+		OfferDefinitionID  int64  `json:"OfferDefinitionId"`
+		SandboxID          int64  `json:"SandboxId"`
+		//SandboxSkipValidation string    `json:"SandboxSkipValidation"`
+		StartDate time.Time `json:"StartDate"`
+	} `json:"inOffer"`
+	InReason int64 `json:"inReason"`
+}
+
+//UpdateOfferResponse Obj
+type UpdateOfferResponse struct {
+	ErrorCode   int    `json:"errorcode"`
+	ErrorDesc   string `json:"errordesc"`
+	ResultValue string `json:"resultvalue"`
+}
+
+// NewUpdateOfferResponse Obj
+func NewUpdateOfferResponse() *UpdateOfferResponse {
+	return &UpdateOfferResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
 }
