@@ -54,3 +54,56 @@ func NewGetListOfferResult() *GetListOfferResult {
 		ErrorDesc: "Unexpected Error",
 	}
 }
+
+//CreateOfferRequest obj
+type CreateOfferRequest struct {
+	ByUser struct {
+		ByChannel string `json:"byChannel"`
+		ByHost    string `json:"byHost"`
+		ByProject string `json:"byProject"`
+		ByUser    string `json:"byUser"`
+	} `json:"byUser"`
+	InOffer struct {
+		Active            string `json:"Active"`
+		AgreementDetailID int64  `json:"AgreementDetailId"`
+		AgreementID       int64  `json:"AgreementId"`
+		//ApplyToLevel          string    `json:"ApplyToLevel"`
+		CustomerID         int64  `json:"CustomerId"`
+		EndDate            string `json:"EndDate"`
+		Extended           string `json:"Extended"`
+		FinancialAccountID int64  `json:"FinancialAccountId"`
+		ID                 int64  `json:"Id"`
+		OfferDefinitionID  int64  `json:"OfferDefinitionId"`
+		SandboxID          int64  `json:"SandboxId"`
+		//SandboxSkipValidation string    `json:"SandboxSkipValidation"`
+		StartDate time.Time `json:"StartDate"`
+	} `json:"inOffer"`
+	InReason int64 `json:"inReason"`
+}
+
+//CreateOfferResponse Obj
+type CreateOfferResponse struct {
+	ErrorCode   int    `json:"errorcode"`
+	ErrorDesc   string `json:"errordesc"`
+	ResultValue string `json:"resultvalue"`
+}
+
+// NewCreateOfferResponse Obj
+func NewCreateOfferResponse() *CreateOfferResponse {
+	return &CreateOfferResponse{
+		ErrorCode: 1,
+		ErrorDesc: "Unexpected Error",
+	}
+}
+
+//DeleteOfferRequest Obj
+type DeleteOfferRequest struct {
+	ByUser struct {
+		ByChannel string `json:"byChannel"`
+		ByHost    string `json:"byHost"`
+		ByProject string `json:"byProject"`
+		ByUser    string `json:"byUser"`
+	} `json:"byUser"`
+	InOfferID string `json:"inOfferId"`
+	InReason  string `json:"inReason"`
+}
