@@ -134,7 +134,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 		} else {
 			break
 		}
-
+		//TVSBNCCBSOfferPropertyobj.Ecbsservicetype
 		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[colmap["CCBS_OFFERNAME"]].(string)
 		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[colmap["CCBS_SOCID"]].(string)
 		TVSBNCCBSOfferPropertyobj.Expirationdate = values[colmap["EXPIRATIONDATE"]].(time.Time)
@@ -226,7 +226,19 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		//	offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate //"2019-02-11T00:00:01"
 		offer.ServiceType = "80" //TVSBNP.TVSBNCCBSOfferPropertylist[0].Ecbsservicetype
 		//offer.TargetPayChannelId = nil
-		offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid!="0" {
+			offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
+		}
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].EffectiveDateSpecified==1{
+			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		}
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action=="REMOVE"{
+			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		}
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind!=" "{
+			offer. = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		}
+		
 		omxreq.Customer.OU.Subscriber.Offers = append(omxreq.Customer.OU.Subscriber.Offers, offer)
 	}
 
