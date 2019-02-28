@@ -109,9 +109,9 @@ type SubmitOrderOpRequest struct {
 				SubscriberType   string `xml:"subscriberType"`
 				ExtendedInfo     struct {
 					Text  string `xml:",chardata"`
-					Name  string `xml:"name"`
-					Value string `xml:"value"`
-				} `xml:"ExtendedInfo"`
+					Name  string `xml:"name,omitempty"`
+					Value string `xml:"value,omitempty"`
+				} `xml:"ExtendedInfo,omitempty"`
 			} `xml:"subscriber"`
 		} `xml:"OU"`
 	} `xml:"Customer"`
@@ -200,7 +200,7 @@ type TVSBNCCBSOfferProperty struct {
 	Newperiodind             string
 	Extendedinfoname         string
 	Extendedinfovalue        string
-	Ecbsservicetype          string
+	Ccbsservicetype          string
 }
 type TVSBNOMXProperty struct {
 	Channel                string
@@ -209,11 +209,17 @@ type TVSBNOMXProperty struct {
 	EffectiveDate          string
 }
 type Omxccbsoffer struct {
-	Text            string `xml:",chardata"`
-	Action          string `xml:"action"`
-	//EffectiveDate   time.Time `xml:"effectiveDate"`
+	Text          string    `xml:",chardata"`
+	Action        string    `xml:"action,omitempty"`
+	EffectiveDate time.Time `xml:"effectiveDate,omitempty"` //iso 8601
 	//ExpirationDate  time.Time `xml:"expirationDate"`
-	OfferName       string `xml:"offerName"`
-	OfferInstanceId string `xml:"offerInstanceId"`
-	ServiceType     string `xml:"serviceType"`
+	OfferName       string             `xml:"offerName"`
+	OfferInstanceId string             `xml:"offerInstanceId,omitempty"`
+	ServiceType     string             `xml:"serviceType"`
+	Offerparas      []Omxccbsofferpara `xml:"omxParameterInfo"`
+}
+type Omxccbsofferpara struct {
+	Text        string `xml:",chardata"`
+	ParamName   string `xml:"paramName,omitempty"`
+	ValuesArray string `xml:"valuesArray,omitempty"`
 }
