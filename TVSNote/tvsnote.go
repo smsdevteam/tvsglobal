@@ -81,7 +81,7 @@ type updateNoteResult struct {
 // GetNoteByNoteID get info
 func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -92,7 +92,13 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	l.FunctionName = "GetNote"
 	l.Request = "NoteID=" + iNoteID
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	l.Tags = tags
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
+	l.PrintJSONLog("GetNote")
 
 	oRes := st.NewGetNoteResult()
 	var oNote st.Note

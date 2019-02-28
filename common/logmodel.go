@@ -157,7 +157,7 @@ func (a *Workflowlog) Insertworkflowlog(logfile string) error {
 }
 
 //PrintJSONLog func
-func (a *Applog) PrintJSONLog(msg string) error {
+func (a *Applog) PrintJSONLog() error {
 	logJSON, _ := json.Marshal(a)
 	fmt.Println(string(logJSON))
 	return nil
