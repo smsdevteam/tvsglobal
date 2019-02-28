@@ -25,6 +25,7 @@ func main() {
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvscustomer", index)
 	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
+	//mainRouter.HandleFunc("/tvsnote/getcustomerinfo", getCustomer).Methods("POST")
 	//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
 	//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
 	//	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
@@ -46,7 +47,7 @@ func main() {
 func getCustomer(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
-	var cusotmerResult c.CustomerInfo
+	var cusotmerResult c.Customerrespon
 
 	cusotmerResult = GetCustomerByCustomerID(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
