@@ -211,15 +211,15 @@ type TVSBNOMXProperty struct {
 type Omxccbsoffer struct {
 	Text          string    `xml:",chardata"`
 	Action        string    `xml:"action,omitempty"`
-	EffectiveDate time.Time `xml:"effectiveDate,omitempty"`
+	EffectiveDate time.Time `xml:"effectiveDate,omitempty"` //iso 8601
 	//ExpirationDate  time.Time `xml:"expirationDate"`
 	OfferName       string             `xml:"offerName"`
 	OfferInstanceId string             `xml:"offerInstanceId,omitempty"`
 	ServiceType     string             `xml:"serviceType"`
-	Offerparas      []omxParameterInfo `xml:"omxParameterInfo"`
+	Offerparas      []Omxccbsofferpara `xml:"omxParameterInfo"`
 }
-type omxParameterInfo struct {
+type Omxccbsofferpara struct {
 	Text        string `xml:",chardata"`
-	paramName   string `xml:"paramName,omitempty"`
-	valuesArray string `xml:"valuesArray,omitempty"`
+	ParamName   string `xml:"paramName,omitempty"`
+	ValuesArray string `xml:"valuesArray,omitempty"`
 }

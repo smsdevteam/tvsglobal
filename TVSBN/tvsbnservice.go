@@ -218,6 +218,7 @@ func mappingvalueomxexistingsub(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderO
 }
 func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpRequest) {
 	var offer st.Omxccbsoffer
+	var offerpara st.Omxccbsofferpara
 	//omxreq.Customer.OU.Subscriber.Offers := []Omxccbsoffer //[]Omxccbsoffer
 	for i := 0; i < len(TVSBNP.TVSBNCCBSOfferPropertylist); i++ {
 		offer.OfferName = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbsoffername
@@ -235,10 +236,87 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action=="REMOVE"{
 			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		}
+		//check new period 
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind!=" "{
-			offer. = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+			offerpara.ParamName = "New period ind" 
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
 		}
-		
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount!=0 {
+			offerpara.ParamName = "New period ind" 
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
+		}
+		If .Override_RC_Amount <> 0 Then
+    
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override RC description Thai"
+                            resourceInfoobj.valuesArray = .Override_RC_Description
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override RC description Eng"
+                            resourceInfoobj.valuesArray = .Override_RC_Description
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override RC amount"
+                            resourceInfoobj.valuesArray = .Override_RC_Amount
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+
+
+                        End If
+                        If .Override_OC_Amount <> 0 Or .Override_OC_Specified = 1 Then
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override OC description Thai"
+                            resourceInfoobj.valuesArray = .Override_OC_Description
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override OC description Eng"
+                            resourceInfoobj.valuesArray = .Override_OC_DescriptionEng
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = "Override OC amount"
+                            resourceInfoobj.valuesArray = .Override_OC_Amount
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+                        End If
+                        If .extendedinfo_name = "RC_END_DATE" Then
+                            resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            resourceInfoobj.paramName = .extendedinfo_name
+                            resourceInfoobj.valuesArray = .extendedinfo_value
+                            resourceInfoobj.effectiveDateSpecified = 1
+                            resourceInfoobj.effectiveDate = .effective_date
+                            temp.Add(resourceInfoobj)
+
+                            'resourceInfoobj = New omx_submitorder.omxParameterInfo
+                            'resourceInfoobj.paramName = "RC_END_DATE"
+                            'resourceInfoobj.valuesArray = TrueVS.Public.TrueVSP.ConvertDatetime(.effective_date, "dd/MM/yyyy")
+                            'temp.Add(resourceInfoobj)
+                        End If
+                        If .extendedinfo_name <> " " And .extendedinfo_name <> "RC_END_DATE" Then
+
+                            omxExtendedInfoType = New omx_submitorder.omxExtendedInfoType
+                            omxExtendedInfoType.name = .extendedinfo_name
+                            omxExtendedInfoType.value = .extendedinfo_value
+                            tempex.Add(omxExtendedInfoType)
+                        End If
+		// check add offer
+
 		omxreq.Customer.OU.Subscriber.Offers = append(omxreq.Customer.OU.Subscriber.Offers, offer)
 	}
 
