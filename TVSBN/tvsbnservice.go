@@ -240,83 +240,43 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind!=" "{
 			offerpara.ParamName = "New period ind" 
 			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
+			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount!=0 {
-			offerpara.ParamName = "New period ind" 
-			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
+			offerpara.ParamName = "Override RC description Thai"
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCDescription
+			offer.Offerparas = append(offer.Offerparas, offerpara)
+
+			offerpara.ParamName = "Override RC description Eng"
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCDescriptionEng
+			offer.Offerparas = append(offer.Offerparas, offerpara)
+
+			offerpara.ParamName = "Override RC amount"
+			offerpara.ValuesArray =cm.Int64ToStr( TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount)
+			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
-		If .Override_RC_Amount <> 0 Then
-    
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override RC description Thai"
-                            resourceInfoobj.valuesArray = .Override_RC_Description
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount!=0 {
+			offerpara.ParamName = "Override OC description Thai"
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCDescription
+			offer.Offerparas = append(offer.Offerparas, offerpara)
 
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override RC description Eng"
-                            resourceInfoobj.valuesArray = .Override_RC_Description
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
+			offerpara.ParamName = "Override OC description Eng"
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCDescriptionEng
+			offer.Offerparas = append(offer.Offerparas, offerpara)
 
-
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override RC amount"
-                            resourceInfoobj.valuesArray = .Override_RC_Amount
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
-
-
-
-                        End If
-                        If .Override_OC_Amount <> 0 Or .Override_OC_Specified = 1 Then
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override OC description Thai"
-                            resourceInfoobj.valuesArray = .Override_OC_Description
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
-
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override OC description Eng"
-                            resourceInfoobj.valuesArray = .Override_OC_DescriptionEng
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
-
-
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = "Override OC amount"
-                            resourceInfoobj.valuesArray = .Override_OC_Amount
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
-                        End If
-                        If .extendedinfo_name = "RC_END_DATE" Then
-                            resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            resourceInfoobj.paramName = .extendedinfo_name
-                            resourceInfoobj.valuesArray = .extendedinfo_value
-                            resourceInfoobj.effectiveDateSpecified = 1
-                            resourceInfoobj.effectiveDate = .effective_date
-                            temp.Add(resourceInfoobj)
-
-                            'resourceInfoobj = New omx_submitorder.omxParameterInfo
-                            'resourceInfoobj.paramName = "RC_END_DATE"
-                            'resourceInfoobj.valuesArray = TrueVS.Public.TrueVSP.ConvertDatetime(.effective_date, "dd/MM/yyyy")
-                            'temp.Add(resourceInfoobj)
-                        End If
-                        If .extendedinfo_name <> " " And .extendedinfo_name <> "RC_END_DATE" Then
-
-                            omxExtendedInfoType = New omx_submitorder.omxExtendedInfoType
-                            omxExtendedInfoType.name = .extendedinfo_name
-                            omxExtendedInfoType.value = .extendedinfo_value
-                            tempex.Add(omxExtendedInfoType)
-                        End If
-		// check add offer
-
+			offerpara.ParamName = "Override OC amount"
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount
+			offer.Offerparas = append(offer.Offerparas, offerpara)
+		}
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Extendedinfoname == "RC_END_DATE" {
+			offerpara.ParamName = TVSBNP.TVSBNCCBSOfferPropertylist[0].Extendedinfoname
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Extendedinfovalue
+			if TVSBNP.TVSBNCCBSOfferPropertylist[0].Extendedinfoname == "RC_END_DATE" {
+				offerpara.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+			}
+			offer.Offerparas = append(offer.Offerparas, offerpara)
+		}
+	 	// check add offer
 		omxreq.Customer.OU.Subscriber.Offers = append(omxreq.Customer.OU.Subscriber.Offers, offer)
 	}
 

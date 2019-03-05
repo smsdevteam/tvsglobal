@@ -222,4 +222,5 @@ type Omxccbsofferpara struct {
 	Text        string `xml:",chardata"`
 	ParamName   string `xml:"paramName,omitempty"`
 	ValuesArray string `xml:"valuesArray,omitempty"`
+	EffectiveDate time.Time `xml:"effectiveDate,omitempty"` //iso 8601
 }
