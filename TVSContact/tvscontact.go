@@ -7,7 +7,6 @@ import (
 	"encoding/xml"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	s "strings"
@@ -130,18 +129,24 @@ const getTemplateforGetContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 // GetContactByContactID get info
 func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "GetContact"
 	l.Request = "ContactID=" + iContactID
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSContact")
+	tags = append(tags, "applogs")
+	l.Tags = tags
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContact")
+	l.PrintJSONLog()
 
 	oRes := st.NewGetContactResponse()
 	var oContact st.Contact
@@ -157,8 +162,12 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -169,8 +178,12 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 3
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -182,6 +195,10 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	if response.StatusCode != 200 {
 		//log.Println(err)
 		resp = "response status code :" + strconv.Itoa(response.StatusCode)
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 4
 		oRes.ErrorDesc = "response status code :" + strconv.Itoa(response.StatusCode)
 		return oRes
@@ -189,8 +206,11 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		log.Println(err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 5
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -241,13 +261,16 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "GetContact"
 	l.Request = "ContactID=" + iContactID
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContact")
 	return oRes
 }
@@ -256,17 +279,23 @@ func GetContactByContactID(iContactID string) *st.GetContactResponse {
 func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "GetContactListByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSContact")
+	tags = append(tags, "applogs")
+	l.Tags = tags
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContactListByCustomerID")
 
 	//log.Println("getContactList")
@@ -275,9 +304,11 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-
-		log.Println(err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oLContact.ErrorCode = 2
 		oLContact.ErrorDesc = err.Error()
 		return oLContact
@@ -288,15 +319,21 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
-			log.Println(err)
 			resp = err.Error()
+			ts := time.Now()
+			l.Timestamp = ts.Format(time.RFC3339Nano)
+			l.Response = resp
+			l.PrintJSONLog()
 			oLContact.ErrorCode = 3
 			oLContact.ErrorDesc = err.Error()
 			return oLContact
 		} else {
 			if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
-				log.Println(err)
 				resp = err.Error()
+				ts := time.Now()
+				l.Timestamp = ts.Format(time.RFC3339Nano)
+				l.Response = resp
+				l.PrintJSONLog()
 				oLContact.ErrorCode = 4
 				oLContact.ErrorDesc = err.Error()
 				return oLContact
@@ -314,8 +351,11 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 					if err == io.EOF {
 						break
 					}
-					log.Println(err)
 					resp = err.Error()
+					ts := time.Now()
+					l.Timestamp = ts.Format(time.RFC3339Nano)
+					l.Response = resp
+					l.PrintJSONLog()
 					oLContact.ErrorCode = 5
 					oLContact.ErrorDesc = err.Error()
 					return oLContact
@@ -407,13 +447,16 @@ func GetContactListByCustomerID(iCustomerID string) *st.ListContact {
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "GetContactListByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "GetContactListByCustomerID")
 	return oLContact
 }
@@ -469,17 +512,23 @@ const getTemplateforCreateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap
 func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "CreateContact"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSContact")
+	tags = append(tags, "applogs")
+	l.Tags = tags
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "CreateContact")
 
 	var oRes st.CreateContactResponse
@@ -539,6 +588,11 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -549,6 +603,11 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -559,6 +618,11 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -567,7 +631,7 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 	//log.Println("contents : " + string(contents[:]))
 	myResult := MyRespEnvelopeCreateContact{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	log.Println(myResult)
+	//log.Println(myResult)
 	oRes.ResultValue = myResult.Body.VCreateContactResponse.VCreateContactResult.ResultValue
 	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.VCreateContactResponse.VCreateContactResult.ErrorCode)
 	oRes.ErrorDesc = myResult.Body.VCreateContactResponse.VCreateContactResult.ErrorDesc
@@ -576,13 +640,16 @@ func CreateContact(iReq st.CreateContactRequest) st.CreateContactResponse {
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "CreateContact"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "CreateContact")
 
 	return oRes
@@ -635,20 +702,27 @@ const getTemplateforUpdateContact = `<s:Envelope xmlns:s="http://schemas.xmlsoap
 </s:Body>
 </s:Envelope>`
 
+//UpdateContact function
 func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "UpdateContact"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
-	l.Start = t0.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSContact")
+	tags = append(tags, "applogs")
+	l.Tags = tags
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "UpdateContact")
 
 	var oRes st.UpdateContactResponse
@@ -710,6 +784,11 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -720,6 +799,11 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -730,6 +814,11 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -747,13 +836,16 @@ func UpdateContact(iReq st.UpdateContactRequest) st.UpdateContactResponse {
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = "TVSContact"
 	l.FunctionName = "UpdateContact"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Response = resp
-	l.Start = t0.String()
-	l.End = t1.String()
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvscontactapplog.log", "UpdateContact")
 	return oRes
 }
