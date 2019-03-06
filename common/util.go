@@ -26,6 +26,7 @@ func StrToInt64(iStr string) int64 {
 	}
 	return i
 }
+
 // StrTofloat64 : Convert string to float   (base 64)
 // error : return 0
 func StrTofloat64(iStr string) float64 {
@@ -51,7 +52,11 @@ func Int64ToStr(iNum int64) string {
 
 // Float64ToStr : Convert int (base 64) to string
 func Float64ToStr(iNum float64) string {
-	s := strconv.FormatInt(iNum, 10)
+	s := strconv.FormatFloat(iNum, 'E', -1, 64)
+	return s
+}
+func TimeToStr(itimein time) string {
+	s := itimein.UTC().String()
 	return s
 }
 

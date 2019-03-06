@@ -146,7 +146,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 		TVSBNCCBSOfferPropertyobj.Processtype = values[colmap["PROCESSTYPE"]].(string)
 		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = values[colmap["EFFECTIVEDATESPECIFIED"]].(int64)
 		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
-			TVSBNCCBSOfferPropertyobj.Effectivedate = values[colmap["EFFECTIVE_DATE"]].(time.Time)
+			TVSBNCCBSOfferPropertyobj.Effectivedate = cm.TimeStr(values[colmap["EFFECTIVE_DATE"]].(time.Time))
 		}
 
 		TVSBNCCBSOfferPropertyobj.Newperiodind = values[colmap["NEW_PERIOD_IND"]].(string)
@@ -165,6 +165,42 @@ func changepackage(customerid int) string {
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid
 	TVSBNP.CCBSFN = "CHANGEPACKAGE"
+	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
+	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
+	TVSBNP.TVSCUSTOMERNO = customerid
+	omxRequest = mappingvalueomx(TVSBNP)
+	print(omxRequest.Customer.CustomerId.Text)
+	result, err := inboundtoomx(TVSBNP, omxRequest)
+	if err == nil {
+		print(result)
+	}
+	return TVSBNP.TRNSEQNO
+
+}
+func suspendsub(customerid int) string {
+	var TVSBNP st.TVSBNProperty
+	var omxRequest st.SubmitOrderOpRequest
+	TVSBNP.CCBSORDERTYPEID = "124"
+	TVSBNP.TVSCUSTOMERNO = customerid
+	TVSBNP.CCBSFN = "SUSPENDSUB"
+	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
+	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
+	TVSBNP.TVSCUSTOMERNO = customerid
+	omxRequest = mappingvalueomx(TVSBNP)
+	print(omxRequest.Customer.CustomerId.Text)
+	result, err := inboundtoomx(TVSBNP, omxRequest)
+	if err == nil {
+		print(result)
+	}
+	return TVSBNP.TRNSEQNO
+
+}
+func restoresub(customerid int) string {
+	var TVSBNP st.TVSBNProperty
+	var omxRequest st.SubmitOrderOpRequest
+	TVSBNP.CCBSORDERTYPEID = "125"
+	TVSBNP.TVSCUSTOMERNO = customerid
+	TVSBNP.CCBSFN = "RESTORESUB"
 	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
 	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
 	TVSBNP.TVSCUSTOMERNO = customerid
@@ -213,8 +249,11 @@ func mappingvalueomxexistingsub(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderO
 	omxreq.Customer.OU.Subscriber.PayChannelIdSecondary = TVSBNP.CCBSAccountno
 	omxreq.Customer.OU.Subscriber.ActivityInfo.ActivityReason = TVSBNP.CCBSACTIVITYREON
 	omxreq.Customer.CustomerId.Text = TVSBNP.CCBSCustomerno
+	omxreq.Customer.OU.Subscriber.ResourceInfo.ResourceCategory = "R"
+	omxreq.Customer.OU.Subscriber.ResourceInfo.ResourceCategory = "R"
+	omxreq.Customer.OU.Subscriber.ResourceInfo.ResourceName = "Television ID"
+	omxreq.Customer.OU.Subscriber.ResourceInfo.ValuesArray = cm.IntToStr(TVSBNP.TVSCUSTOMERNO)
 	//omxreq.Customer.OU.Subscriber.SubscriberAddress=nil
-
 }
 func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpRequest) {
 	var offer st.Omxccbsoffer
@@ -227,22 +266,22 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		//	offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate //"2019-02-11T00:00:01"
 		offer.ServiceType = "80" //TVSBNP.TVSBNCCBSOfferPropertylist[0].Ecbsservicetype
 		//offer.TargetPayChannelId = nil
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid!="0" {
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid != "0" {
 			offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].EffectiveDateSpecified==1{
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].EffectiveDateSpecified == 1 {
 			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action=="REMOVE"{
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action == "REMOVE" {
 			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		}
-		//check new period 
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind!=" "{
-			offerpara.ParamName = "New period ind" 
+		//check new period
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind != " " {
+			offerpara.ParamName = "New period ind"
 			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount!=0 {
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount != 0 {
 			offerpara.ParamName = "Override RC description Thai"
 			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCDescription
 			offer.Offerparas = append(offer.Offerparas, offerpara)
@@ -252,10 +291,10 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 
 			offerpara.ParamName = "Override RC amount"
-			offerpara.ValuesArray =cm.Int64ToStr( TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount)
+			//offerpara.ValuesArray =cm.Int64ToStr( TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount)
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount!=0 {
+		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount != 0 {
 			offerpara.ParamName = "Override OC description Thai"
 			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCDescription
 			offer.Offerparas = append(offer.Offerparas, offerpara)
@@ -265,7 +304,7 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 
 			offerpara.ParamName = "Override OC amount"
-			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount
+			//offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideOCAmount
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Extendedinfoname == "RC_END_DATE" {
@@ -276,7 +315,7 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 			}
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
-	 	// check add offer
+		// check add offer
 		omxreq.Customer.OU.Subscriber.Offers = append(omxreq.Customer.OU.Subscriber.Offers, offer)
 	}
 
@@ -286,10 +325,13 @@ func inboundtoomx(TVSBNP st.TVSBNProperty, omxreq st.SubmitOrderOpRequest) (stri
 	client := &http.Client{}
 	output, err := xml.MarshalIndent(omxreq, "  ", "    ")
 	a := string(output)
+
 	a = `<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:sub="http://services.omx.truecorp.co.th/SubmitOrder">
 	<soapenv:Header/>
 	<soapenv:Body> ` + a + ` </soapenv:Body>
 	</soapenv:Envelope> `
+	fmt.Println("********************************************************")
+
 	fmt.Println(a)
 	fmt.Println("********************************************************")
 	requestContent := []byte(a)
