@@ -1,9 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"log"
 	st "tvsglobal/tvsstructs"
-	"encoding/json"
+
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
@@ -34,11 +35,11 @@ func main() {
 
 	q, err := ch.QueueDeclare(
 		Queueinfo.Queuename, // name
-		false,   // durable
-		false,   // delete when unused
-		false,   // exclusive
-		false,   // no-wait
-		nil,     // arguments
+		false,               // durable
+		false,               // delete when unused
+		false,               // exclusive
+		false,               // no-wait
+		nil,                 // arguments
 	)
 	failOnError(err, "Failed to declare a queue")
 
@@ -57,18 +58,18 @@ func main() {
 	var TVSOrdReqtoQueue st.TVSSubmitOrderToQueue
 	go func() {
 		for d := range msgs {
-			  err := json.Unmarshal(d.Body,TVSOrdReqtoQueue )
-			  if err!=nil{
-				  print(err.Error())
-			  }
-
-			log.Printf("Received a message: %s", d.Body)
+			err := json.Unmarshal(d.Body, &TVSOrdReqtoQueue)
+			if err != nil {
+				print(err.Error())
+			}
+			initialtask(TVSOrdReqtoQueue)
+			//log.Printf("Received a message: %s",d.Body)
 		}
 	}()
 
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
 }
-func preparetask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue){
-	
+func initialtask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue) {
+   print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
 }

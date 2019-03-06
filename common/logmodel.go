@@ -1,34 +1,47 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 )
 
 //Applog strucure
 type Applog struct {
-	OrderNo         string `json:"orderno"`
-	TrackingNo      string `json:"trackingno"`
-	ApplicationName string `json:"applicationname"`
-	FunctionName    string `json:"functionname"`
-	OrderDate       string `json:"orderdate"`
-	TVSNo           string `json:"tvsno"`
-	MobileNo        string `json:"mobileno"`
-	SerialNo        string `json:"serialno"`
-	Reference1      string `json:"reference1"`
-	Reference2      string `json:"reference2"`
-	Reference3      string `json:"reference3"`
-	Reference4      string `json:"reference4"`
-	Reference5      string `json:"reference5"`
-	Request         string `json:"request"`
-	Response        string `json:"response"`
-	Start           string `json:"start"`
-	End             string `json:"end"`
-	Duration        string `json:"duration"`
+	Timestamp       string   `json:"@timestamp"`
+	Tags            []string `json:"tags"`
+	OrderNo         string   `json:"orderno"`
+	TrackingNo      string   `json:"trackingno"`
+	ApplicationName string   `json:"applicationname"`
+	FunctionName    string   `json:"functionname"`
+	OrderDate       string   `json:"orderdate"`
+	TVSNo           string   `json:"tvsno"`
+	MobileNo        string   `json:"mobileno"`
+	SerialNo        string   `json:"serialno"`
+	Reference1      string   `json:"reference1"`
+	Reference2      string   `json:"reference2"`
+	Reference3      string   `json:"reference3"`
+	Reference4      string   `json:"reference4"`
+	Reference5      string   `json:"reference5"`
+	Request         string   `json:"request"`
+	Response        string   `json:"response"`
+	Start           string   `json:"start"`
+	End             string   `json:"end"`
+	Duration        string   `json:"duration"`
 }
 
+// NewApplog Obj
+func NewApplog() *Applog {
+	t0 := time.Now()
+	return &Applog{
+		Timestamp: t0.Format(time.RFC3339Nano),
+	}
+}
+
+//Processconfig struct
 type Processconfig struct {
 	CallFunction string `json:"callfunction"`
 	Start        string `json:"start"`
@@ -60,6 +73,7 @@ type Workflowlog struct {
 	ProcessConfig   []Processconfig `json:"processconfig"`
 }
 
+//InsertappLog func
 func (a *Applog) InsertappLog(logfile string, msg string) error {
 	// open a file
 	f, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
@@ -101,6 +115,7 @@ func (a *Applog) InsertappLog(logfile string, msg string) error {
 	return nil
 }
 
+//Insertworkflowlog func
 func (a *Workflowlog) Insertworkflowlog(logfile string) error {
 	// open a file
 	f, err := os.OpenFile(logfile, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666)
@@ -138,5 +153,12 @@ func (a *Workflowlog) Insertworkflowlog(logfile string) error {
 		"Duration":        a.Duration,
 		"ProcessConfig":   a.ProcessConfig,
 	}).Info("")
+	return nil
+}
+
+//PrintJSONLog func
+func (a *Applog) PrintJSONLog() error {
+	logJSON, _ := json.Marshal(a)
+	fmt.Println(string(logJSON))
 	return nil
 }

@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"strconv"
 	s "strings"
@@ -81,7 +80,7 @@ type updateNoteResult struct {
 // GetNoteByNoteID get info
 func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -92,7 +91,13 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	l.FunctionName = "GetNote"
 	l.Request = "NoteID=" + iNoteID
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	l.Tags = tags
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
+	l.PrintJSONLog()
 
 	oRes := st.NewGetNoteResult()
 	var oNote st.Note
@@ -101,8 +106,12 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -113,15 +122,23 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 		var resultC driver.Rows
 		intNoteID, err := strconv.Atoi(iNoteID)
 		if err != nil {
-			log.Println(err)
+			//log.Println(err)
 			resp = err.Error()
+			ts := time.Now()
+			l.Timestamp = ts.Format(time.RFC3339Nano)
+			l.Response = resp
+			l.PrintJSONLog()
 			oRes.ErrorCode = 3
 			oRes.ErrorDesc = err.Error()
 			return oRes
 		} else {
 			if _, err := db.Exec(statement, intNoteID, sql.Out{Dest: &resultC}); err != nil {
-				log.Println(err)
+				//log.Println(err)
 				resp = err.Error()
+				ts := time.Now()
+				l.Timestamp = ts.Format(time.RFC3339Nano)
+				l.Response = resp
+				l.PrintJSONLog()
 				oRes.ErrorCode = 4
 				oRes.ErrorDesc = err.Error()
 				return oRes
@@ -139,8 +156,12 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 					if err == io.EOF {
 						break
 					}
-					log.Println("error:", err)
+					//log.Println("error:", err)
 					resp = err.Error()
+					ts := time.Now()
+					l.Timestamp = ts.Format(time.RFC3339Nano)
+					l.Response = resp
+					l.PrintJSONLog()
 					oRes.ErrorCode = 5
 					oRes.ErrorDesc = err.Error()
 					return oRes
@@ -189,7 +210,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
+	l.PrintJSONLog()
 	//test
 	return oRes
 }
@@ -197,7 +221,7 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 //GetListNoteByCustomerID get list note by customer id
 func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -208,7 +232,13 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	l.FunctionName = "GetListNoteByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	l.Tags = tags
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
+	l.PrintJSONLog()
 
 	oRes := st.NewGetListNoteResult()
 	var oListNote st.ListNote
@@ -216,8 +246,12 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Println(err)
+		//log.Println("error:", err)
 		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -228,15 +262,23 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
-			log.Println(err)
+			//log.Println("error:", err)
 			resp = err.Error()
+			ts := time.Now()
+			l.Timestamp = ts.Format(time.RFC3339Nano)
+			l.Response = resp
+			l.PrintJSONLog()
 			oRes.ErrorCode = 3
 			oRes.ErrorDesc = err.Error()
 			return oRes
 		} else {
 			if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
-				log.Fatal(err)
+				//log.Println("error:", err)
 				resp = err.Error()
+				ts := time.Now()
+				l.Timestamp = ts.Format(time.RFC3339Nano)
+				l.Response = resp
+				l.PrintJSONLog()
 				oRes.ErrorCode = 4
 				oRes.ErrorDesc = err.Error()
 				return oRes
@@ -253,8 +295,12 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 					if err == io.EOF {
 						break
 					}
-					log.Println("error:", err)
+					//log.Println("error:", err)
 					resp = err.Error()
+					ts := time.Now()
+					l.Timestamp = ts.Format(time.RFC3339Nano)
+					l.Response = resp
+					l.PrintJSONLog()
 					oRes.ErrorCode = 5
 					oRes.ErrorDesc = err.Error()
 					return oRes
@@ -304,6 +350,9 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 	//test
 	return oRes
@@ -338,7 +387,7 @@ const getTemplateforCreateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -349,6 +398,12 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	l.FunctionName = "CreateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	l.Tags = tags
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 
 	oRes := st.NewCreateNoteResponse()
@@ -385,6 +440,11 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -395,6 +455,11 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -404,6 +469,11 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -411,6 +481,11 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -420,9 +495,10 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	log.Println(myResult)
+	//log.Println(myResult)
 	oRes.ResultValue = myResult.Body.GetResponse.MyCreateNoteResult.ResultValue
 	oRes.ErrorCode, _ = strconv.Atoi(myResult.Body.GetResponse.MyCreateNoteResult.ErrorCode)
+	oRes.ErrorDesc = myResult.Body.GetResponse.MyCreateNoteResult.ErrorDesc
 
 	//log.Println(oRes)
 
@@ -437,6 +513,9 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 	return oRes
 }
@@ -469,7 +548,7 @@ const getTemplateforUpdateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 // UpdateNote to
 func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -480,6 +559,12 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	l.FunctionName = "UpdateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	l.Tags = tags
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	var oRes st.UpdateNoteResponse
@@ -514,6 +599,11 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -524,6 +614,11 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -533,6 +628,11 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -540,6 +640,11 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		ts := time.Now()
+		l.Timestamp = ts.Format(time.RFC3339Nano)
+		l.Response = resp
+		l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -565,6 +670,9 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
+	ts := time.Now()
+	l.Timestamp = ts.Format(time.RFC3339Nano)
+	l.PrintJSONLog()
 	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	return oRes

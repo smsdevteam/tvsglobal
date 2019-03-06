@@ -1,7 +1,6 @@
 package tvsstructs
 
- 
-type WorkorderInfo struct { 
-	ID                       string `xml:"Id"`  
+type WorkorderInfo struct {
+	Id          int64
+	ProblemDesc string
 }
- 
