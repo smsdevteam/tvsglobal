@@ -136,8 +136,10 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 		}
 		//TVSBNCCBSOfferPropertyobj.Ecbsservicetype
 		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[colmap["CCBS_OFFERNAME"]].(string)
+		TVSBNCCBSOfferPropertyobj.Ccbsservicetype =  values[colmap["CCBS_SERVICETYPE"]].(string) 
+
 		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[colmap["CCBS_SOCID"]].(string)
-		TVSBNCCBSOfferPropertyobj.Expirationdate = values[colmap["EXPIRATIONDATE"]].(time.Time)
+		TVSBNCCBSOfferPropertyobj.Expirationdate = cm.TimeToStr(values[colmap["EXPIRATIONDATE"]].(time.Time))
 		TVSBNCCBSOfferPropertyobj.TargetPayChannelID = values[colmap["TARGETPAYCHANNELID"]].(int64)
 		if values[8].(int64) > 0 {
 			TVSBNCCBSOfferPropertyobj.OverrideRCAmount = cm.StrTofloat64(values[colmap["OVERRIDE_RC_AMOUNT"]].(string))
@@ -146,7 +148,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 		TVSBNCCBSOfferPropertyobj.Processtype = values[colmap["PROCESSTYPE"]].(string)
 		TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified = values[colmap["EFFECTIVEDATESPECIFIED"]].(int64)
 		if TVSBNCCBSOfferPropertyobj.EffectiveDateSpecified == 1 {
-			TVSBNCCBSOfferPropertyobj.Effectivedate = cm.TimeStr(values[colmap["EFFECTIVE_DATE"]].(time.Time))
+			TVSBNCCBSOfferPropertyobj.Effectivedate = cm.TimeToStr(values[colmap["EFFECTIVE_DATE"]].(time.Time))
 		}
 
 		TVSBNCCBSOfferPropertyobj.Newperiodind = values[colmap["NEW_PERIOD_IND"]].(string)
@@ -264,7 +266,7 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 		offer.Action = TVSBNP.TVSBNCCBSOfferPropertylist[0].Action
 		//offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		//	offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate //"2019-02-11T00:00:01"
-		offer.ServiceType = "80" //TVSBNP.TVSBNCCBSOfferPropertylist[0].Ecbsservicetype
+		offer.ServiceType = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbsservicetype
 		//offer.TargetPayChannelId = nil
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid != "0" {
 			offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
@@ -273,8 +275,9 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		}
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action == "REMOVE" {
-			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+			offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		}
+
 		//check new period
 		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind != " " {
 			offerpara.ParamName = "New period ind"

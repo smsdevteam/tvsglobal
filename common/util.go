@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
 
 // StrToInt : Convert string to int (base 10)
@@ -55,8 +56,11 @@ func Float64ToStr(iNum float64) string {
 	s := strconv.FormatFloat(iNum, 'E', -1, 64)
 	return s
 }
-func TimeToStr(itimein time) string {
-	s := itimein.UTC().String()
+
+// TimeToStr : Convert time to format
+func TimeToStr(itimein time.Time) string {
+	//s := itimein.String()
+	s := itimein.Format("2006-01-02T15:04:05.99")
 	return s
 }
 
