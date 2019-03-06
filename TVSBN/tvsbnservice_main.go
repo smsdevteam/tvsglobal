@@ -25,6 +25,9 @@ func main() {
 	//restoresub(108218909)
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tgovsbn/ccbschangepackage/{customerid}", ccbschangepackage)
+	mainRouter.HandleFunc("/tgovsbn/ccbssuspendsub/{customerid}", ccbssuspendsub)
+	mainRouter.HandleFunc("/tgovsbn/ccbsrestoresub/{customerid}", ccbsrestoresub)
+
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
@@ -40,6 +43,36 @@ func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
 	//noteResult = GetNoteByNoteID(params["noteid"])
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(changepackage(customerid))
+
+}
+func ccbssuspendsub(w http.ResponseWriter, r *http.Request) {
+	//var customerid int64
+	//var err error
+	params := mux.Vars(r)
+	fmt.Println(params["customerid"])
+	customerid := cm.StrToInt(params["customerid"])
+	//changepackage(customerid)
+	//customerid = 0
+	//var noteResult st.FinancialTransaction
+
+	//noteResult = GetNoteByNoteID(params["noteid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(suspendsub(customerid))
+
+}
+func ccbsrestoresub(w http.ResponseWriter, r *http.Request) {
+	//var customerid int64
+	//var err error
+	params := mux.Vars(r)
+	fmt.Println(params["customerid"])
+	customerid := cm.StrToInt(params["customerid"])
+	//changepackage(customerid)
+	//customerid = 0
+	//var noteResult st.FinancialTransaction
+
+	//noteResult = GetNoteByNoteID(params["noteid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(restoresub(customerid))
 
 }
 
