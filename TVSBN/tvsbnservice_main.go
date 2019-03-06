@@ -34,6 +34,7 @@ func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
 	//var customerid int64
 	//var err error
 	params := mux.Vars(r)
+	fmt.Println("start change package  ")
 	fmt.Println(params["customerid"])
 	customerid := cm.StrToInt(params["customerid"])
 	//changepackage(customerid)
