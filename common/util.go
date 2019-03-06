@@ -49,6 +49,12 @@ func Int64ToStr(iNum int64) string {
 	return s
 }
 
+// BoolToStr : Convert boolean to string
+func BoolToStr(iBool bool) string {
+	s := strconv.FormatBool(iBool)
+	return s
+}
+
 // StrToBool : Convert string (1, t, T, TRUE, true, True, 0, f, F, FALSE, false, False) to boolean (true or false)
 func StrToBool(iStr string) bool {
 	b, err := strconv.ParseBool(iStr)

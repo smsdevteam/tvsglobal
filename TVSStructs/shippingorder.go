@@ -1,10 +1,16 @@
 package tvsstructs
 
+// import (
+// 	"time"
+// )
+
 // ShippingOrderReq Header Obj
 type ShippingOrderReq struct {
 	ID                   int64                  `json:"id"`
+	AgreementID          int64                  `json:"agreementid"`
 	Comments             string                 `json:"comments"`
 	CustomerID           int64                  `json:"customerid"`
+	AddressID            int64                  `json:"addressid"`
 	ShipByDate           string                 `json:"shipbydate"`
 	ShipFromStockhandler int64                  `json:"shipfromstockhandler"`
 	Status               int                    `json:"status"`
@@ -12,7 +18,6 @@ type ShippingOrderReq struct {
 	OrderType            int64                  `json:"ordertype"`
 	FinancialAccount     int64                  `json:"financialaccount"`
 	ShippedDate          string                 `json:"shippeddate"`
-	CreateDateTime       string                 `json:"createdatetime"`
 	Reference            string                 `json:"reference"`
 	ExternalAgent        string                 `json:"externalagent"`
 	ShippingOrderLines   []ShippingOrderLineReq `json:"shippingorderlines"`
@@ -75,4 +80,112 @@ type ShippingDeviceRes struct {
 	SerialNumber    string `json:"sn"`
 	StatusID        int64  `json:"statusid"`
 	DVResult        string `json:"deviceresult"`
+}
+
+// ShippingOrderData Obj
+type ShippingOrderData struct {
+	AgreementID    int64     `xml:"agreementId" json:"agreementId"`
+	Comment        string    `xml:"Comment" json:"Comment"`
+	CreateDateTime string `xml:"CreateDateTime" json:"CreateDateTime"`
+	CustomFields   struct {
+		CustomFields []CustomFieldValue
+	} `xml:"CustomFields,omitempty" json:"CustomFields,omitempty"`
+	CustomerID                int64     `xml:"CustomerId" json:"CustomerId"`
+	Destination               string    `xml:"Destination" json:"Destination"`
+	Extended                  string    `xml:"Extended" json:"Extended"`
+	FinancialAccountID        int64     `xml:"FinancialAccountId" json:"FinancialAccountId"`
+	FullyReceiveReturnedOrder bool      `xml:"FullyReceiveReturnedOrder" json:"FullyReceiveReturnedOrder"`
+	ID                        int64     `xml:"Id" json:"Id"`
+	IgnoreAgreementID         bool      `xml:"IgnoreAgreementId" json:"IgnoreAgreementId"`
+	OldStatusID               int64     `xml:"OldStatusId" json:"OldStatusId"`
+	ParentOrderID             int64     `xml:"ParentOrderId" json:"ParentOrderId"`
+	ReceivedQuantity          int64     `xml:"ReceivedQuantity" json:"ReceivedQuantity"`
+	Reference                 string    `xml:"Reference" json:"Reference"`
+	ReturnedQuantity          int64     `xml:"ReturnedQuantity" json:"ReturnedQuantity"`
+	SandboxID                 int64     `xml:"SandboxId" json:"SandboxId"`
+	SandboxSkipValidation     bool      `xml:"SandboxSkipValidation" json:"SandboxSkipValidation"`
+	ShipByDate                string `xml:"ShipByDate" json:"ShipByDate"`
+	ShipFromStockHandlerID    int64     `xml:"ShipFromStockHandlerId" json:"ShipFromStockHandlerId"`
+	ShipToAddressID           int64     `xml:"ShipToAddressId" json:"ShipToAddressId"`
+	ShipToPartyID             int64     `xml:"ShipToPartyId" json:"ShipToPartyId"`
+	ShipToPostalCode          string    `xml:"ShipToPostalCode" json:"ShipToPostalCode"`
+	ShippedDate               string `xml:"ShippedDate" json:"ShippedDate"`
+	ShippedQuantity           int64     `xml:"ShippedQuantity" json:"ShippedQuantity"`
+	ShippingMethodID          int64     `xml:"ShippingMethodId" json:"ShippingMethodId"`
+	ShippingOrderLines        struct {
+		Items struct {
+			ShippingOrderLine []ShippingOrderLineStruct
+		} `xml:"Items" json:"Items"`
+		More       bool  `xml:"More" json:"More"`
+		Page       int64 `xml:"Page" json:"Page"`
+		TotalCount int64 `xml:"TotalCount" json:"TotalCount"`
+	} `xml:"ShippingOrderLines" json:"ShippingOrderLines"`
+	StatusID      int64 `xml:"StatusId" json:"StatusId"`
+	TotalQuantity int64 `xml:"TotalQuantity" json:"TotalQuantity"`
+	TrackingNumbers struct {
+		Items struct {
+			TrackingNumbers []TrackingNumber
+		} `xml:"Items" json:"Items"`
+		More       bool  `xml:"More" json:"More"`
+		Page       int64 `xml:"Page" json:"Page"`
+		TotalCount int64 `xml:"TotalCount" json:"TotalCount"`
+	} `xml:"TrackingNumbers,omitempty" json:"TrackingNumbers,omitempty"`	
+	TypeID          int64  `xml:"TypeId" json:"TypeId"`
+}
+
+// ShippingOrderLineStruct Obj
+type ShippingOrderLineStruct struct {
+	AgreeementDetailID        int64 `xml:"AgreeementDetailId" json:"AgreeementDetailId"`
+	CorrelatedHardwareModelID int64 `xml:"CorrelatedHardwareModelId" json:"CorrelatedHardwareModelId"`
+	CustomFields              struct {
+		CustomFields []CustomFieldValue
+	} `xml:"CustomFields,omitempty" json:"CustomFields,omitempty"`
+	DevicePerAgreementDetailID int64  `xml:"DevicePerAgreementDetailId" json:"DevicePerAgreementDetailId"`
+	Extended                   string `xml:"Extended" json:"Extended"`
+	ExternalID                 string `xml:"ExternalId" json:"ExternalId"`
+	FinanceOptionID            int64  `xml:"FinanceOptionId" json:"FinanceOptionId"`
+	HardwareModelID            int64  `xml:"HardwareModelId" json:"HardwareModelId"`
+	ID                         int64  `xml:"Id" json:"Id"`
+	NonSubstitutableModel      bool   `xml:"NonSubstitutableModel" json:"NonSubstitutableModel"`
+	OrderLineNumber            int64  `xml:"OrderLineNumber" json:"OrderLineNumber"`
+	Quantity                   int64  `xml:"Quantity" json:"Quantity"`
+	ReceivedQuantity           int64  `xml:"ReceivedQuantity" json:"ReceivedQuantity"`
+	ReturnedQuantity           int64  `xml:"ReturnedQuantity" json:"ReturnedQuantity"`
+	SandboxID                  int64  `xml:"SandboxId" json:"SandboxId"`
+	SandboxSkipValidation      bool   `xml:"SandboxSkipValidation" json:"SandboxSkipValidation"`
+	SerializedStock            bool   `xml:"SerializedStock" json:"SerializedStock"`
+	ShippingOrderID            int64  `xml:"ShippingOrderId" json:"ShippingOrderId"`
+	TechnicalProductID         int64  `xml:"TechnicalProductId" json:"TechnicalProductId"`
+	TotalLinkedDevices         int64  `xml:"TotalLinkedDevices" json:"TotalLinkedDevices"`
+	TotalUnlinkedDevices       int64  `xml:"TotalUnlinkedDevices" json:"TotalUnlinkedDevices"`
+}
+
+// TrackingNumber Obj
+type TrackingNumber struct {
+	Extended        string `xml:"Extended" json:"Extended"`
+	ID              int64  `xml:"Id" json:"Id"`
+	Number          string `xml:"Number" json:"Number"`
+	ShippingOrderID int64  `xml:"ShippingOrderId" json:"ShippingOrderId"`
+}
+
+// CustomFieldValue Obj
+type CustomFieldValue struct {
+	Extended string `xml:"Extended" json:"Extended"`
+	ID       int64  `xml:"Id" json:"Id"`
+	Name     string `xml:"Name" json:"Name"`
+	Sequence int64  `xml:"Sequence" json:"Sequence"`
+	Value    string `xml:"Value" json:"Value"`
+}
+
+// ShippingOrderDataReq Obj
+type ShippingOrderDataReq struct {
+	SODetail   ShippingOrderData `xml:"SODetail" json:"SODetail"`
+	Reasonnr   int64             `xml:"Reasonnr" json:"Reasonnr"`
+	ByUsername string            `xml:"ByUsername" json:"ByUsername"`
+}
+
+// SOResult Obj
+type SOResult struct {
+	ProcessResult ResponseResult
+	SODetail      ShippingOrderData
 }

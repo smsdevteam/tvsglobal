@@ -19,7 +19,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 func getDeviceBySerialNumber(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	fmt.Println(params["sn"])
+	p(params["sn"])
 	var odv st.GetDeviceResponse
 	odv = GetDeviceBySerialNumber(params["sn"], params["by"])
 	w.Header().Set("Content-Type", "application/json")
@@ -28,7 +28,7 @@ func getDeviceBySerialNumber(w http.ResponseWriter, r *http.Request) {
 
 func getDeviceData(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	fmt.Println(params["sn"])
+	p(params["sn"])
 	var odv st.DeviceInfo
 	odv = GetDataSerialNumber(params["sn"])
 	/*var odv st.ResponseResult
@@ -90,7 +90,7 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 	var req st.NewDeviceReq
 	err = json.Unmarshal(temp, &req)
 	if err != nil {
-		fmt.Println("There was an error:", err)
+		p("There was an error:", err)
 		panic(err)
 	}
 
@@ -103,7 +103,7 @@ func createNewSN(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	fmt.Println("Service Start...")
+	log.Println("Service Start...")
 
 	// tRes := st.NewResponseResult()
 	// log.Println(*tRes)
