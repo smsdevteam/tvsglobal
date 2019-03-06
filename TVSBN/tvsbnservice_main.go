@@ -8,7 +8,7 @@ import (
 	"log"
 	"net/http"
 
-	cm "tvsglobal/common"
+	cm "github.com/smsdevteam/tvsglobal/common"
 
 	"github.com/gorilla/mux"
 	//st "tvsglobal/tvsstructs"

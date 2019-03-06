@@ -11,7 +11,7 @@ import (
 
 	//"strconv"
 
-	st "tvsglobal/tvsstructs"
+	st "github.com/smsdevteam/tvsglobal/TVSStructs"
 
 	//"github.com/jmoiron/sqlx"
 	"net/http"

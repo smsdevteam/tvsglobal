@@ -13,9 +13,9 @@ import (
 	"io"
 	//"strconv"
 	"time"
-	cm "tvsglobal/common"
-	tg "tvsglobal/tvsccglobal"
-	st "tvsglobal/tvsstructs"
+	cm "github.com/smsdevteam/tvsglobal/common"
+	tg "github.com/smsdevteam/tvsglobal/TVSCCGLOBAL"
+	st "github.com/smsdevteam/tvsglobal/TVSStructs"
 
 	//"github.com/jmoiron/sqlx"
 	"net/http"
