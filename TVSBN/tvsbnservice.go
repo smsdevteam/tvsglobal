@@ -161,7 +161,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 	return TVSBNCCBSOfferPropertylist
 }
 
-func changepackage(customerid int) string {
+func changepackage(customerid int ) string {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
 	TVSBNP.CCBSORDERTYPEID = "128"
