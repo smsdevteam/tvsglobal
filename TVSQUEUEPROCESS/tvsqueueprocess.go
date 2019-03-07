@@ -73,4 +73,5 @@ func main() {
 func initialtask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue) {
 	
 	print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
+	generatetasklist( TVSOrdReqtoQueue.Trackingno,TVSOrdReqtoQueue)
 }
