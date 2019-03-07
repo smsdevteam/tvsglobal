@@ -71,5 +71,6 @@ func main() {
 	<-forever
 }
 func initialtask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue) {
-   print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
+	
+	print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
 }

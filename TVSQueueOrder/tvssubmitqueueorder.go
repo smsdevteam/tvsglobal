@@ -42,7 +42,7 @@ func sendtoqueue(queuename string, TVSOrdReq st.TVSQueuSubmitOrderRequest, TVSOr
 	defer conn.Close()
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close()
+	defer ch.Close() 
 	q, err := ch.QueueDeclare(
 		queuename, // name
 		false,     // durable
