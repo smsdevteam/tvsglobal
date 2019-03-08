@@ -28,7 +28,7 @@ type TVSQueueSubmitOrderReponse struct {
 
 // TVSTaskinfo object for task process info
 type TVSTaskinfo struct {
-	Taskid    int64
+	Taskid    string
 	Taskname  string
 	MSname    string
 	Resultobj ResponseResult
