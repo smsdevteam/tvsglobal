@@ -75,12 +75,15 @@ func initialtask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue) {
 	print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
 	resultcode ,TVSOrdReqtoQueue= generatetasklist( TVSOrdReqtoQueue.Trackingno,TVSOrdReqtoQueue)
 	if resultcode =="success"{
+		for i := 0; i < len(TVSOrdReqtoQueue.TVSTaskList); i++ {
+			taskid :=TVSOrdReqtoQueue.TVSTaskList[i].Taskid
+			msname :=TVSOrdReqtoQueue.TVSTaskList[i].MSname
+			switch taskid {
+			case "1":
+				log.Printf(" Start procee number " + msname )
+			 
+			}
+		}
 		
-		select {
-        case msg1 := <-c1:
-            fmt.Println("received", msg1)
-        case msg2 := <-c2:
-            fmt.Println("received", msg2)
-        }
 	}
 }
