@@ -13,7 +13,7 @@ type TVSQueuSubmitOrderRequest struct {
 type TVSSubmitOrderToQueue struct {
 	Trackingno        string
 	TVSOrdReq TVSQueuSubmitOrderRequest
-
+	
 }
 
 type TVSQueueSubmitOrderReponse struct {
