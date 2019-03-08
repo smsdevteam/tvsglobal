@@ -27,9 +27,10 @@ type MyRespEnvelope struct {
 }
 
 type body struct {
-	XMLName                  xml.Name
-	Fault                    fault
-	ResponseGetShippingOrder responseGetShippingOrder `xml:"GetShippingOrderResponse"`
+	XMLName                     xml.Name
+	Fault                       fault
+	ResponseGetShippingOrder    responseGetShippingOrder    `xml:"GetShippingOrderResponse"`
+	ResponseCreateShippingOrder responseCreateShippingOrder `xml:"CreateShippingOrderResponse"`
 }
 
 type fault struct {
@@ -41,6 +42,11 @@ type fault struct {
 type responseGetShippingOrder struct {
 	XMLName                xml.Name               `xml:"GetShippingOrderResponse"`
 	GetShippingOrderResult getShippingOrderResult `xml:"GetShippingOrderResult"`
+}
+
+type responseCreateShippingOrder struct {
+	XMLName                xml.Name               `xml:"CreateShippingOrderResponse"`
+	GetShippingOrderResult getShippingOrderResult `xml:"CreateShippingOrderResult"`
 }
 
 type getShippingOrderResult struct {
@@ -190,7 +196,7 @@ func CreateShippingOrder(SORequest st.ShippingOrderDataReq) st.SOResult {
 		SORequest.SODetail.CreateDateTime = time.Now().Format("2006-01-02T15:04:05")
 	}
 	if len(s.Trim(SORequest.SODetail.ShipByDate, " ")) == 0 {
-			SORequest.SODetail.ShipByDate = time.Now().Format("2006-01-02T15:04:05")
+		SORequest.SODetail.ShipByDate = time.Now().Format("2006-01-02T15:04:05")
 	}
 	if len(s.Trim(SORequest.SODetail.ShippedDate, " ")) == 0 {
 		SORequest.SODetail.ShippedDate = time.Now().Format("2006-01-02T15:04:05")
@@ -258,68 +264,16 @@ func CreateShippingOrder(SORequest st.ShippingOrderDataReq) st.SOResult {
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	oSO.AgreementID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.AgreementId
-	oSO.Comment = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Comment
-	oSO.CreateDateTime = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CreateDateTime
-	oSO.CustomerID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomerId
-	oSO.Destination = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Destination
-	oSO.FinancialAccountID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.FinancialAccountId
-	oSO.FullyReceiveReturnedOrder = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.FullyReceiveReturnedOrder
-	oSO.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ID
-	oSO.IgnoreAgreementID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.IgnoreAgreementId
-	oSO.OldStatusID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.OldStatusId
-	oSO.ParentOrderID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ParentOrderId
-	oSO.ReceivedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ReceivedQuantity
-	oSO.Reference = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Reference
-	oSO.ReturnedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ReturnedQuantity
-	oSO.SandboxID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.SandboxId
-	oSO.SandboxSkipValidation = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.SandboxSkipValidation
-	oSO.ShipByDate = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipByDate
-	oSO.ShipFromStockHandlerID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipFromStockHandlerId
-	oSO.ShipToAddressID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToAddressId
-	oSO.ShipToPartyID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToPartyId
-	oSO.ShipToPostalCode = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToPostalCode
-	oSO.ShippedDate = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippedDate
-	oSO.ShippedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippedQuantity
-	oSO.ShippingMethodID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingMethodId
-	qty := len(myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine)
-	for i := 0; i < qty; i++ {
-		//p(i)
-		var oSL st.ShippingOrderLineStruct
+	oSO.ID = myResult.Body.ResponseCreateShippingOrder.GetShippingOrderResult.ID
+	p("Shipping Order Id : ",oSO.ID)
 
-		oSL.AgreeementDetailID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].AgreeementDetailId
-		oSL.CorrelatedHardwareModelID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CorrelatedHardwareModelId
-		oSL.DevicePerAgreementDetailID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].DevicePerAgreementDetailId
-
-		oSL.ExternalID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ExternalId
-		oSL.FinanceOptionID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].FinanceOptionId
-		oSL.HardwareModelID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].HardwareModelId
-		oSL.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ID
-		oSL.NonSubstitutableModel = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].NonSubstitutableModel
-		oSL.OrderLineNumber = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].OrderLineNumber
-		oSL.Quantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].Quantity
-		oSL.ReceivedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ReceivedQuantity
-		oSL.ReturnedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ReturnedQuantity
-		oSL.SandboxID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SandboxId
-		oSL.SandboxSkipValidation = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SandboxSkipValidation
-		oSL.SerializedStock = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SerializedStock
-		oSL.ShippingOrderID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ShippingOrderId
-		oSL.TechnicalProductID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TechnicalProductId
-		oSL.TotalLinkedDevices = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TotalLinkedDevices
-		oSL.TotalUnlinkedDevices = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TotalUnlinkedDevices
-		oSO.ShippingOrderLines.Items.ShippingOrderLine = append(oSO.ShippingOrderLines.Items.ShippingOrderLine, oSL)
-	}
-	oSO.ShippingOrderLines.More = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.More
-	oSO.ShippingOrderLines.Page = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Page
-	oSO.ShippingOrderLines.TotalCount = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.TotalCount
-	oSO.StatusID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.StatusId
-	oSO.TotalQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TotalQuantity
-	oSO.TypeID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TypeId
+	var gRes st.SOResult
+	gRes = GetShippingOrder(oSO.ID, SORequest.ByUsername)
 
 	oRes.ErrorCode = 0
 	oRes.ErrorDesc = "SUCCESS"
 	result.ProcessResult = oRes
-	result.SODetail = oSO
+	result.SODetail = gRes.SODetail
 
 	return result
 }
