@@ -13,9 +13,10 @@ import (
 	"io"
 	//"strconv"
 	"time"
-	cm "github.com/smsdevteam/tvsglobal/common"
+
 	tg "github.com/smsdevteam/tvsglobal/TVSCCGLOBAL"
 	st "github.com/smsdevteam/tvsglobal/TVSStructs"
+	cm "github.com/smsdevteam/tvsglobal/common"
 
 	//"github.com/jmoiron/sqlx"
 	"net/http"
@@ -136,7 +137,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 		}
 		//TVSBNCCBSOfferPropertyobj.Ecbsservicetype
 		TVSBNCCBSOfferPropertyobj.Ccbsoffername = values[colmap["CCBS_OFFERNAME"]].(string)
-		TVSBNCCBSOfferPropertyobj.Ccbsservicetype =  values[colmap["CCBS_SERVICETYPE"]].(string) 
+		TVSBNCCBSOfferPropertyobj.Ccbsservicetype = values[colmap["CCBS_SERVICETYPE"]].(string)
 
 		TVSBNCCBSOfferPropertyobj.Ccbssocid = values[colmap["CCBS_SOCID"]].(string)
 		TVSBNCCBSOfferPropertyobj.Expirationdate = cm.TimeToStr(values[colmap["EXPIRATIONDATE"]].(time.Time))
@@ -161,7 +162,7 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 	return TVSBNCCBSOfferPropertylist
 }
 
-func changepackage(customerid int ) string {
+func changepackage(customerid int) string {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
 	TVSBNP.CCBSORDERTYPEID = "128"
@@ -262,35 +263,35 @@ func mappingvalueomxoffer(TVSBNP st.TVSBNProperty, omxreq *st.SubmitOrderOpReque
 	var offerpara st.Omxccbsofferpara
 	//omxreq.Customer.OU.Subscriber.Offers := []Omxccbsoffer //[]Omxccbsoffer
 	for i := 0; i < len(TVSBNP.TVSBNCCBSOfferPropertylist); i++ {
-		offer.OfferName = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbsoffername
-		offer.Action = TVSBNP.TVSBNCCBSOfferPropertylist[0].Action
+		offer.OfferName = TVSBNP.TVSBNCCBSOfferPropertylist[i].Ccbsoffername
+		offer.Action = TVSBNP.TVSBNCCBSOfferPropertylist[i].Action
 		//offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
 		//	offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate //"2019-02-11T00:00:01"
-		offer.ServiceType = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbsservicetype
+		offer.ServiceType = TVSBNP.TVSBNCCBSOfferPropertylist[i].Ccbsservicetype
 		//offer.TargetPayChannelId = nil
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid != "0" {
-			offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[0].Ccbssocid
+		if TVSBNP.TVSBNCCBSOfferPropertylist[i].Ccbssocid != "0" {
+			offer.OfferInstanceId = TVSBNP.TVSBNCCBSOfferPropertylist[i].Ccbssocid
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].EffectiveDateSpecified == 1 {
-			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		if TVSBNP.TVSBNCCBSOfferPropertylist[i].EffectiveDateSpecified == 1 {
+			offer.EffectiveDate = TVSBNP.TVSBNCCBSOfferPropertylist[i].Effectivedate
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Action == "REMOVE" {
-			offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[0].Effectivedate
+		if TVSBNP.TVSBNCCBSOfferPropertylist[i].Action == "REMOVE" {
+			offer.ExpirationDate = TVSBNP.TVSBNCCBSOfferPropertylist[i].Effectivedate
 		}
 
 		//check new period
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind != " " {
+		if TVSBNP.TVSBNCCBSOfferPropertylist[i].Newperiodind != " " {
 			offerpara.ParamName = "New period ind"
-			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].Newperiodind
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[i].Newperiodind
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 		}
-		if TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCAmount != 0 {
+		if TVSBNP.TVSBNCCBSOfferPropertylist[i].OverrideRCAmount != 0 {
 			offerpara.ParamName = "Override RC description Thai"
-			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCDescription
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[i].OverrideRCDescription
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 
 			offerpara.ParamName = "Override RC description Eng"
-			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[0].OverrideRCDescriptionEng
+			offerpara.ValuesArray = TVSBNP.TVSBNCCBSOfferPropertylist[i].OverrideRCDescriptionEng
 			offer.Offerparas = append(offer.Offerparas, offerpara)
 
 			offerpara.ParamName = "Override RC amount"
