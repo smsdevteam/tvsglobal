@@ -34,7 +34,7 @@ func generatetasklist(Trackingno string, TVSOrdReq st.TVSSubmitOrderToQueue) (st
 		} else {
 			break
 		}
-		tvstask.Taskid = values[colmap["TASKID"]].(int64)
+		tvstask.Taskid = values[colmap["TASKID"]].(string)
 		tvstask.Taskname = values[colmap["TASKNAME"]].(string)
 		tvstask.MSname = values[colmap["MSNAME"]].(string)
 
