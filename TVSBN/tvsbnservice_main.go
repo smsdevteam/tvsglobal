@@ -25,7 +25,7 @@ func main() {
 	//restoresub(108218909)
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tgovsbn/ccbschangepackage/{customerid}", ccbschangepackage)
-	mainRouter.HandleFunc("/tgovsbn/ccbschangepackage2", ccbschangepackage2).Methods("POST")
+	mainRouter.HandleFunc("/tgovsbn/ccbschangepackagep", ccbschangepackage2).Methods("POST")
 	mainRouter.HandleFunc("/tgovsbn/ccbssuspendsub/{customerid}", ccbssuspendsub)
 	mainRouter.HandleFunc("/tgovsbn/ccbsrestoresub/{customerid}", ccbsrestoresub)
 
