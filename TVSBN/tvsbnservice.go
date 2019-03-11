@@ -165,6 +165,26 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 func changepackage(customerid int) string {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
+
+	TVSBNP.CCBSORDERTYPEID = "128"
+	TVSBNP.TVSCUSTOMERNO = customerid
+	TVSBNP.CCBSFN = "CHANGEPACKAGE"
+	TVSBNP.TRNSEQNO = preparejobdata(TVSBNP.TVSCUSTOMERNO, TVSBNP.CCBSFN)
+	TVSBNP = getjobinfo(TVSBNP.TRNSEQNO)
+	TVSBNP.TVSCUSTOMERNO = customerid
+	omxRequest = mappingvalueomx(TVSBNP)
+	print(omxRequest.Customer.CustomerId.Text)
+	result, err := inboundtoomx(TVSBNP, omxRequest)
+	if err == nil {
+		print(result)
+	}
+	return TVSBNP.TRNSEQNO
+
+}
+func changepackagep(customerid int) string {
+	var TVSBNP st.TVSBNProperty
+	var omxRequest st.SubmitOrderOpRequest
+	l := cm.NewApploginfo()
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid
 	TVSBNP.CCBSFN = "CHANGEPACKAGE"

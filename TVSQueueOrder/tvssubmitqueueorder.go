@@ -36,7 +36,7 @@ func submitorder(TVSSubmitOrderRequest st.TVSQueuSubmitOrderRequest) st.TVSQueue
 	return TVSOrdRes
 }
 func sendtoqueue(queuename string, TVSOrdReq st.TVSQueuSubmitOrderRequest, TVSOrdRes *st.TVSQueueSubmitOrderReponse) {
-	var TVSOrdReqtoQueue st.TVSSubmitOrderToQueue
+	var TVSOrdReqtoQueue st.TVSSubmitOrderData
 	conn, err := amqp.Dial("amqp://admin:admin@172.19.218.104:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
