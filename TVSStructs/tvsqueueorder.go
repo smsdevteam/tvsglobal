@@ -12,13 +12,16 @@ type TVSQueuSubmitOrderRequest struct {
 	Custinfo    CustomerInfo
 }
 
-// TVSSubmitOrderToQueue object for send to rabbit mq
-type TVSSubmitOrderToQueue struct {
-	Trackingno  string
-	TVSOrdReq   TVSQueuSubmitOrderRequest
+// TVSSubmitOrderProcess object for send to rabbit mq
+type TVSSubmitOrderProcess struct {
+	orderdata  TVSSubmitOrderData
 	TVSTaskList []TVSTaskinfo
 }
-
+// TVSSubmitOrderData object for send to rabbit mq
+type TVSSubmitOrderData struct {
+	Trackingno  string
+	TVSOrdReq   TVSQueuSubmitOrderRequest
+}
 // TVSQueueSubmitOrderReponse object for response to client
 type TVSQueueSubmitOrderReponse struct {
 	Orderid           string
