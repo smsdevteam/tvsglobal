@@ -14,7 +14,7 @@ type TVSQueuSubmitOrderRequest struct {
 
 // TVSSubmitOrderProcess object for send to rabbit mq
 type TVSSubmitOrderProcess struct {
-	orderdata  TVSSubmitOrderData
+	Orderdata  TVSSubmitOrderData
 	TVSTaskList []TVSTaskinfo
 }
 // TVSSubmitOrderData object for send to rabbit mq
