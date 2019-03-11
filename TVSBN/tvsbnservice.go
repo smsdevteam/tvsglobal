@@ -181,10 +181,17 @@ func changepackage(customerid int) string {
 	return TVSBNP.TRNSEQNO
 
 }
-func changepackagep(customerid int) string {
+func changepackagep(trackingno string, customerid int) st.ResponseResult {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
-	l := cm.NewApploginfo()
+	var tags []string
+	var applog cm.Applog
+	var res st.ResponseResult
+	tags = append(tags, "env7")
+	tags = append(tags, "TVSNote")
+	tags = append(tags, "applogs")
+	applog   = cm.NewApploginfo(trackingno,"TVSBN","changepackagep" ,tags)
+	applog.Request=cm.IntToStr(customerid)
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid
 	TVSBNP.CCBSFN = "CHANGEPACKAGE"
@@ -196,8 +203,13 @@ func changepackagep(customerid int) string {
 	result, err := inboundtoomx(TVSBNP, omxRequest)
 	if err == nil {
 		print(result)
+		res.ErrorCode= 0 
+		res.ErrorDesc=" "
+	}else{
+		res.ErrorCode= 999
+		res.ErrorDesc=err.Error()
 	}
-	return TVSBNP.TRNSEQNO
+	return res
 
 }
 func suspendsub(customerid int) string {
