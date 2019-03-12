@@ -33,7 +33,6 @@ func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdRe
 	var queuename string
 	var applog cm.Applog
 	defer applog.PrintJSONLog()
-
 	applog = cm.NewApploginfo("", "tvs-serviceinterface", "changepackagep",
 		"env7", "submitorder", "applogs")
 	b, _ := json.Marshal(TVSSubmitOrderRequest)
