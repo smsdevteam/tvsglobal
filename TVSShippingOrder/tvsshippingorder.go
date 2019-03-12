@@ -2,10 +2,10 @@ package main
 
 import (
 	"bytes"
-	"database/sql"
-	"database/sql/driver"
+	// "database/sql"
+	// "database/sql/driver"
 	"encoding/xml"
-	"io"
+	// "io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -27,12 +27,10 @@ type MyRespEnvelope struct {
 }
 
 type body struct {
-	XMLName xml.Name
-	Fault   fault
-	//	ResponseCreateStockRecv      responseCreateStockRecv      `xml:"CreateStockReceiveDetailsResponse"`
-	//	ResponseCreateBuildList      responseCreateBuildList      `xml:"CreateBuildListResponse"`
-	//	ResponseAddDeviceToBuildList responseAddDeviceToBuildList `xml:"AddDeviceToBuildListManuallyResponse"`
-	//	ResponsePerformBuildList     responsePerformBuildList     `xml:"PerformBuildListActionResponse"`
+	XMLName                     xml.Name
+	Fault                       fault
+	ResponseGetShippingOrder    responseGetShippingOrder    `xml:"GetShippingOrderResponse"`
+	ResponseCreateShippingOrder responseCreateShippingOrder `xml:"CreateShippingOrderResponse"`
 }
 
 type fault struct {
@@ -41,130 +39,106 @@ type fault struct {
 	Detail string `xml:"detail"`
 }
 
-// GetShippingOrder Method
-func GetShippingOrder(iOrderID int64) st.ShippingOrderRes {
-	//db, err := sql.Open("goracle", "bgweb/bgweb#1@//tv-uat62-dq.tvsit.co.th:1521/UAT62")
-	var dbsource string
-	dbsource = cm.GetDatasourceName("ICC")
-	db, err := sql.Open("goracle", dbsource)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	var statement string
-	var resultC driver.Rows
-
-	// Shipping Order Header
-	statement = "begin redibsservice.getdatashippingorderheader(:0,:1); end;"
-
-	if _, err := db.Exec(statement, iOrderID, sql.Out{Dest: &resultC}); err != nil {
-		log.Fatal(err)
-	}
-
-	defer resultC.Close()
-	values := make([]driver.Value, len(resultC.Columns()))
-
-	var oSO st.ShippingOrderRes
-	for {
-		err = resultC.Next(values)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Println("error:", err)
-		}
-		oSO.ID = values[0].(int64)
-		oSO.DepotFrom = values[1].(int64)
-		oSO.DepotTo = values[2].(int64)
-		oSO.StatusID = values[3].(int64)
-		oSO.StatusDesc = values[4].(string)
-		oSO.TypeID = values[5].(int64)
-		oSO.TypeDesc = values[6].(string)
-		oSO.CreateComments = values[7].(string)
-		oSO.CreateReference = values[8].(string)
-		oSO.CreateDateTime = values[9].(string)
-		oSO.CreateBy = values[10].(int64)
-		oSO.CreateByName = values[11].(string)
-	}
-
-	// Shipping Order Line
-	statement = "begin redibsservice.getdatashippingorderline(:0,:1); end;"
-
-	if _, err := db.Exec(statement, iOrderID, sql.Out{Dest: &resultC}); err != nil {
-		log.Fatal(err)
-	}
-
-	defer resultC.Close()
-	values = make([]driver.Value, len(resultC.Columns()))
-
-	var oSLList []st.ShippingOrderLineRes
-
-	for {
-		err = resultC.Next(values)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Println("error:", err)
-		}
-		var oSL st.ShippingOrderLineRes
-		oSL.LineID = values[0].(int64)
-		oSL.ShippingOrderID = values[1].(int64)
-		oSL.LineNr = values[2].(int64)
-		oSL.ProductID = values[3].(int64)
-		oSL.ProductKey = values[4].(string)
-		oSL.ModelID = values[5].(int64)
-		oSL.ModelKey = values[6].(string)
-		oSL.Qty = values[7].(int64)
-		oSLList = append(oSLList, oSL)
-	}
-	oSO.ShippingOrderLines = oSLList
-
-	// Shipping Device
-	statement = "begin redibsservice.getdatashippingordersn(:0,:1); end;"
-
-	if _, err := db.Exec(statement, iOrderID, sql.Out{Dest: &resultC}); err != nil {
-		log.Fatal(err)
-	}
-
-	defer resultC.Close()
-	values = make([]driver.Value, len(resultC.Columns()))
-
-	var oSDList []st.ShippingDeviceRes
-
-	for {
-		err = resultC.Next(values)
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			log.Println("error:", err)
-		}
-		var oSD st.ShippingDeviceRes
-		oSD.ShippingOrderID = values[0].(int64)
-		oSD.LineID = values[1].(int64)
-		oSD.SerialNumber = values[2].(string)
-		oSD.StatusID = values[3].(int64)
-		oSD.DVResult = values[4].(string)
-		oSDList = append(oSDList, oSD)
-	}
-	oSO.ShippingDevices = oSDList
-
-	return oSO
+type responseGetShippingOrder struct {
+	XMLName                xml.Name               `xml:"GetShippingOrderResponse"`
+	GetShippingOrderResult getShippingOrderResult `xml:"GetShippingOrderResult"`
 }
 
-/*
-func main() {
-	var Val int64
-	fmt.Printf("input : ")
-	fmt.Scan(&Val)
-	r := GetShippingOrder(Val)
-	//r := GetShippingOrder(16301898)
-	fmt.Println(r)
-
-	json.NewEncoder(os.Stdout).Encode(r)
+type responseCreateShippingOrder struct {
+	XMLName                xml.Name               `xml:"CreateShippingOrderResponse"`
+	GetShippingOrderResult getShippingOrderResult `xml:"CreateShippingOrderResult"`
 }
-*/
+
+type getShippingOrderResult struct {
+	AgreementId    int64  `xml: agreementId"`
+	Comment        string `xml:"Comment"`
+	CreateDateTime string `xml:"CreateDateTime"`
+	CustomFields   struct {
+		CustomFieldValue []struct {
+			Extended string `xml:"Extended"`
+			Id       int64  `xml:"Id"`
+			Name     string `xml:"Name"`
+			Sequence int64  `xml:"Sequence"`
+			Value    string `xml:"Value"`
+		} `xml:"CustomFieldValue"`
+	} `xml:"CustomFields"`
+	CustomerId                int64  `xml:"CustomerId"`
+	Destination               string `xml:"Destination"`
+	Extended                  string `xml:"Extended"`
+	FinancialAccountId        int64  `xml:"FinancialAccountId"`
+	FullyReceiveReturnedOrder bool   `xml:"FullyReceiveReturnedOrder"`
+	ID                        int64  `xml:"Id"`
+	IgnoreAgreementId         bool   `xml:"IgnoreAgreementId"`
+	OldStatusId               int64  `xml:"OldStatusId"`
+	ParentOrderId             int64  `xml:"ParentOrderId"`
+	ReceivedQuantity          int64  `xml:"ReceivedQuantity"`
+	Reference                 string `xml:"Reference"`
+	ReturnedQuantity          int64  `xml:"ReturnedQuantity"`
+	SandboxId                 int64  `xml:"SandboxId"`
+	SandboxSkipValidation     bool   `xml:"SandboxSkipValidation"`
+	ShipByDate                string `xml:"ShipByDate"`
+	ShipFromStockHandlerId    int64  `xml:"ShipFromStockHandlerId"`
+	ShipToAddressId           int64  `xml:"ShipToAddressId"`
+	ShipToPartyId             int64  `xml:"ShipToPartyId"`
+	ShipToPostalCode          string `xml:"ShipToPostalCode"`
+	ShippedDate               string `xml:"ShippedDate"`
+	ShippedQuantity           int64  `xml:"ShippedQuantity"`
+	ShippingMethodId          int64  `xml:"ShippingMethodId"`
+	ShippingOrderLines        struct {
+		Items struct {
+			ShippingOrderLine []struct {
+				AgreeementDetailId        int64 `xml:"AgreeementDetailId"`
+				CorrelatedHardwareModelId int64 `xml:"CorrelatedHardwareModelId"`
+				CustomFields              struct {
+					CustomFieldValue []struct {
+						Extended string `xml:"Extended"`
+						Id       int64  `xml:"Id"`
+						Name     string `xml:"Name"`
+						Sequence int64  `xml:"Sequence"`
+						Value    string `xml:"Value"`
+					} `xml:"CustomFieldValue"`
+				} `xml:"CustomFields"`
+				DevicePerAgreementDetailId int64  `xml:"DevicePerAgreementDetailId"`
+				Extended                   string `xml:"Extended"`
+				ExternalId                 string `xml:"ExternalId"`
+				FinanceOptionId            int64  `xml:"FinanceOptionId"`
+				HardwareModelId            int64  `xml:"HardwareModelId"`
+				ID                         int64  `xml:"Id"`
+				NonSubstitutableModel      bool   `xml:"NonSubstitutableModel"`
+				OrderLineNumber            int64  `xml:"OrderLineNumber"`
+				Quantity                   int64  `xml:"Quantity"`
+				ReceivedQuantity           int64  `xml:"ReceivedQuantity"`
+				ReturnedQuantity           int64  `xml:"ReturnedQuantity"`
+				SandboxId                  int64  `xml:"SandboxId"`
+				SandboxSkipValidation      bool   `xml:"SandboxSkipValidation"`
+				SerializedStock            bool   `xml:"SerializedStock"`
+				ShippingOrderId            int64  `xml:"ShippingOrderId"`
+				TechnicalProductId         int64  `xml:"TechnicalProductId"`
+				TotalLinkedDevices         int64  `xml:"TotalLinkedDevices"`
+				TotalUnlinkedDevices       int64  `xml:"TotalUnlinkedDevices"`
+			} `xml:"ShippingOrderLine"`
+		} `xml:"Items"`
+		More       bool  `xml:"More"`
+		Page       int64 `xml:"Page"`
+		TotalCount int64 `xml:"TotalCount"`
+	} `xml:"ShippingOrderLines"`
+	StatusId        int64 `xml:"StatusId"`
+	TotalQuantity   int64 `xml:"TotalQuantity"`
+	TrackingNumbers struct {
+		Items struct {
+			TrackingNumber []struct {
+				Extended        string `xml:"Extended"`
+				Id              int64  `xml:"Id"`
+				Number          string `xml:"Number"`
+				ShippingOrderId int64  `xml:"ShippingOrderId"`
+			} `xml:"TrackingNumber"`
+		} `xml:"Items"`
+		More       bool  `xml:"More"`
+		Page       int64 `xml:"Page"`
+		TotalCount int64 `xml:"TotalCount"`
+	} `xml:"TrackingNumbers"`
+	TypeId int64 `xml:"TypeId"`
+}
 
 // ShippingOrder : ICC API
 const getTemplateAuthenHD = `<s:Header>
@@ -186,81 +160,21 @@ const getTemplateAuthenHD = `<s:Header>
 const getTemplatefortrxso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
 $TemplateHD
 <s:Body>
-<$method xmlns="http://ibs.entriq.net/OrderManagement">
-<order xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-  <AgreementId i:nil="true" />
-  <Comment>$comment</>
-  <CreateDateTime>$createdatetime<CreateDateTime>
-  <CustomFields xmlns:d5p1="http://ibs.entriq.net/Core" />
-  <CustomerId>$customerid</CustomerId>
-  <Destination>Customer</Destination>
-  <Extended i:nil="true" />
-  <FinancialAccountId i:nil="true" />
-  <FullyReceiveReturnedOrder i:nil="true" />
-  <Id i:nil="true" />
-  <IgnoreAgreementId i:nil="true" />
-  <OldStatusId i:nil="true" />
-  <ParentOrderId i:nil="true" />
-  <ReceivedQuantity i:nil="true" />
-  <Reference>$reference</Reference>
-  <ReturnedQuantity i:nil="true" />
-  <SandboxId i:nil="true" />
-  <SandboxSkipValidation i:nil="true" />
-  <ShipByDate>$shippeddate</ShipByDate>
-  <ShipFromStockHandlerId>$shipfromstockhandler</ShipFromStockHandlerId>
-  <ShipToAddressId i:nil="true" />
-  <ShipToPartyId>$customerid</ShipToPartyId>
-  <ShipToPostalCode i:nil="true" />
-  <ShippedDate i:nil="true" />
-  <ShippedQuantity i:nil="true" />
-  <ShippingMethodId>$shippingmethod</ShippingMethodId>
-  <ShippingOrderLines>
-	<Items>
-	  $itemline
-	</Items>
-	<More>false</More>
-	<Page>0</Page>
-	<TotalCount>0</TotalCount>
-  </ShippingOrderLines>
-  <StatusId i:nil="true" />
-  <TotalQuantity i:nil="true" />
-  <TrackingNumbers i:nil="true" />
-  <TypeId>$ordertype</TypeId>
-</order>
-<reasonId>0</reasonId>
-<printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />
-</$method>
+	<$method xmlns="http://ibs.entriq.net/OrderManagement">
+		<order xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+			$order
+		</order>
+	  <reasonId>$reason</reasonId>
+  	<printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />
+	</$method>
 </s:Body>
 </s:Envelope>`
 
-const getTemplateforcreateslitem = `<ShippingOrderLine>
-	<AgreeementDetailId i:nil="true" />
-	<CorrelatedHardwareModelId i:nil="true" />
-	<CustomFields xmlns:d8p1="http://ibs.entriq.net/Core" />
-	<DevicePerAgreementDetailId i:nil="true" />
-	<Extended i:nil="true" />
-	<ExternalId i:nil="true" />
-	<FinanceOptionId i:nil="true" />
-	<HardwareModelId i:nil="true" />
-	<Id i:nil="true" />
-	<NonSubstitutableModel i:nil="true" />
-	<OrderLineNumber i:nil="true" />
-	<Quantity i:nil="true" />
-	<ReceivedQuantity i:nil="true" />
-	<ReturnedQuantity i:nil="true" />
-	<SandboxId i:nil="true" />
-	<SandboxSkipValidation i:nil="true" />
-	<SerializedStock i:nil="true" />
-	<ShippingOrderId i:nil="true" />
-	<TechnicalProductId i:nil="true" />
-	<TotalLinkedDevices i:nil="true" />
-	<TotalUnlinkedDevices i:nil="true" />
-</ShippingOrderLine> `
-
 // CreateShippingOrder Obj
-func CreateShippingOrder(iSO st.ShippingOrderReq) (st.ResponseResult, st.ShippingOrderRes) {
+func CreateShippingOrder(SORequest st.ShippingOrderDataReq) st.SOResult {
 	var oRes st.ResponseResult
-	var oSORes st.ShippingOrderRes
+	var oSO st.ShippingOrderData
+	var result st.SOResult
 
 	// 1. Get Token
 	var ICCAuthen cm.ICCAuthenHD
@@ -271,11 +185,26 @@ func CreateShippingOrder(iSO st.ShippingOrderReq) (st.ResponseResult, st.Shippin
 	if err != nil {
 		oRes.ErrorCode = 100
 		oRes.ErrorDesc = err.Error()
-		return oRes, oSORes
+		result.ProcessResult = oRes
+		return result
 	}
 
 	url := ServiceLnk.ShippingOrderURL
 	client := &http.Client{}
+
+	if len(s.Trim(SORequest.SODetail.CreateDateTime, " ")) == 0 {
+		SORequest.SODetail.CreateDateTime = time.Now().Format("2006-01-02T15:04:05")
+	}
+	if len(s.Trim(SORequest.SODetail.ShipByDate, " ")) == 0 {
+		SORequest.SODetail.ShipByDate = time.Now().Format("2006-01-02T15:04:05")
+	}
+	if len(s.Trim(SORequest.SODetail.ShippedDate, " ")) == 0 {
+		SORequest.SODetail.ShippedDate = time.Now().Format("2006-01-02T15:04:05")
+	}
+
+	output, err := xml.MarshalIndent(SORequest.SODetail, "  ", "    ")
+	var so string
+	so = string(output)
 
 	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
 	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
@@ -283,36 +212,30 @@ func CreateShippingOrder(iSO st.ShippingOrderReq) (st.ResponseResult, st.Shippin
 	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
 	requestHD = s.Replace(requestHD, "$token", token, -1)
 
-	if len(s.Trim(iSO.ExternalAgent, " ")) != 0 {
-		extAgentTag := "<h:ExternalAgent>" + iSO.ExternalAgent + "</h:ExternalAgent>"
+	if len(s.Trim(SORequest.ByUsername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + SORequest.ByUsername + "</h:ExternalAgent>"
 		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
 	}
 	requestValue := s.Replace(getTemplatefortrxso, "$TemplateHD", requestHD, -1)
 	requestValue = s.Replace(requestValue, "$method", "CreateShippingOrder", -1)
+	requestValue = s.Replace(requestValue, "$order", so, -1)
+	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(SORequest.Reasonnr), -1)
+	requestValue = s.Replace(requestValue, "<ShippingOrderData>", "", -1)
+	requestValue = s.Replace(requestValue, "</ShippingOrderData>", "", -1)
 
-	// Replace Value Parameters : SO Line
-	var subrequest string
-	for i := 0; i < len(iSO.ShippingOrderLines); i++ {
-		subrequest = s.Replace(getTemplateforcreateslitem, "", "a", -1)
-	}
+	// Test Fix
+	requestValue = s.Replace(requestValue, "<CustomFields></CustomFields>", `<CustomFields xmlns:d5p1="http://ibs.entriq.net/Core" />`, -1)
 
-	p(subrequest)
-
-	// Replace Value Parameters : SO Header
-	requestValue = s.Replace(requestValue, "$comment", iSO.Comments, -1)
-	requestValue = s.Replace(requestValue, "$createdatetime", iSO.CreateDateTime, -1)
-	requestValue = s.Replace(requestValue, "$customerid", cm.Int64ToStr(iSO.CustomerID), -1)
-	requestValue = s.Replace(requestValue, "$reference", iSO.Reference, -1)
-	requestValue = s.Replace(requestValue, "$shippeddate", iSO.CreateDateTime, -1)
-	requestValue = s.Replace(requestValue, "$shipfromstockhandler", cm.Int64ToStr(iSO.CustomerID), -1)
-	requestValue = s.Replace(requestValue, "$shippingmethod", cm.Int64ToStr(iSO.ShippingMethod), -1)
+	p(requestValue)
+	p("----------------------------------------------")
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
-		return oRes, oSORes
+		result.ProcessResult = oRes
+		return result
 	}
 	req.Header.Add("SOAPAction", `"http://ibs.entriq.net/OrderManagement/IOrderManagementService/CreateShippingOrder"`)
 	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
@@ -321,27 +244,38 @@ func CreateShippingOrder(iSO st.ShippingOrderReq) (st.ResponseResult, st.Shippin
 	if err != nil {
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
-		return oRes, oSORes
+		result.ProcessResult = oRes
+		return result
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		oRes.ErrorCode = resp.StatusCode
 		oRes.ErrorDesc = resp.Status
-		return oRes, oSORes
+		result.ProcessResult = oRes
+		return result
 	}
 	contents, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
-		return oRes, oSORes
+		result.ProcessResult = oRes
+		return result
 	}
 
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
-	oRes.ErrorCode = cm.StrToInt(myResult.Body.Fault.Code)
-	oRes.ErrorDesc = myResult.Body.Fault.String
+	oSO.ID = myResult.Body.ResponseCreateShippingOrder.GetShippingOrderResult.ID
+	p("Shipping Order Id : ",oSO.ID)
 
-	return oRes, oSORes
+	var gRes st.SOResult
+	gRes = GetShippingOrder(oSO.ID, SORequest.ByUsername)
+
+	oRes.ErrorCode = 0
+	oRes.ErrorDesc = "SUCCESS"
+	result.ProcessResult = oRes
+	result.SODetail = gRes.SODetail
+
+	return result
 }
 
 const getTemplateforcancelso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
@@ -420,6 +354,291 @@ func CancelShippingOrder(soid int64, reasonnr int64, byusername string) st.Respo
 	xml.Unmarshal([]byte(contents), &myResult)
 	oRes.ErrorCode = cm.StrToInt(myResult.Body.Fault.Code)
 	oRes.ErrorDesc = myResult.Body.Fault.String
+
+	return oRes
+}
+
+const getTemplateforgetso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+$TemplateHD
+<s:Body>
+    <GetShippingOrder xmlns="http://ibs.entriq.net/OrderManagement">
+      <orderId>$soid</orderId>
+    </GetShippingOrder>
+</s:Body>
+</s:Envelope>`
+
+// GetShippingOrder Method
+func GetShippingOrder(soid int64, byusername string) st.SOResult {
+	var oRes st.ResponseResult
+	var oSO st.ShippingOrderData
+	var result st.SOResult
+
+	// 1. Get Token
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
+		oRes.ErrorCode = 100
+		oRes.ErrorDesc = err.Error()
+		result.ProcessResult = oRes
+		return result
+	}
+
+	url := ServiceLnk.ShippingOrderURL
+	client := &http.Client{}
+
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+
+	if len(s.Trim(byusername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
+	requestValue := s.Replace(getTemplateforgetso, "$TemplateHD", requestHD, -1)
+	requestValue = s.Replace(requestValue, "$soid", cm.Int64ToStr(soid), -1)
+
+	p(requestValue)
+
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		result.ProcessResult = oRes
+		return result
+	}
+
+	req.Header.Add("SOAPAction", `"http://ibs.entriq.net/OrderManagement/IOrderManagementService/GetShippingOrder"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	resp, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		result.ProcessResult = oRes
+		return result
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		oRes.ErrorCode = resp.StatusCode
+		oRes.ErrorDesc = resp.Status
+		result.ProcessResult = oRes
+		return result
+	}
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		result.ProcessResult = oRes
+		return result
+	}
+
+	myResult := MyRespEnvelope{}
+	xml.Unmarshal([]byte(contents), &myResult)
+	oSO.AgreementID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.AgreementId
+	oSO.Comment = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Comment
+	oSO.CreateDateTime = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CreateDateTime
+	oSO.CustomerID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomerId
+	oSO.Destination = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Destination
+	oSO.FinancialAccountID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.FinancialAccountId
+	oSO.FullyReceiveReturnedOrder = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.FullyReceiveReturnedOrder
+	oSO.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ID
+	oSO.IgnoreAgreementID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.IgnoreAgreementId
+	oSO.OldStatusID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.OldStatusId
+	oSO.ParentOrderID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ParentOrderId
+	oSO.ReceivedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ReceivedQuantity
+	oSO.Reference = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.Reference
+	oSO.ReturnedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ReturnedQuantity
+	oSO.SandboxID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.SandboxId
+	oSO.SandboxSkipValidation = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.SandboxSkipValidation
+	oSO.ShipByDate = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipByDate
+	oSO.ShipFromStockHandlerID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipFromStockHandlerId
+	oSO.ShipToAddressID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToAddressId
+	oSO.ShipToPartyID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToPartyId
+	oSO.ShipToPostalCode = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShipToPostalCode
+	oSO.ShippedDate = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippedDate
+	oSO.ShippedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippedQuantity
+	oSO.ShippingMethodID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingMethodId
+
+	// ShippingOrderLine
+	qty := len(myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine)
+	for i := 0; i < qty; i++ {
+		//p(i)
+		var oSL st.ShippingOrderLineStruct
+
+		oSL.AgreeementDetailID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].AgreeementDetailId
+		oSL.CorrelatedHardwareModelID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CorrelatedHardwareModelId
+		oSL.DevicePerAgreementDetailID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].DevicePerAgreementDetailId
+
+		oSL.ExternalID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ExternalId
+		oSL.FinanceOptionID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].FinanceOptionId
+		oSL.HardwareModelID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].HardwareModelId
+		oSL.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ID
+		oSL.NonSubstitutableModel = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].NonSubstitutableModel
+		oSL.OrderLineNumber = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].OrderLineNumber
+		oSL.Quantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].Quantity
+		oSL.ReceivedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ReceivedQuantity
+		oSL.ReturnedQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ReturnedQuantity
+		oSL.SandboxID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SandboxId
+		oSL.SandboxSkipValidation = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SandboxSkipValidation
+		oSL.SerializedStock = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].SerializedStock
+		oSL.ShippingOrderID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].ShippingOrderId
+		oSL.TechnicalProductID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TechnicalProductId
+		oSL.TotalLinkedDevices = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TotalLinkedDevices
+		oSL.TotalUnlinkedDevices = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].TotalUnlinkedDevices
+		oSO.ShippingOrderLines.Items.ShippingOrderLine = append(oSO.ShippingOrderLines.Items.ShippingOrderLine, oSL)
+
+		// CustomField
+		sqty := len(myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue)
+		for j := 0; j < sqty; j++ {
+			var oSCT st.CustomFieldValue
+
+			oSCT.Extended = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue[i].Extended
+			oSCT.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue[i].Id
+			oSCT.Name = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue[i].Name
+			oSCT.Sequence = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue[i].Sequence
+			oSCT.Value = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Items.ShippingOrderLine[i].CustomFields.CustomFieldValue[i].Value
+			oSL.CustomFields.CustomFields = append(oSL.CustomFields.CustomFields, oSCT)
+
+		}
+	}
+	oSO.ShippingOrderLines.More = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.More
+	oSO.ShippingOrderLines.Page = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.Page
+	oSO.ShippingOrderLines.TotalCount = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.ShippingOrderLines.TotalCount
+	oSO.StatusID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.StatusId
+	oSO.TotalQuantity = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TotalQuantity
+	oSO.TypeID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TypeId
+
+	// CustomField
+	qty = len(myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue)
+	for i := 0; i < qty; i++ {
+		var oCT st.CustomFieldValue
+
+		oCT.Extended = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue[i].Extended
+		oCT.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue[i].Id
+		oCT.Name = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue[i].Name
+		oCT.Sequence = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue[i].Sequence
+		oCT.Value = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.CustomFields.CustomFieldValue[i].Value
+		oSO.CustomFields.CustomFields = append(oSO.CustomFields.CustomFields, oCT)
+
+	}
+
+	// TrackingNumber
+	qty = len(myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TrackingNumbers.Items.TrackingNumber)
+	for i := 0; i < qty; i++ {
+		var oTR st.TrackingNumber
+
+		oTR.Extended = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TrackingNumbers.Items.TrackingNumber[i].Extended
+		oTR.ID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TrackingNumbers.Items.TrackingNumber[i].Id
+		oTR.Number = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TrackingNumbers.Items.TrackingNumber[i].Number
+		oTR.ShippingOrderID = myResult.Body.ResponseGetShippingOrder.GetShippingOrderResult.TrackingNumbers.Items.TrackingNumber[i].ShippingOrderId
+
+		oSO.TrackingNumbers.Items.TrackingNumbers = append(oSO.TrackingNumbers.Items.TrackingNumbers, oTR)
+	}
+
+	oRes.ErrorCode = 0
+	oRes.ErrorDesc = "SUCCESS"
+	result.ProcessResult = oRes
+	result.SODetail = oSO
+
+	return result
+}
+
+const getTemplateforshipso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+$TemplateHD
+<s:Body>
+		<ShipOrder xmlns="http://ibs.entriq.net/OrderManagement">
+			<order xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+				$sodata
+			</order>
+      <reasonId>$reason</reasonId>
+      <printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />			
+		</ShipOrder>
+</s:Body>
+</s:Envelope>`
+
+// ShipOrder Method
+func ShipOrder(SOData st.SOResult, reasonnr int64, byusername string) st.ResponseResult {
+	var oRes st.ResponseResult
+	// var SOData st.SOResult
+	// SOData = GetShippingOrder(soid, byusername)
+
+	output, err := xml.MarshalIndent(SOData.SODetail, "  ", "    ")
+	var so string
+	so = string(output)
+
+	// 1. Get Token
+	var ICCAuthen cm.ICCAuthenHD
+	var ServiceLnk cm.ServiceURL
+	ICCAuthen, ServiceLnk = cm.ICCReadConfig("ICC")
+
+	token, err := cm.GetICCAuthenToken("ICC")
+	if err != nil {
+		oRes.ErrorCode = 100
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	url := ServiceLnk.ShippingOrderURL
+	client := &http.Client{}
+
+	requestHD := s.Replace(getTemplateAuthenHD, "$username", ICCAuthen.ServiceUser, -1)
+	requestHD = s.Replace(requestHD, "$password", ICCAuthen.ServiceUserIdentity, -1)
+	requestHD = s.Replace(requestHD, "$dsn", ICCAuthen.ServiceDSN, -1)
+	requestHD = s.Replace(requestHD, "$servicetime", time.Now().Format("2006-01-02T15:04:05"), -1)
+	requestHD = s.Replace(requestHD, "$token", token, -1)
+
+	if len(s.Trim(byusername, " ")) != 0 {
+		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
+		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
+	}
+	requestValue := s.Replace(getTemplateforshipso, "$TemplateHD", requestHD, -1)
+	requestValue = s.Replace(requestValue, "$sodata", so, -1)
+	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "<ShippingOrderData>", "", -1)
+	requestValue = s.Replace(requestValue, "</ShippingOrderData>", "", -1)
+
+	//p(requestValue)
+
+	requestContent := []byte(requestValue)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+
+	req.Header.Add("SOAPAction", `"http://ibs.entriq.net/OrderManagement/IOrderManagementService/ShipOrder"`)
+	req.Header.Add("Content-Type", "text/xml; charset=utf-8")
+	req.Header.Add("Accept", "text/xml")
+	resp, err := client.Do(req)
+	if err != nil {
+		oRes.ErrorCode = 200
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != 200 {
+		oRes.ErrorCode = resp.StatusCode
+		oRes.ErrorDesc = resp.Status
+		return oRes
+	}
+	contents, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		oRes.ErrorCode = 400
+		oRes.ErrorDesc = err.Error()
+		return oRes
+	}
+	myResult := MyRespEnvelope{}
+	xml.Unmarshal([]byte(contents), &myResult)
+
+	oRes.ErrorCode = 0
+	oRes.ErrorDesc = "SUCCESS"
 
 	return oRes
 }
