@@ -54,6 +54,9 @@ func Int64ToStr(iNum int64) string {
 // BoolToStr : Convert boolean to string
 func BoolToStr(iBool bool) string {
 	s := strconv.FormatBool(iBool)
+	return s
+}
+
 // Float64ToStr : Convert int (base 64) to string
 func Float64ToStr(iNum float64) string {
 	s := strconv.FormatFloat(iNum, 'E', -1, 64)
