@@ -31,8 +31,18 @@ func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdRe
 	// save to request log and put to queue
 	var TVSOrdRes st.TVSSubmitOrdResData
 	var queuename string
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+
+	applog = cm.NewApploginfo("", "tvs-serviceinterface", "changepackagep",
+		"env7", "submitorder", "applogs")
+	b, _ := json.Marshal(TVSSubmitOrderRequest)
+	// Convert bytes to string.
+	s := string(b)
+	applog.Request = s
 	queuename, TVSOrdRes = savereq(TVSSubmitOrderRequest)
 	sendtoqueue(queuename, TVSSubmitOrderRequest, &TVSOrdRes)
+	applog.TrackingNo = TVSOrdRes.Trackingno
 	return TVSOrdRes
 }
 func sendtoqueue(queuename string, TVSOrdReq st.TVSSubmitOrdReqData, TVSOrdRes *st.TVSSubmitOrdResData) {

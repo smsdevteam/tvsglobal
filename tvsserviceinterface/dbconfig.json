@@ -9,6 +9,9 @@
         "cache": {
             "address": "10.0.0.2",
             "port": 6379
+        },
+        "applicationinfo": {
+            "env": "set01" 
         }
     }
 }

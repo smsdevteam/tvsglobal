@@ -184,12 +184,14 @@ func changepackage(customerid int) string {
 func changepackagep(trackingno string, customerid int) st.ResponseResult {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
+	
+	var res st.ResponseResult
 	var tags []string
 	var applog cm.Applog
-	var res st.ResponseResult
 	tags = append(tags, "env7")
 	tags = append(tags, "TVSNote")
 	tags = append(tags, "applogs")
+	defer applog.PrintJSONLog()
 	applog   = cm.NewApploginfo(trackingno,"TVSBN","changepackagep" ,tags)
 	applog.Request=cm.IntToStr(customerid)
 	TVSBNP.CCBSORDERTYPEID = "128"
