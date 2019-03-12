@@ -2,8 +2,8 @@ package tvsstructs
 
 import "time"
 
-// TVSQueuSubmitOrderRequest object  call from client
-type TVSQueuSubmitOrderRequest struct {
+// TVSSubmitOrdReqData object  call from client
+type TVSSubmitOrdReqData struct {
 	Orderid     string
 	OrderType   string
 	ChannelCode string
@@ -12,21 +12,23 @@ type TVSQueuSubmitOrderRequest struct {
 	Custinfo    CustomerInfo
 }
 
-// TVSSubmitOrderProcess object for send to rabbit mq
-type TVSSubmitOrderProcess struct {
-	Orderdata  TVSSubmitOrderData
-	TVSTaskList []TVSTaskinfo
-}
-// TVSSubmitOrderData object for send to rabbit mq
-type TVSSubmitOrderData struct {
-	Trackingno  string
-	TVSOrdReq   TVSQueuSubmitOrderRequest
-}
-// TVSQueueSubmitOrderReponse object for response to client
-type TVSQueueSubmitOrderReponse struct {
+// TVSSubmitOrdResData object for response to client
+type TVSSubmitOrdResData struct {
 	Orderid           string
 	Trackingno        string
 	ResponseResultobj ResponseResult
+}
+
+// TVSSubmitOrderProcess object for send to rabbit mq
+type TVSSubmitOrderProcess struct {
+	Orderdata   TVSSubmitOrderData
+	TVSTaskList []TVSTaskinfo
+}
+
+// TVSSubmitOrderData object for send to rabbit mq
+type TVSSubmitOrderData struct {
+	Trackingno string
+	TVSOrdReq  TVSSubmitOrdReqData
 }
 
 // TVSTaskinfo object for task process info
