@@ -17,6 +17,19 @@ func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to TVS Shipping Order Restful")
 }
 
+// Warehouse Shipping Order
+func cancelWHOrder(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	//p(params["soid"])
+	var oSO st.ResponseResult
+	var soid, reason int64
+	soid = cm.StrToInt64(params["soid"])
+	reason = cm.StrToInt64(params["reason"])
+	oSO = CancelShippingOrder(soid, reason, params["by"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(oSO)
+}
+
 func getWHOrder(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	var oSO st.ShippingOrderRes
@@ -26,16 +39,20 @@ func getWHOrder(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(oSO)
 }
 
-func getShippingOrder(w http.ResponseWriter, r *http.Request) {
+func shipWHOrder(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
-	//p(params["soid"])
-	var oSO st.SOResult
+	var oSO st.ResponseResult
+	var soid, reason, reasondv int64
+	soid = cm.StrToInt64(params["soid"])
+	reason = cm.StrToInt64(params["reason"])
+	reasondv = cm.StrToInt64(params["reasondv"])
 
-	oSO = GetShippingOrder(cm.StrToInt64(params["soid"]), params["by"])
+	oSO = ShipWHOrder(soid, reason, reasondv, params["by"] )
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(oSO)
 }
 
+// Customer Shipping Order
 func cancelShippingOrder(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	//p(params["soid"])
@@ -71,13 +88,24 @@ func createShippingOrder(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(oRes)
 }
 
+func getShippingOrder(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	//p(params["soid"])
+	var oSO st.SOResult
+
+	oSO = GetShippingOrder(cm.StrToInt64(params["soid"]), params["by"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(oSO)
+}
+
 func main() {
 	p("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsshippingorder", index)
 
 	mainRouter.HandleFunc("/tvsshippingorder/getwhshippingorder/{soid}", getWHOrder)
-	mainRouter.HandleFunc("/tvsshippingorder/cancelwhshippingorder/{soid}/{reason}/{by}", cancelShippingOrder)
+	mainRouter.HandleFunc("/tvsshippingorder/cancelwhshippingorder/{soid}/{reason}/{by}", cancelWHOrder)
+	mainRouter.HandleFunc("/tvsshippingorder/shipwhshippingorder/{soid}/{reason}/{reasondv}/{by}", shipWHOrder)
 
 	mainRouter.HandleFunc("/tvsshippingorder/getshippingorder/{soid}", getShippingOrder)
 	mainRouter.HandleFunc("/tvsshippingorder/getshippingorder/{soid}/{by}", getShippingOrder)

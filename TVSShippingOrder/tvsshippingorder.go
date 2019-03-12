@@ -402,7 +402,7 @@ func GetShippingOrder(soid int64, byusername string) st.SOResult {
 	requestValue := s.Replace(getTemplateforgetso, "$TemplateHD", requestHD, -1)
 	requestValue = s.Replace(requestValue, "$soid", cm.Int64ToStr(soid), -1)
 
-	//p(requestValue)
+	p(requestValue)
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
@@ -600,6 +600,8 @@ func ShipOrder(SOData st.SOResult, reasonnr int64, byusername string) st.Respons
 	requestValue := s.Replace(getTemplateforshipso, "$TemplateHD", requestHD, -1)
 	requestValue = s.Replace(requestValue, "$sodata", so, -1)
 	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
+	requestValue = s.Replace(requestValue, "<ShippingOrderData>", "", -1)
+	requestValue = s.Replace(requestValue, "</ShippingOrderData>", "", -1)
 
 	//p(requestValue)
 
@@ -634,6 +636,9 @@ func ShipOrder(SOData st.SOResult, reasonnr int64, byusername string) st.Respons
 	}
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
+
+	oRes.ErrorCode = 0
+	oRes.ErrorDesc = "SUCCESS"
 
 	return oRes
 }

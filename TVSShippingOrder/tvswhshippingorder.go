@@ -151,13 +151,13 @@ $TemplateHD
 		</order>
       <reasonId>$reason</reasonId>
 	  <printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />		
-	  <reasonIdForDeviceTransfer>$reasondevice</reasonIdForDeviceTransfer>	
+	  <reasonIdForDeviceTransfer>$devicereason</reasonIdForDeviceTransfer>	
 	</ShipOrderBetweenStockHandlers>
 </s:Body>
 </s:Envelope>`
 
 // ShipWHOrder Method
-func ShipWHOrder(soid int64, reasonnr int64, reasonnrfordevice int64,byusername string) st.ResponseResult {
+func ShipWHOrder(soid int64, reasonnr int64, reasonnrfordevice int64, byusername string) st.ResponseResult {
 	var oRes st.ResponseResult
 	var SOData st.SOResult
 	SOData = GetShippingOrder(soid, byusername)
@@ -194,9 +194,11 @@ func ShipWHOrder(soid int64, reasonnr int64, reasonnrfordevice int64,byusername 
 	requestValue := s.Replace(getTemplateforshipwhso, "$TemplateHD", requestHD, -1)
 	requestValue = s.Replace(requestValue, "$sodata", so, -1)
 	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
-	requestValue = s.Replace(requestValue, "$reasondevice", cm.Int64ToStr(reasonnrfordevice), -1)
+	requestValue = s.Replace(requestValue, "$devicereason", cm.Int64ToStr(reasonnrfordevice), -1)
+	requestValue = s.Replace(requestValue, "<ShippingOrderData>", "", -1)
+	requestValue = s.Replace(requestValue, "</ShippingOrderData>", "", -1)
 
-	//p(requestValue)
+	p(requestValue)
 
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
@@ -229,6 +231,9 @@ func ShipWHOrder(soid int64, reasonnr int64, reasonnrfordevice int64,byusername 
 	}
 	myResult := MyRespEnvelope{}
 	xml.Unmarshal([]byte(contents), &myResult)
+
+	oRes.ErrorCode = 0
+	oRes.ErrorDesc = "SUCCESS"
 
 	return oRes
 }
