@@ -14,6 +14,10 @@ import (
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
+const applicationname string = "tvs-serviceinterface"
+const tagappname string = "tvs-serviceinterface"
+const taglogtype string = "applogs"
+const tagenv string = "set01"
 
 func savereq(TVSOrdReq st.TVSSubmitOrdReqData) (string, st.TVSSubmitOrdResData) {
 	var queuename string
@@ -33,8 +37,8 @@ func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdRe
 	var queuename string
 	var applog cm.Applog
 	defer applog.PrintJSONLog()
-	applog = cm.NewApploginfo("", "tvs-serviceinterface", "changepackagep",
-		"env7", "submitorder", "applogs")
+	applog = cm.NewApploginfo("", applicationname, "submitorder",
+	tagenv,  tagappname, taglogtype)
 	b, _ := json.Marshal(TVSSubmitOrderRequest)
 	// Convert bytes to string.
 	s := string(b)

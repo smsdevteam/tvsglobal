@@ -4,12 +4,10 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"io"
-
 	//"encoding/json"
 	//"log"
 	cm "tvsglobal/common"
 	st "tvsglobal/tvsstructs"
-
 	//"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
