@@ -105,13 +105,9 @@ type SubmitOrderOpRequest struct {
 					LastName           string `xml:"lastName"`
 					Gender             string `xml:"gender"`
 				} `xml:"subscriberIndyName"`
-				SubscriberNumber string `xml:"subscriberNumber"`
-				SubscriberType   string `xml:"subscriberType"`
-				ExtendedInfo     struct {
-					Text  string `xml:",chardata"`
-					Name  string `xml:"name,omitempty"`
-					Value string `xml:"value,omitempty"`
-				} `xml:"ExtendedInfo,omitempty"`
+				SubscriberNumber string        `xml:"subscriberNumber"`
+				SubscriberType   string        `xml:"subscriberType"`
+				ExtendedInfoobj  *ExtendedInfo `xml:"ExtendedInfo,omitempty"`
 			} `xml:"subscriber"`
 		} `xml:"OU"`
 	} `xml:"Customer"`
@@ -184,9 +180,9 @@ type TVSBNCCBSOfferProperty struct {
 	Ccbsoffername            string
 	Ccbssocid                string
 	OfferInstanceID          string
-	Effectivedate            time.Time
+	Effectivedate            string
 	EffectiveDateSpecified   int64
-	Expirationdate           time.Time
+	Expirationdate           string
 	Processtype              string
 	TargetPayChannelID       int64
 	OverrideRCAmount         float64
@@ -209,17 +205,23 @@ type TVSBNOMXProperty struct {
 	EffectiveDate          string
 }
 type Omxccbsoffer struct {
-	Text          string    `xml:",chardata"`
-	Action        string    `xml:"action,omitempty"`
-	EffectiveDate time.Time `xml:"effectiveDate,omitempty"` //iso 8601
-	//ExpirationDate  time.Time `xml:"expirationDate"`
+	Text            string             `xml:",chardata"`
+	Action          string             `xml:"action,omitempty"`
+	EffectiveDate   string             `xml:"effectiveDate,omitempty"` //iso 8601
+	ExpirationDate  string             `xml:"expirationDate,omitempty"`
 	OfferName       string             `xml:"offerName"`
 	OfferInstanceId string             `xml:"offerInstanceId,omitempty"`
 	ServiceType     string             `xml:"serviceType"`
 	Offerparas      []Omxccbsofferpara `xml:"omxParameterInfo"`
 }
 type Omxccbsofferpara struct {
-	Text        string `xml:",chardata"`
-	ParamName   string `xml:"paramName,omitempty"`
-	ValuesArray string `xml:"valuesArray,omitempty"`
+	Text          string `xml:",chardata"`
+	ParamName     string `xml:"paramName,omitempty"`
+	ValuesArray   string `xml:"valuesArray,omitempty"`
+	EffectiveDate string `xml:"effectiveDate,omitempty"` //iso 8601
+}
+type ExtendedInfo struct {
+	Text  string `xml:",omitempty"`
+	Name  string `xml:"name,omitempty"`
+	Value string `xml:"value,omitempty"`
 }

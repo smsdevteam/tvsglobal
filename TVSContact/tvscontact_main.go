@@ -61,7 +61,7 @@ func createContact(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	log.Println(req)
+	//log.Println(req)
 
 	var res st.CreateContactResponse
 	res = CreateContact(req)
@@ -82,7 +82,7 @@ func updateContact(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	log.Println(req)
+	//log.Println(req)
 
 	var res st.UpdateContactResponse
 	res = UpdateContact(req)

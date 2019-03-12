@@ -3,6 +3,7 @@ package common
 import (
 	"fmt"
 	"strconv"
+	"time"
 )
 
 // StrToInt : Convert string to int (base 10)
@@ -26,6 +27,7 @@ func StrToInt64(iStr string) int64 {
 	}
 	return i
 }
+
 // StrTofloat64 : Convert string to float   (base 64)
 // error : return 0
 func StrTofloat64(iStr string) float64 {
@@ -52,6 +54,16 @@ func Int64ToStr(iNum int64) string {
 // BoolToStr : Convert boolean to string
 func BoolToStr(iBool bool) string {
 	s := strconv.FormatBool(iBool)
+// Float64ToStr : Convert int (base 64) to string
+func Float64ToStr(iNum float64) string {
+	s := strconv.FormatFloat(iNum, 'E', -1, 64)
+	return s
+}
+
+// TimeToStr : Convert time to format
+func TimeToStr(itimein time.Time) string {
+	//s := itimein.String()
+	s := itimein.Format("2006-01-02T15:04:05.99")
 	return s
 }
 

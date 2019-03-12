@@ -55,14 +55,14 @@ func main() {
 	failOnError(err, "Failed to register a consumer")
 
 	forever := make(chan bool)
-	var TVSOrdReqtoQueue st.TVSSubmitOrderToQueue
+	var tvssubmitdata st.TVSSubmitOrderData
 	go func() {
 		for d := range msgs {
-			err := json.Unmarshal(d.Body, &TVSOrdReqtoQueue)
+			err := json.Unmarshal(d.Body, &tvssubmitdata)
 			if err != nil {
 				print(err.Error())
 			}
-			initialtask(TVSOrdReqtoQueue)
+			initialtask(tvssubmitdata)
 			//log.Printf("Received a message: %s",d.Body)
 		}
 	}()
@@ -70,6 +70,22 @@ func main() {
 	log.Printf(" [*] Waiting for messages. To exit press CTRL+C")
 	<-forever
 }
-func initialtask(TVSOrdReqtoQueue st.TVSSubmitOrderToQueue) {
-   print("Get Task Config For Order Type " +TVSOrdReqtoQueue.TVSOrdReq.OrderType +" Tracking no " + TVSOrdReqtoQueue.Trackingno)
+func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
+	var resultcode string
+	var Processdata  st.TVSSubmitOrderProcess
+	Processdata.Orderdata=tvssubmitdata
+	print("Get Task Config For Order Type " +  tvssubmitdata.TVSOrdReq.OrderType +" Tracking no " +   tvssubmitdata.Trackingno)
+	resultcode ,Processdata= generatetasklist( tvssubmitdata.Trackingno,tvssubmitdata)
+	if resultcode =="success"{
+		for i := 0; i < len(Processdata.TVSTaskList); i++ {
+			taskid :=Processdata.TVSTaskList[i].Taskid
+			msname :=Processdata.TVSTaskList[i].MSname
+			switch taskid {
+			case "1":
+				log.Printf(" Start procee number " + msname )
+			 
+			}
+		}
+		
+	}
 }
