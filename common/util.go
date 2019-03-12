@@ -39,6 +39,16 @@ func StrTofloat64(iStr string) float64 {
 	return i
 }
 
+// StrToBool : Convert string (1, t, T, TRUE, true, True, 0, f, F, FALSE, false, False) to boolean (true or false)
+func StrToBool(iStr string) bool {
+	b, err := strconv.ParseBool(iStr)
+	if err != nil {
+		fmt.Println(err)
+		return false
+	}
+	return b
+}
+
 // IntToStr : Convert int (base 10) to string
 func IntToStr(iNum int) string {
 	s := strconv.Itoa(iNum)
@@ -68,16 +78,6 @@ func TimeToStr(itimein time.Time) string {
 	//s := itimein.String()
 	s := itimein.Format("2006-01-02T15:04:05.99")
 	return s
-}
-
-// StrToBool : Convert string (1, t, T, TRUE, true, True, 0, f, F, FALSE, false, False) to boolean (true or false)
-func StrToBool(iStr string) bool {
-	b, err := strconv.ParseBool(iStr)
-	if err != nil {
-		fmt.Println(err)
-		return false
-	}
-	return b
 }
 
 /* func main() {
