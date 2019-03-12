@@ -15,9 +15,9 @@ import (
 	_ "gopkg.in/goracle.v2"
 )
 
-func savereq(TVSOrdReq st.TVSQueuSubmitOrderRequest) (string, st.TVSQueueSubmitOrderReponse) {
+func savereq(TVSOrdReq st.TVSSubmitOrdReqData) (string, st.TVSSubmitOrdResData) {
 	var queuename string
-	var TVSOrdRes st.TVSQueueSubmitOrderReponse
+	var TVSOrdRes st.TVSSubmitOrdResData
 	cm.ExcutestoreDS("ICC", `begin
 	-- Call the procedure
 	tvs_servorder.save_requestservorder(:p_orderid,:p_ordertype,:p_channelcode,
@@ -27,22 +27,22 @@ func savereq(TVSOrdReq st.TVSQueuSubmitOrderRequest) (string, st.TVSQueueSubmitO
 		sql.Out{Dest: &queuename}, sql.Out{Dest: &TVSOrdRes.ResponseResultobj.ErrorCode}, sql.Out{Dest: &TVSOrdRes.ResponseResultobj.ErrorDesc})
 	return queuename, TVSOrdRes
 }
-func submitorder(TVSSubmitOrderRequest st.TVSQueuSubmitOrderRequest) st.TVSQueueSubmitOrderReponse {
+func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdResData {
 	// save to request log and put to queue
-	var TVSOrdRes st.TVSQueueSubmitOrderReponse
+	var TVSOrdRes st.TVSSubmitOrdResData
 	var queuename string
 	queuename, TVSOrdRes = savereq(TVSSubmitOrderRequest)
 	sendtoqueue(queuename, TVSSubmitOrderRequest, &TVSOrdRes)
 	return TVSOrdRes
 }
-func sendtoqueue(queuename string, TVSOrdReq st.TVSQueuSubmitOrderRequest, TVSOrdRes *st.TVSQueueSubmitOrderReponse) {
+func sendtoqueue(queuename string, TVSOrdReq st.TVSSubmitOrdReqData, TVSOrdRes *st.TVSSubmitOrdResData) {
 	var TVSOrdReqtoQueue st.TVSSubmitOrderData
 	conn, err := amqp.Dial("amqp://admin:admin@172.19.218.104:5672/")
 	failOnError(err, "Failed to connect to RabbitMQ")
 	defer conn.Close()
 	ch, err := conn.Channel()
 	failOnError(err, "Failed to open a channel")
-	defer ch.Close() 
+	defer ch.Close()
 	q, err := ch.QueueDeclare(
 		queuename, // name
 		false,     // durable
@@ -74,7 +74,7 @@ func failOnError(err error, msg string) {
 }
 
 func main() {
-	var req st.TVSQueuSubmitOrderRequest
+	var req st.TVSSubmitOrdReqData
 	req.ChannelCode = "ood"
 	req.OrderDate = time.Now()
 	req.OrderType = "1"
