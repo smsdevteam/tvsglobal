@@ -46,14 +46,14 @@ func NewApplog() *Applog {
 
 // NewApploginfo Obj
 func NewApploginfo(trackingno  string,applicationname string,
-				  functionname string,tags []string) *Applog {
+				  functionname string,tags []string)  Applog {
 	var applog Applog 
 	applog.TrackingNo = trackingno
 	applog.ApplicationName = applicationname
 	applog.FunctionName = functionname
 	applog.Tags = tags
 	applog.Timestamp = time.Now().Format(time.RFC3339Nano)
-	return &applog 
+	return  applog 
 }
 
 //Processconfig struct
