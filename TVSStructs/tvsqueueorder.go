@@ -40,6 +40,6 @@ type Tvsmsresp struct {
 type TVSTaskinfo struct {
 	Taskid    string
 	Taskname  string
-	MSname    string1
+	MSname    string
 	Resultobj ResponseResult
 }
