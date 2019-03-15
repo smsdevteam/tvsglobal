@@ -12,14 +12,14 @@ import (
 	_ "gopkg.in/goracle.v2"
 )
 
-func generatetasklist(Trackingno string, TVSOrdReq st.TVSSubmitOrderData) (string, st.TVSSubmitOrderProcess) {
+func generatetasklist(Trackingno string, TVSOrdprocess  *st.TVSSubmitOrderProcess)  {
 
 	var resultI driver.Rows
 	var err error
 	var tvstask st.TVSTaskinfo
 	var dataprocess st.TVSSubmitOrderProcess
 	cm.ExcutestoreDS("ICC", `begin tvs_servorder.generatetasklist(:p_trackingno,:p_ordertype,:p_rs );  end;`,
-		Trackingno, TVSOrdReq.TVSOrdReq.OrderType, sql.Out{Dest: &resultI})
+		Trackingno, TVSOrdprocess.Orderdata.TVSOrdReq.OrderType, sql.Out{Dest: &resultI})
 	defer resultI.Close()
 	values := make([]driver.Value, len(resultI.Columns()))
 	colmap := cm.Createmapcol(resultI.Columns())
@@ -39,5 +39,5 @@ func generatetasklist(Trackingno string, TVSOrdReq st.TVSSubmitOrderData) (strin
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)
 		dataprocess.TVSTaskList = append(dataprocess.TVSTaskList, tvstask)
 	}
-	return "success", dataprocess
-}
+	TVSOrdprocess.TVSTaskList=dataprocess.TVSTaskList
+}	

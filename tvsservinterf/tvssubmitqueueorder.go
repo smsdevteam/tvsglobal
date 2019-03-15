@@ -92,6 +92,6 @@ func main() {
 	req.OrderDate = time.Now()
 	req.OrderType = "1"
 	req.Orderid = "TEST001"
-	req.TVSCustNo = 0
+	req.TVSCustNo = 104854381
 	submitorder(req)
 }
