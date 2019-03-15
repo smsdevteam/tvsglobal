@@ -86,7 +86,7 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	var Processdata st.TVSSubmitOrderProcess
 	Processdata.Orderdata = tvssubmitdata
 	print("Get Task Config For Order Type " + tvssubmitdata.TVSOrdReq.OrderType + " Tracking no " + tvssubmitdata.Trackingno)
-	generatetasklist(tvssubmitdata.Trackingno, &Processdata)
+	Processdata=generatetasklist(tvssubmitdata.Trackingno, Processdata)
 	resultcode = "success"
 	if resultcode == "success" {
 		for i := 0; i < len(Processdata.TVSTaskList); i++ {
