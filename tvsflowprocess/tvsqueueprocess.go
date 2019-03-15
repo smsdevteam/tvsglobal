@@ -86,7 +86,7 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	var Processdata st.TVSSubmitOrderProcess
 	Processdata.Orderdata = tvssubmitdata
 	print("Get Task Config For Order Type " + tvssubmitdata.TVSOrdReq.OrderType + " Tracking no " + tvssubmitdata.Trackingno)
-	Processdata=generatetasklist(tvssubmitdata.Trackingno, Processdata)
+	Processdata = generatetasklist(tvssubmitdata.Trackingno, Processdata)
 	resultcode = "success"
 	if resultcode == "success" {
 		for i := 0; i < len(Processdata.TVSTaskList); i++ {
@@ -103,8 +103,8 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	}
 }
 func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
-	var msresponce st.Tvsmsresp
-	//err := json.Unmarshal(d.Body, &msresponce)
+	var msresponce st.TVSBN_Responseresult
+
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
 	fmt.Println("URL:>", url)
 	b, _ := json.Marshal(tvssubmitdata)
@@ -123,8 +123,12 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 
 	fmt.Println("response Status:", resp.Status)
 	fmt.Println("response Headers:", resp.Header)
-	fmt.Println("response json:", msresponce)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	fmt.Println("response Body:", string(body))
+
+	err = json.Unmarshal(body, &msresponce)
+
+	fmt.Println("response json:", msresponce)
+	fmt.Println("*********************************************************")
 }
