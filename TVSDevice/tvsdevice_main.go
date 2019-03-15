@@ -29,10 +29,20 @@ func getDeviceBySerialNumber(w http.ResponseWriter, r *http.Request) {
 func getDeviceData(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	p(params["sn"])
-	var odv st.DeviceInfo
+	var odv st.DeviceData
 	odv = GetDataSerialNumber(params["sn"])
 	/*var odv st.ResponseResult
 	odv = GetDeviceFromAPI(params["sn"])*/
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(odv)
+}
+
+func getDeviceViewBySerialNumber(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	p(params["sn"])
+	var odv st.DeviceInfo
+	odv = GetDeviceViewBySerialNumber(params["sn"],params["chip"],params["custnr"])
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(odv)
@@ -124,6 +134,11 @@ func main() {
 	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}/{by}", getDeviceBySerialNumber)
 	mainRouter.HandleFunc("/tvsdevice/getdevicebyserialnumber/{sn}", getDeviceBySerialNumber)
 	mainRouter.HandleFunc("/tvsdevice/getdevicedata/{sn}", getDeviceData)
+
+	mainRouter.HandleFunc("/tvsdevice/getdeviceviewbyserialnumber/{sn}/{chip}/{custnr}", getDeviceViewBySerialNumber)
+	mainRouter.HandleFunc("/tvsdevice/getdeviceviewbyserialnumber/{sn}/{chip}", getDeviceViewBySerialNumber)
+	mainRouter.HandleFunc("/tvsdevice/getdeviceviewbyserialnumber/{sn}", getDeviceViewBySerialNumber)
+
 	mainRouter.HandleFunc("/tvsdevice/movedevice/{deviceid}/{depottoid}/{reason}/{by}", moveDepot)
 	mainRouter.HandleFunc("/tvsdevice/paironedevicetoanother/{devicefrom}/{deviceto}/{reason}/{by}", pairingDevice)
 	mainRouter.HandleFunc("/tvsdevice/sendcmdtodevice/{deviceid}/{reason}/{by}", sendCmd)
