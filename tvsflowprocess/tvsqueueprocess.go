@@ -7,7 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	st "tvsglobal/tvsstructs"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
 	"net/http"
 
@@ -103,8 +103,8 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	}
 }
 func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
-	var msresponce st.tvsbn
-	err := json.Unmarshal(d.Body, &msresponce)
+	var msresponce st.Tvsmsresp
+	//err := json.Unmarshal(d.Body, &msresponce)
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
 	fmt.Println("URL:>", url)
 	b, _ := json.Marshal(tvssubmitdata)
