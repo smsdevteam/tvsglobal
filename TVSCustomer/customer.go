@@ -80,9 +80,9 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	var oCustomerRespon c.Customerrespon
 	var  oCustomerinfocolection   []c.CustomerInfo
 	//var dbsource string 
-	
-	dbsource :=  cm.GetDatasourceName("ICC") 
 	 
+	dbsource :=  cm.GetDatasourceName("ICC") 
+	  
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
 		log.Fatal(err)
@@ -105,7 +105,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
 		   colmap :=cm.Createmapcol(resultC.Columns())
-		   
+		  
 			for {
 					
 				err = resultC.Next(values)
@@ -113,6 +113,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 					if err == io.EOF {
 						break
 					}
+					
 					log.Println("error:", err)
 					//resp = err.Error()
 				}

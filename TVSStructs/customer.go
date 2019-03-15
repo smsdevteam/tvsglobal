@@ -19,6 +19,7 @@ type CustomerInfo struct {
 			Value    string `xml:"Value"`
 		} `xml:"CustomFieldValue"`
 	} `xml:"CustomFields"`
+	DeviceList   []DeviceInfo
 	CustomerSince  string `xml:"CustomerSince"`
 	DefaultAddress struct {
 		Text                    string `xml:",chardata"`

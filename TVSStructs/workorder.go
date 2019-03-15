@@ -1,6 +1,12 @@
 package tvsstructs
 
 type WorkorderInfo struct {
-	Id          int64
+	ID          int64
 	ProblemDesc string
+	WorkorderServiceDTlist []WorkorderServiceDTInfo  
 }
+ type WorkorderServiceDTInfo struct {
+	ServiceId  int64
+	ServiceDescription string
+
+ }
