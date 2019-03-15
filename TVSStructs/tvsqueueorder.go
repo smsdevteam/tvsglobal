@@ -38,3 +38,7 @@ type TVSTaskinfo struct {
 	MSname    string
 	Resultobj ResponseResult
 }
+
+type TVSMSSERVRES struct {
+	Resultobj ResponseResult
+}
