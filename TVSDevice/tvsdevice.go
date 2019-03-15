@@ -195,7 +195,7 @@ type performBuildListActionResult struct {
 }
 
 // GetDataSerialNumber
-func GetDataSerialNumber(iSN string) st.DeviceInfo {
+func GetDataSerialNumber(iSN string) st.DeviceData {
 	// Log#Start
 	var l cm.Applog
 	var trackingno string
@@ -210,7 +210,7 @@ func GetDataSerialNumber(iSN string) st.DeviceInfo {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
 
-	var odv st.DeviceInfo
+	var odv st.DeviceData
 
 	// Database
 	//db, err := sql.Open("goracle", "bgweb/bgweb#1@//tv-uat62-dq.tvsit.co.th:1521/UAT62")
@@ -276,6 +276,91 @@ func GetDataSerialNumber(iSN string) st.DeviceInfo {
 		l.Duration = t2.String()
 		l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
 	}
+	return odv
+}
+
+// IfThenElse evaluates a condition, if true returns the first parameter otherwise the second
+func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
+	if condition {
+		return a
+	}
+	return b
+}
+
+// DefaultIfNil checks if the value is nil, if true returns the default value otherwise the original
+func DefaultIfNil(value interface{}, defaultValue interface{}) interface{} {
+	if value != nil {
+		return value
+	}
+	return defaultValue
+}
+
+// GetDeviceViewBySerialNumber
+func GetDeviceViewBySerialNumber(iSN string, iChipID string, iCustNr string) st.DeviceInfo {
+	var odv st.DeviceInfo
+	var resp string
+	resp = "SUCCESS"
+
+	// Database
+	//db, err := sql.Open("goracle", "bgweb/bgweb#1@//tv-uat62-dq.tvsit.co.th:1521/UAT62")
+	var dbsource string
+	dbsource = cm.GetDatasourceName("ICC")
+	db, err := sql.Open("goracle", dbsource)
+	if err != nil {
+		log.Fatal(err)
+		resp = err.Error()
+	} else {
+
+		defer db.Close()
+		var statement string
+		statement = "begin tvsgo_product.GetDeviceBySerialNumber(:0,:1,:2,:3); end;"
+		var resultC driver.Rows
+
+		if _, err := db.Exec(statement, iSN, iChipID, iCustNr, sql.Out{Dest: &resultC}); err != nil {
+			log.Fatal(err)
+			resp = err.Error()
+		}
+
+		defer resultC.Close()
+		values := make([]driver.Value, len(resultC.Columns()))
+
+		colmap := cm.Createmapcol(resultC.Columns())
+
+		for {
+			err = resultC.Next(values)
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				log.Println("error:", err)
+				resp = err.Error()
+			}
+
+			odv.ID = values[cm.Getcolindex(colmap, "ID")].(int64)
+			odv.Serial_Number = values[cm.Getcolindex(colmap, "SERIAL_NUMBER")].(string)
+			odv.Status_ID = values[cm.Getcolindex(colmap, "STATUS_ID")].(int64)
+			odv.StatusDesc = values[cm.Getcolindex(colmap, "STATUSDESC")].(string)
+			odv.Stock_HandlerID = values[cm.Getcolindex(colmap, "STOCK_HANDLERID")].(int64)
+			odv.Stock_HandlerName = values[cm.Getcolindex(colmap, "STOCK_HANDLERNAME")].(string)
+			odv.Model_ID = values[cm.Getcolindex(colmap, "MODEL_ID")].(int64)
+			odv.Model_Desc = values[cm.Getcolindex(colmap, "MODEL_DESC")].(string)
+			odv.Technical_Product_ID = values[cm.Getcolindex(colmap, "TECHNICAL_PRODUCT_ID")].(int64)
+			odv.Technical_Product_Desc = values[cm.Getcolindex(colmap, "TECHNICAL_PRODUCT_DESC")].(string)
+			odv.Technical_Product_Type = values[cm.Getcolindex(colmap, "TECHNICAL_PRODUCT_TYPE")].(string)
+			odv.Names = values[cm.Getcolindex(colmap, "NAME")].(string)
+			odv.Company = values[cm.Getcolindex(colmap, "COMPANY")].(string)
+			odv.CustType = values[cm.Getcolindex(colmap, "CUSTTYPE")].(string)
+			odv.SiliconFlag = values[cm.Getcolindex(colmap, "SILICONFLAG")].(string)
+			odv.Duallnbf = values[cm.Getcolindex(colmap, "DUALLNBF")].(string)
+			odv.Mac_Address1 = values[cm.Getcolindex(colmap, "MAC_ADDRESS1")].(string)
+			odv.External_ID = values[cm.Getcolindex(colmap, "EXTERNAL_ID")].(string)
+			odv.FinOption = values[cm.Getcolindex(colmap, "FINOPTION")].(string)
+			odv.CustomerID = cm.StrToInt64(values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(string))
+			odv.DescLinkBasics = values[cm.Getcolindex(colmap, "DESCLINKBASICS")].(string)
+			odv.Batch_number = values[cm.Getcolindex(colmap, "BATCH_NUMBER")].(string)
+		}
+	}
+	p(resp)
 	return odv
 }
 

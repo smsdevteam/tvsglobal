@@ -549,18 +549,18 @@ func GetShippingOrder(soid int64, byusername string) st.SOResult {
 	return result
 }
 
-const getTemplateforshipso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
-$TemplateHD
-<s:Body>
-		<ShipOrder xmlns="http://ibs.entriq.net/OrderManagement">
-			<order xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
-				$sodata
-			</order>
-      <reasonId>$reason</reasonId>
-      <printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />			
-		</ShipOrder>
-</s:Body>
-</s:Envelope>`
+// const getTemplateforshipso = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/soap/envelope/">
+// $TemplateHD
+// <s:Body>
+// 		<ShipOrder xmlns="http://ibs.entriq.net/OrderManagement">
+// 			<order xmlns:i="http://www.w3.org/2001/XMLSchema-instance">
+// 				$sodata
+// 			</order>
+//       <reasonId>$reason</reasonId>
+//       <printers i:nil="true" xmlns:i="http://www.w3.org/2001/XMLSchema-instance" />			
+// 		</ShipOrder>
+// </s:Body>
+// </s:Envelope>`
 
 // ShipOrder Method
 func ShipOrder(SOData st.SOResult, reasonnr int64, byusername string) st.ResponseResult {
@@ -597,8 +597,9 @@ func ShipOrder(SOData st.SOResult, reasonnr int64, byusername string) st.Respons
 		extAgentTag := "<h:ExternalAgent>" + byusername + "</h:ExternalAgent>"
 		requestHD = s.Replace(requestHD, `<h:ExternalAgent i:nil="true" />`, extAgentTag, -1)
 	}
-	requestValue := s.Replace(getTemplateforshipso, "$TemplateHD", requestHD, -1)
-	requestValue = s.Replace(requestValue, "$sodata", so, -1)
+	requestValue := s.Replace(getTemplatefortrxso, "$TemplateHD", requestHD, -1)
+	requestValue = s.Replace(requestValue, "$method", "ShipOrder", -1)
+	requestValue = s.Replace(requestValue, "$order", so, -1)
 	requestValue = s.Replace(requestValue, "$reason", cm.Int64ToStr(reasonnr), -1)
 	requestValue = s.Replace(requestValue, "<ShippingOrderData>", "", -1)
 	requestValue = s.Replace(requestValue, "</ShippingOrderData>", "", -1)
