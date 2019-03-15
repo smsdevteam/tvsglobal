@@ -1,0 +1,13 @@
+{
+    "RBQUEUE": {
+        "Queueinfo": {
+            "Queuename": "queue1",
+            "Address": "amqp://admin:admin@172.19.218.104:5672/" 
+            
+        },
+        "cache": {
+            "address": "10.0.0.2",
+            "port": 6379
+        }
+    }
+}

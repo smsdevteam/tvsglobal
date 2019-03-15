@@ -14,6 +14,10 @@ import (
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
+const applicationname string = "tvs-serviceinterface"
+const tagappname string = "tvs-serviceinterface"
+const taglogtype string = "applogs"
+const tagenv string = "set01"
 
 func savereq(TVSOrdReq st.TVSSubmitOrdReqData) (string, st.TVSSubmitOrdResData) {
 	var queuename string
@@ -31,8 +35,17 @@ func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdRe
 	// save to request log and put to queue
 	var TVSOrdRes st.TVSSubmitOrdResData
 	var queuename string
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "submitorder",
+	tagenv,  tagappname, taglogtype)
+	b, _ := json.Marshal(TVSSubmitOrderRequest)
+	// Convert bytes to string.
+	s := string(b)
+	applog.Request = s
 	queuename, TVSOrdRes = savereq(TVSSubmitOrderRequest)
 	sendtoqueue(queuename, TVSSubmitOrderRequest, &TVSOrdRes)
+	applog.TrackingNo = TVSOrdRes.Trackingno
 	return TVSOrdRes
 }
 func sendtoqueue(queuename string, TVSOrdReq st.TVSSubmitOrdReqData, TVSOrdRes *st.TVSSubmitOrdResData) {
@@ -79,6 +92,6 @@ func main() {
 	req.OrderDate = time.Now()
 	req.OrderType = "1"
 	req.Orderid = "TEST001"
-	req.TVSCustNo = 0
+	req.TVSCustNo = 104854381
 	submitorder(req)
 }

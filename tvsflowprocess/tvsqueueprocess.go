@@ -1,10 +1,18 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
+
 	st "tvsglobal/tvsstructs"
 
+	"net/http"
+
+	config "github.com/micro/go-config"
+	"github.com/micro/go-config/source/file"
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
@@ -12,8 +20,11 @@ import (
 func initailreceiver() st.Tvsqueueinfo {
 
 	var Queueinfo st.Tvsqueueinfo
-	Queueinfo.Queuename = "queue1"
-	Queueinfo.Address = "amqp://admin:admin@172.19.218.104:5672/"
+	config.Load(file.NewSource(
+		file.WithPath("queueconfig.json"),
+	))
+	Queueinfo.Queuename = config.Get("RBQUEUE", "Queueinfo", "Queuename").String("") //"queue1"
+	Queueinfo.Address = config.Get("RBQUEUE", "Queueinfo", "Address").String("")
 	return Queueinfo
 }
 
@@ -72,20 +83,44 @@ func main() {
 }
 func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	var resultcode string
-	var Processdata  st.TVSSubmitOrderProcess
-	Processdata.Orderdata=tvssubmitdata
-	print("Get Task Config For Order Type " +  tvssubmitdata.TVSOrdReq.OrderType +" Tracking no " +   tvssubmitdata.Trackingno)
-	resultcode ,Processdata= generatetasklist( tvssubmitdata.Trackingno,tvssubmitdata)
-	if resultcode =="success"{
+	var Processdata st.TVSSubmitOrderProcess
+	Processdata.Orderdata = tvssubmitdata
+	print("Get Task Config For Order Type " + tvssubmitdata.TVSOrdReq.OrderType + " Tracking no " + tvssubmitdata.Trackingno)
+	generatetasklist(tvssubmitdata.Trackingno, &Processdata)
+	resultcode = "success"
+	if resultcode == "success" {
 		for i := 0; i < len(Processdata.TVSTaskList); i++ {
-			taskid :=Processdata.TVSTaskList[i].Taskid
-			msname :=Processdata.TVSTaskList[i].MSname
+			taskid := Processdata.TVSTaskList[i].Taskid
+			msname := Processdata.TVSTaskList[i].MSname
 			switch taskid {
 			case "1":
-				log.Printf(" Start procee number " + msname )
-			 
+				log.Printf(" Start procee number " + msname)
+				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
+
 			}
 		}
-		
+
 	}
+}
+func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
+	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
+	fmt.Println("URL:>", url)
+	b, _ := json.Marshal(tvssubmitdata)
+	s := string(b)
+	var jsonStr = []byte(s)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
 }
