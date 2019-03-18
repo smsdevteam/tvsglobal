@@ -60,7 +60,7 @@ type updateCustomerResult struct {
 }
 
 // GetCustomerByCustomerID get info
- 
+ //CustomeGetDeviceInfo 
 func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	// Log#Start
 	/*var l cm.Applog
@@ -78,10 +78,10 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
-	var oDeviceinfo   c.DeviceInfo
+	var oDeviceinfo   c.DeviceData
 	var oCustomerRespon c.Customerrespon
-	var  oCustomerinfocolection   []c.CustomerInfo
-	var  oDeviceinfocolection []c.DeviceInfo
+//	var  oCustomerinfocolection   []c.CustomerInfo
+	var  oDeviceinfocolection []c.DeviceData
 	//var dbsource string 
 	 
 	dbsource :=  cm.GetDatasourceName("ICC") 
@@ -121,39 +121,40 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 					//resp = err.Error()
 				}
 				//var oCustomer c.CustomerInfo
-				if values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64) != nil {
-					ocustomerInfo.ID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
+				if values[0]!= nil {
+					ocustomerInfo.CUSTOMERID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
 				}
-                oDeviceinfo.DeviceID     =  values[cm.Getcolindex(colmap,"DEVICE_ID")].(int64)
-	            oDeviceinfo.SerialNumber     =   values[cm.Getcolindex(colmap, upper("SerialNumber"))].(string)
-	            oDeviceinfo.StatusID           = values[cm.Getcolindex(colmap, upper("StatusID"))].(int64)
-	            oDeviceinfo.StatusDesc          = values[cm.Getcolindex(colmap, upper("StatusDesc"))].(string)
-	            oDeviceinfo.ModelID              =values[cm.Getcolindex(colmap, upper("ModelID"))].(int64)
-	            oDeviceinfo.ModelDesc           =values[cm.Getcolindex(colmap, upper("ModelDesc")].(string)
-				oDeviceinfo.ProductID          =values[cm.Getcolindex(colmap, upper("ProductID"))].(int64)
-				oDeviceinfo.ProductDesc         =values[cm.Getcolindex(colmap, upper("ProductDesc"))].(string)
-				oDeviceinfo.StockhandlerID       =values[cm.Getcolindex(colmap, upper("StockhandlerID"))].(int64)
-				oDeviceinfo.StockhandlerDesc    =values[cm.Getcolindex(colmap, upper("StockhandlerDesc"))].(string)
-				oDeviceinfo.AllowSystem          =values[cm.Getcolindex(colmap, upper("AllowSystem"))].(string)
-				oDeviceinfo.FactoryWarrantyDate  =values[cm.Getcolindex(colmap, upper("FactoryWarrantyDate")].(string)
-				oDeviceinfo.AgentKey            =values[cm.Getcolindex(colmap, upper("AgentKey"))].(string)
-				oDeviceinfo.AgentName           =values[cm.Getcolindex(colmap, upper("AgentName"))].(string)
-				oDeviceinfo.ReturnDate   =values[cm.Getcolindex(colmap, upper("ReturnDate"))].(string)
-			
+                oDeviceinfo.DeviceID     =  values[cm.Getcolindex(colmap,"DEVICEID")].(int64)
+	            oDeviceinfo.SerialNumber     =   values[cm.Getcolindex(colmap,  "SERIALNUMBER")].(string)
+	            oDeviceinfo.StatusID           = values[cm.Getcolindex(colmap,  "STATUSID")].(int64)
+	            oDeviceinfo.StatusDesc          = values[cm.Getcolindex(colmap, "STATUSDESC")].(string)
+	            oDeviceinfo.ModelID              =values[cm.Getcolindex(colmap, "MODELID")].(int64)
+	            oDeviceinfo.ModelDesc           =values[cm.Getcolindex(colmap, "MODELDESC")].(string)
+				oDeviceinfo.ProductID          =values[cm.Getcolindex(colmap, "PRODUCTID")].(int64)
+				oDeviceinfo.ProductDesc         =values[cm.Getcolindex(colmap, "PRODUCTDESC")].(string)
+			//	oDeviceinfo.StockhandlerID       =values[cm.Getcolindex(colmap, "STOCKHANDLERID")].(int64)
+				oDeviceinfo.StockhandlerDesc    =values[cm.Getcolindex(colmap, "STOCKHANDLERDESC")].(string)
+				oDeviceinfo.AllowSystem          =values[cm.Getcolindex(colmap, "ALLOWSYSTEM")].(string)
+				oDeviceinfo.FactoryWarrantyDate  =values[cm.Getcolindex(colmap, "FACTORYWARRANTYDATE")].(string)
+				oDeviceinfo.AgentKey            =values[cm.Getcolindex(colmap, "AGENTKEY")].(string)
+				oDeviceinfo.AgentName           =values[cm.Getcolindex(colmap, "AGENTNAME")].(string)
+				oDeviceinfo.ReturnDate   =values[cm.Getcolindex(colmap, "RETURNDATE")].(string)
+			    
 				oDeviceinfocolection =append(oDeviceinfocolection,oDeviceinfo)
-				  
-			   //	print(ocustomerInfo.BusinessUnitID)
+				 
+			    	//print(oDeviceinfocolection)
 			}
-				  
-			ocustomerInfo.DeviceList =append(ocustomerInfo.DeviceList,oDeviceinfocolection)
-			oCustomerRespon.Customerrespon =ocustomerInfo
+				  ocustomerInfo.DeviceList = oDeviceinfocolection 
+		//	ocustomerInfo.DeviceList =append(ocustomerInfo.DeviceList,oDeviceinfocolection)
+			 
+		
 			//ocustomerInfo = oCustomer
          //log.Println(oCustomerinfocolection)
 		}
-
+	 
 	}
 	    
-        oCustomerRespon.CustomerInfocollection =oCustomerinfocolection
+        oCustomerRespon.CustomerInfocollection =append(oCustomerRespon.CustomerInfocollection,  ocustomerInfo)
 	// Log#Stop
 	/* 	t1 := time.Now()
 	   	t2 := t1.Sub(t0)

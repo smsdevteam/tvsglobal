@@ -19,7 +19,7 @@ type CustomerInfo struct {
 			Value    string `xml:"Value"`
 		} `xml:"CustomFieldValue"`
 	} `xml:"CustomFields"`
-	DeviceList   []DeviceInfo
+	DeviceList   []DeviceData
 	CustomerSince  string `xml:"CustomerSince"`
 	DefaultAddress struct {
 		Text                    string `xml:",chardata"`
@@ -49,7 +49,7 @@ type CustomerInfo struct {
 		HomePhoneExt       string `xml:"HomePhoneExt"`
 		HouseNumberAlpha   string `xml:"HouseNumberAlpha"`
 		HouseNumberNumeric string `xml:"HouseNumberNumeric"`
-		ID                 string `xml:"Id"`
+		CUSTOMERID                 string `xml:"Id"`
 		LandMark           string `xml:"LandMark"`
 		MarketSegmentID    string `xml:"MarketSegmentId"`
 		MiddleName         string `xml:"MiddleName"`
