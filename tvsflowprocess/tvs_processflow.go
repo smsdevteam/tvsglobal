@@ -39,6 +39,7 @@ func generatetasklist(Trackingno string, TVSOrdprocess  st.TVSSubmitOrderProcess
 		tvstask.Taskname = values[colmap["TASKNAME"]].(string)
 		tvstask.MSname = values[colmap["MSNAME"]].(string)
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)
+		tvstask.Responseobjname = values[colmap["RESPONSEOBJNAME"]].(string)
 		dataprocess.TVSTaskList = append(dataprocess.TVSTaskList, tvstask)
 	}
 	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
