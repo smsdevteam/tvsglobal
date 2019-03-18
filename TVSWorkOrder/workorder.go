@@ -66,6 +66,7 @@ func GetWorkorderByworkorderid(iworkorderID string) c.WorkorderInfo {
 
 	//resp := "SUCCESS"
 	var oWorkorderinfo c.WorkorderInfo
+	var sworkoderid string 
 	//var dbsource string
 
 	dbsource := cm.GetDatasourceName("ICC")
@@ -101,10 +102,11 @@ func GetWorkorderByworkorderid(iworkorderID string) c.WorkorderInfo {
 				} else {
 					break
 				}
+				sworkoderid  = cm.Int64ToStr( values[cm.Getcolindex(colmap, "ID")].(int64))
 				//oWorkorderinfo.Id = cm.StrToInt64(values[1].(string))
 				//print(values[cm.Getcolindex(colmap, "PROBLEM_DESCRIPTION")].(string))
-				oWorkorderinfo.ID = values[cm.Getcolindex(colmap, "ID")].(int64)
-				oWorkorderinfo.WorkorderServiceDTlist =Getworkorderservicebyid(values[cm.Getcolindex(colmap, "ID")].(string))
+				oWorkorderinfo.ID = cm.StrToInt64( sworkoderid   )
+				oWorkorderinfo.WorkorderServiceDTlist =Getworkorderservicebyid(sworkoderid)
 				//oWorkorderinfo.ProblemDesc = values[cm.Getcolindex(colmap, "Problem_Description")].(string)
 			}
 		}
