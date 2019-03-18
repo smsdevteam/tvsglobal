@@ -7,17 +7,12 @@ package tvsstructs
 // ShippingOrderReq Header Obj
 type ShippingOrderReq struct {
 	ID                   int64                  `json:"id"`
-	AgreementID          int64                  `json:"agreementid"`
 	Comments             string                 `json:"comments"`
 	CustomerID           int64                  `json:"customerid"`
-	AddressID            int64                  `json:"addressid"`
-	ShipByDate           string                 `json:"shipbydate"`
 	ShipFromStockhandler int64                  `json:"shipfromstockhandler"`
 	Status               int                    `json:"status"`
 	ShippingMethod       int64                  `json:"shippingmethod"`
 	OrderType            int64                  `json:"ordertype"`
-	FinancialAccount     int64                  `json:"financialaccount"`
-	ShippedDate          string                 `json:"shippeddate"`
 	Reference            string                 `json:"reference"`
 	ExternalAgent        string                 `json:"externalagent"`
 	ShippingOrderLines   []ShippingOrderLineReq `json:"shippingorderlines"`
@@ -84,34 +79,34 @@ type ShippingDeviceRes struct {
 
 // ShippingOrderData Obj
 type ShippingOrderData struct {
-	AgreementID    int64     `xml:"agreementId" json:"agreementId"`
-	Comment        string    `xml:"Comment" json:"Comment"`
+	AgreementID    int64  `xml:"agreementId" json:"agreementId"`
+	Comment        string `xml:"Comment" json:"Comment"`
 	CreateDateTime string `xml:"CreateDateTime" json:"CreateDateTime"`
 	CustomFields   struct {
 		CustomFields []CustomFieldValue
 	} `xml:"CustomFields,omitempty" json:"CustomFields,omitempty"`
-	CustomerID                int64     `xml:"CustomerId" json:"CustomerId"`
-	Destination               string    `xml:"Destination" json:"Destination"`
-	Extended                  string    `xml:"Extended" json:"Extended"`
-	FinancialAccountID        int64     `xml:"FinancialAccountId" json:"FinancialAccountId"`
-	FullyReceiveReturnedOrder bool      `xml:"FullyReceiveReturnedOrder" json:"FullyReceiveReturnedOrder"`
-	ID                        int64     `xml:"Id" json:"Id"`
-	IgnoreAgreementID         bool      `xml:"IgnoreAgreementId" json:"IgnoreAgreementId"`
-	OldStatusID               int64     `xml:"OldStatusId" json:"OldStatusId"`
-	ParentOrderID             int64     `xml:"ParentOrderId" json:"ParentOrderId"`
-	ReceivedQuantity          int64     `xml:"ReceivedQuantity" json:"ReceivedQuantity"`
-	Reference                 string    `xml:"Reference" json:"Reference"`
-	ReturnedQuantity          int64     `xml:"ReturnedQuantity" json:"ReturnedQuantity"`
-	SandboxID                 int64     `xml:"SandboxId" json:"SandboxId"`
-	SandboxSkipValidation     bool      `xml:"SandboxSkipValidation" json:"SandboxSkipValidation"`
+	CustomerID                int64  `xml:"CustomerId" json:"CustomerId"`
+	Destination               string `xml:"Destination" json:"Destination"`
+	Extended                  string `xml:"Extended" json:"Extended"`
+	FinancialAccountID        int64  `xml:"FinancialAccountId" json:"FinancialAccountId"`
+	FullyReceiveReturnedOrder bool   `xml:"FullyReceiveReturnedOrder" json:"FullyReceiveReturnedOrder"`
+	ID                        int64  `xml:"Id" json:"Id"`
+	IgnoreAgreementID         bool   `xml:"IgnoreAgreementId" json:"IgnoreAgreementId"`
+	OldStatusID               int64  `xml:"OldStatusId" json:"OldStatusId"`
+	ParentOrderID             int64  `xml:"ParentOrderId" json:"ParentOrderId"`
+	ReceivedQuantity          int64  `xml:"ReceivedQuantity" json:"ReceivedQuantity"`
+	Reference                 string `xml:"Reference" json:"Reference"`
+	ReturnedQuantity          int64  `xml:"ReturnedQuantity" json:"ReturnedQuantity"`
+	SandboxID                 int64  `xml:"SandboxId" json:"SandboxId"`
+	SandboxSkipValidation     bool   `xml:"SandboxSkipValidation" json:"SandboxSkipValidation"`
 	ShipByDate                string `xml:"ShipByDate" json:"ShipByDate"`
-	ShipFromStockHandlerID    int64     `xml:"ShipFromStockHandlerId" json:"ShipFromStockHandlerId"`
-	ShipToAddressID           int64     `xml:"ShipToAddressId" json:"ShipToAddressId"`
-	ShipToPartyID             int64     `xml:"ShipToPartyId" json:"ShipToPartyId"`
-	ShipToPostalCode          string    `xml:"ShipToPostalCode" json:"ShipToPostalCode"`
+	ShipFromStockHandlerID    int64  `xml:"ShipFromStockHandlerId" json:"ShipFromStockHandlerId"`
+	ShipToAddressID           int64  `xml:"ShipToAddressId" json:"ShipToAddressId"`
+	ShipToPartyID             int64  `xml:"ShipToPartyId" json:"ShipToPartyId"`
+	ShipToPostalCode          string `xml:"ShipToPostalCode" json:"ShipToPostalCode"`
 	ShippedDate               string `xml:"ShippedDate" json:"ShippedDate"`
-	ShippedQuantity           int64     `xml:"ShippedQuantity" json:"ShippedQuantity"`
-	ShippingMethodID          int64     `xml:"ShippingMethodId" json:"ShippingMethodId"`
+	ShippedQuantity           int64  `xml:"ShippedQuantity" json:"ShippedQuantity"`
+	ShippingMethodID          int64  `xml:"ShippingMethodId" json:"ShippingMethodId"`
 	ShippingOrderLines        struct {
 		Items struct {
 			ShippingOrderLine []ShippingOrderLineStruct
@@ -120,8 +115,8 @@ type ShippingOrderData struct {
 		Page       int64 `xml:"Page" json:"Page"`
 		TotalCount int64 `xml:"TotalCount" json:"TotalCount"`
 	} `xml:"ShippingOrderLines" json:"ShippingOrderLines"`
-	StatusID      int64 `xml:"StatusId" json:"StatusId"`
-	TotalQuantity int64 `xml:"TotalQuantity" json:"TotalQuantity"`
+	StatusID        int64 `xml:"StatusId" json:"StatusId"`
+	TotalQuantity   int64 `xml:"TotalQuantity" json:"TotalQuantity"`
 	TrackingNumbers struct {
 		Items struct {
 			TrackingNumbers []TrackingNumber
@@ -129,8 +124,8 @@ type ShippingOrderData struct {
 		More       bool  `xml:"More" json:"More"`
 		Page       int64 `xml:"Page" json:"Page"`
 		TotalCount int64 `xml:"TotalCount" json:"TotalCount"`
-	} `xml:"TrackingNumbers,omitempty" json:"TrackingNumbers,omitempty"`	
-	TypeID          int64  `xml:"TypeId" json:"TypeId"`
+	} `xml:"TrackingNumbers,omitempty" json:"TrackingNumbers,omitempty"`
+	TypeID int64 `xml:"TypeId" json:"TypeId"`
 }
 
 // ShippingOrderLineStruct Obj

@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/xml"
 	"io"
 	"io/ioutil"
 	"log"
-	"encoding/xml"
 	"net/http"
 	s "strings"
 	"time"
+
 	_ "gopkg.in/goracle.v2"
 
 	cm "github.com/smsdevteam/tvsglobal/Common"     // db
@@ -136,9 +137,43 @@ func CancelWHOrder(soid int64, reasonnr int64, byusername string) st.ResponseRes
 }
 
 // CreateWHOrder Method
-func CreateWHOrder(iSO st.ShippingOrderReq, reasonnr int64, byusername string) st.SOResult {
+func CreateWHOrder(iSO st.ShippingOrderReq) st.SOResult {
 	var oRes st.SOResult
-	//oRes = CreateShippingOrder(iSO)
+	var cSO st.ShippingOrderData
+	var fSO st.ShippingOrderDataReq
+	var totalqty int64
+	var oSL st.ShippingOrderLineStruct
+
+	cSO.Comment = iSO.Comments
+	cSO.CustomerID = iSO.CustomerID
+	cSO.Reference = iSO.Reference
+	cSO.ShipFromStockHandlerID = iSO.ShipFromStockhandler
+	cSO.ShippingMethodID = 1     // Fix : 'CAR'
+	cSO.TypeID = 4               // Fix : Internal Transfer
+	cSO.Destination = "Customer" // Fix
+	cSO.ShipToPartyID = iSO.CustomerID
+	cSO.ShipToAddressID = 102544654    // Need to continue
+	cSO.ShipToPostalCode = "10800" // Need to continue
+
+	totalqty = 0
+	for i := 0; i < len(iSO.ShippingOrderLines); i++ {
+		oSL.FinanceOptionID = 2 // Fix : Rental
+		oSL.HardwareModelID = iSO.ShippingOrderLines[i].HardwareModelID
+		oSL.TechnicalProductID = iSO.ShippingOrderLines[i].TechnicalProductID
+		oSL.Quantity = iSO.ShippingOrderLines[i].Quantity
+		totalqty = totalqty + oSL.Quantity
+
+		cSO.ShippingOrderLines.Items.ShippingOrderLine = append(cSO.ShippingOrderLines.Items.ShippingOrderLine, oSL)
+	}
+
+	cSO.TotalQuantity = totalqty
+
+	fSO.SODetail = cSO
+	fSO.Reasonnr = 584 // Fix : Create Shipping Order 905
+	fSO.ByUsername = iSO.ExternalAgent
+
+	oRes = CreateShippingOrder(fSO)
+
 	return oRes
 }
 
