@@ -1,20 +1,23 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"strings"
 
-	//"encoding/json"
-	//"log"
-	cm "tvsglobal/common"
 	st "github.com/smsdevteam/tvsglobal/tvsstructs"
+	cm "github.com/smsdevteam/tvsglobal/common"
+	"net/http"
 
-	//"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
 
-func generatetasklist(Trackingno string, TVSOrdprocess  st.TVSSubmitOrderProcess) st.TVSSubmitOrderProcess {
+func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess) st.TVSSubmitOrderProcess {
 
 	var resultI driver.Rows
 	var err error
@@ -39,8 +42,37 @@ func generatetasklist(Trackingno string, TVSOrdprocess  st.TVSSubmitOrderProcess
 		tvstask.Taskname = values[colmap["TASKNAME"]].(string)
 		tvstask.MSname = values[colmap["MSNAME"]].(string)
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)
+		tvstask.Responseobjname = values[colmap["RESPONSEOBJNAME"]].(string)
 		dataprocess.TVSTaskList = append(dataprocess.TVSTaskList, tvstask)
 	}
 	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
 	return TVSOrdprocess
+}
+func callsendcommand(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
+	var msresponce st.TVSBN_Responseresult
+	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
+
+	b, _ := json.Marshal(tvssubmitdata)
+	s := string(b)
+	var jsonStr = []byte(s)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	tempbody := string(body)
+	fmt.Println("response Body:", tempbody)
+	tempbody = strings.Replace(tempbody, taskobj.Responseobjname, "TVSBN_RESPONSERESULT", -1)
+
+	mySlice := []byte(tempbody)
+	err = json.Unmarshal(mySlice, &msresponce)
+
+	fmt.Println("response json:", msresponce)
+	fmt.Println("*********************************************************")
 }

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 
 	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
@@ -104,7 +105,6 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 }
 func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.TVSBN_Responseresult
-
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
 	fmt.Println("URL:>", url)
 	b, _ := json.Marshal(tvssubmitdata)
@@ -113,7 +113,6 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("X-Custom-Header", "myvalue")
 	req.Header.Set("Content-Type", "application/json")
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -121,13 +120,13 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	}
 	defer resp.Body.Close()
 
-	fmt.Println("response Status:", resp.Status)
-	fmt.Println("response Headers:", resp.Header)
-
 	body, _ := ioutil.ReadAll(resp.Body)
-	fmt.Println("response Body:", string(body))
+	tempbody := string(body)
+	fmt.Println("response Body:", tempbody)
+	tempbody = strings.Replace(tempbody, taskobj.Responseobjname, "TVSBN_RESPONSERESULT", -1)
 
-	err = json.Unmarshal(body, &msresponce)
+	mySlice := []byte(tempbody)
+	err = json.Unmarshal(mySlice, &msresponce)
 
 	fmt.Println("response json:", msresponce)
 	fmt.Println("*********************************************************")

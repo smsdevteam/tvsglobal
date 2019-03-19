@@ -42,5 +42,6 @@ type TVSTaskinfo struct {
 	Taskname  string
 	MSname    string
 	Servurl   string
+	Responseobjname string
 	Resultobj ResponseResult
 }
