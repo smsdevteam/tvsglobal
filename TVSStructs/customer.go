@@ -19,6 +19,7 @@ type CustomerInfo struct {
 			Value    string `xml:"Value"`
 		} `xml:"CustomFieldValue"`
 	} `xml:"CustomFields"`
+	DeviceList   []DeviceInfo
 	CustomerSince  string `xml:"CustomerSince"`
 	DefaultAddress struct {
 		Text                    string `xml:",chardata"`
@@ -72,7 +73,7 @@ type CustomerInfo struct {
 	} `xml:"Extended"`
 	FiscalCode               string `xml:"FiscalCode"`
 	FiscalNumber             string `xml:"FiscalNumber"`
-	ID                       string `xml:"Id"`
+	ID                       int64 `xml:"Id"`
 	InternetPassword         string `xml:"InternetPassword"`
 	InternetUserID           string `xml:"InternetUserId"`
 	IsDistributor            string `xml:"IsDistributor"`

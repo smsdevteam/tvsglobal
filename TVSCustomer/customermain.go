@@ -25,6 +25,8 @@ func main() {
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvscustomer", index)
 	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
+    mainRouter.HandleFunc("/tvscustomer/customerGetdevice/{customerid}", customerGetdevice)
+	mainRouter.HandleFunc("/tvscustomer/customerGetWork/{customerid}", customerGetWork)
 	//mainRouter.HandleFunc("/tvsnote/getcustomerinfo", getCustomer).Methods("POST")
 	//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
 	//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
@@ -53,6 +55,25 @@ func getCustomer(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cusotmerResult)
 }
+func customerGetWork(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	var cusotmerResult c.Customerrespon
+
+    cusotmerResult = CustomeGetWorkInfo(params["customerid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cusotmerResult)
+}
+func customerGetdevice(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+
+	var cusotmerResult c.Customerrespon
+
+	cusotmerResult = CustomeGetDeviceInfo(params["customerid"])
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(cusotmerResult)
+}
+
 
 /* func addTVS(w http.ResponseWriter, r *http.Request) {
 

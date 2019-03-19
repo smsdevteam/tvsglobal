@@ -192,7 +192,7 @@ func changepackagep(trackingno string, customerid int) st.ResponseResult {
 	tags = append(tags, "TVSNote")
 	tags = append(tags, "applogs")
 	defer applog.PrintJSONLog()
-	applog   = cm.NewApploginfo(trackingno,"TVSBN","changepackagep" ,tags)
+	//applog   = cm.NewApploginfo(trackingno,"TVSBN","changepackagep" ,tags)
 	applog.Request=cm.IntToStr(customerid)
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid

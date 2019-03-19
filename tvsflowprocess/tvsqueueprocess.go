@@ -1,10 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"log"
 
-	st "tvsglobal/tvsstructs"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
+
+	"net/http"
 
 	config "github.com/micro/go-config"
 	"github.com/micro/go-config/source/file"
@@ -81,7 +86,8 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	var Processdata st.TVSSubmitOrderProcess
 	Processdata.Orderdata = tvssubmitdata
 	print("Get Task Config For Order Type " + tvssubmitdata.TVSOrdReq.OrderType + " Tracking no " + tvssubmitdata.Trackingno)
-	resultcode, Processdata = generatetasklist(tvssubmitdata.Trackingno, tvssubmitdata)
+	Processdata = generatetasklist(tvssubmitdata.Trackingno, Processdata)
+	resultcode = "success"
 	if resultcode == "success" {
 		for i := 0; i < len(Processdata.TVSTaskList); i++ {
 			taskid := Processdata.TVSTaskList[i].Taskid
@@ -89,30 +95,40 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 			switch taskid {
 			case "1":
 				log.Printf(" Start procee number " + msname)
+				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
 
 			}
 		}
 
 	}
 }
-func callserv() {
-    url := "http://restapi3.apiary.io/notes"
-    fmt.Println("URL:>", url)
+func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
+	var msresponce st.TVSBN_Responseresult
 
-    var jsonStr = []byte(`{"title":"Buy cheese and bread for breakfast."}`)
-    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-    req.Header.Set("X-Custom-Header", "myvalue")
-    req.Header.Set("Content-Type", "application/json")
+	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
+	fmt.Println("URL:>", url)
+	b, _ := json.Marshal(tvssubmitdata)
+	s := string(b)
+	var jsonStr = []byte(s)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
 
-    client := &http.Client{}
-    resp, err := client.Do(req)
-    if err != nil {
-        panic(err)
-    }
-    defer resp.Body.Close()
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
 
-    fmt.Println("response Status:", resp.Status)
-    fmt.Println("response Headers:", resp.Header)
-    body, _ := ioutil.ReadAll(resp.Body)
-    fmt.Println("response Body:", string(body))
+	fmt.Println("response Status:", resp.Status)
+	fmt.Println("response Headers:", resp.Header)
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	fmt.Println("response Body:", string(body))
+
+	err = json.Unmarshal(body, &msresponce)
+
+	fmt.Println("response json:", msresponce)
+	fmt.Println("*********************************************************")
 }
