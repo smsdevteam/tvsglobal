@@ -68,7 +68,7 @@ func customerGetdevice(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	var cusotmerResult c.Customerrespon
-     cm.
+    
 	cusotmerResult = CustomeGetDeviceInfo(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cusotmerResult)
