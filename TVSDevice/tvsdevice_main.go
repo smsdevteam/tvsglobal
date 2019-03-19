@@ -9,7 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 
-	cm "github.com/smsdevteam/tvsglobal/Common"     // util
+	cm "github.com/smsdevteam/tvsglobal/common"     // util
 	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 

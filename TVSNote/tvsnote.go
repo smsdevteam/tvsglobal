@@ -19,6 +19,11 @@ import (
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
+const applicationname string = "tvs-note"
+const tagappname string = "tvs-note"
+const taglogtype string = "applogs"
+const tagenv string = "set01"
+
 var p = fmt.Println
 
 // MyRespEnvelope for CreateNote
@@ -80,6 +85,10 @@ type updateNoteResult struct {
 // GetNoteByNoteID get info
 func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	// Log#Start
+
+	// var applog cm.Applog
+	// defer applog.PrintJSONLog()
+
 	l := cm.NewApplog()
 	var trackingno string
 	var resp string
@@ -96,8 +105,8 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	tags = append(tags, "TVSNote")
 	tags = append(tags, "applogs")
 	l.Tags = tags
-	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
-	l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
+	defer l.PrintJSONLog()
 
 	oRes := st.NewGetNoteResult()
 	var oNote st.Note
@@ -111,7 +120,7 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 		ts := time.Now()
 		l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -124,10 +133,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 		if err != nil {
 			//log.Println(err)
 			resp = err.Error()
-			ts := time.Now()
-			l.Timestamp = ts.Format(time.RFC3339Nano)
+			//ts := time.Now()
+			//l.Timestamp = ts.Format(time.RFC3339Nano)
 			l.Response = resp
-			l.PrintJSONLog()
+			//l.PrintJSONLog()
 			oRes.ErrorCode = 3
 			oRes.ErrorDesc = err.Error()
 			return oRes
@@ -135,10 +144,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 			if _, err := db.Exec(statement, intNoteID, sql.Out{Dest: &resultC}); err != nil {
 				//log.Println(err)
 				resp = err.Error()
-				ts := time.Now()
-				l.Timestamp = ts.Format(time.RFC3339Nano)
+				//ts := time.Now()
+				//l.Timestamp = ts.Format(time.RFC3339Nano)
 				l.Response = resp
-				l.PrintJSONLog()
+				//l.PrintJSONLog()
 				oRes.ErrorCode = 4
 				oRes.ErrorDesc = err.Error()
 				return oRes
@@ -158,10 +167,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 					}
 					//log.Println("error:", err)
 					resp = err.Error()
-					ts := time.Now()
-					l.Timestamp = ts.Format(time.RFC3339Nano)
+					//ts := time.Now()
+					//l.Timestamp = ts.Format(time.RFC3339Nano)
 					l.Response = resp
-					l.PrintJSONLog()
+					//l.PrintJSONLog()
 					oRes.ErrorCode = 5
 					oRes.ErrorDesc = err.Error()
 					return oRes
@@ -210,10 +219,10 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	ts := time.Now()
-	l.Timestamp = ts.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
-	l.PrintJSONLog()
+	//ts := time.Now()
+	//l.Timestamp = ts.Format(time.RFC3339Nano)
+	//l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
+	//l.PrintJSONLog()
 	//test
 	return oRes
 }
@@ -237,8 +246,8 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	tags = append(tags, "TVSNote")
 	tags = append(tags, "applogs")
 	l.Tags = tags
-	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
-	l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
+	defer l.PrintJSONLog()
 
 	oRes := st.NewGetListNoteResult()
 	var oListNote st.ListNote
@@ -248,10 +257,10 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	if err != nil {
 		//log.Println("error:", err)
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -264,10 +273,10 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 		if err != nil {
 			//log.Println("error:", err)
 			resp = err.Error()
-			ts := time.Now()
-			l.Timestamp = ts.Format(time.RFC3339Nano)
+			//ts := time.Now()
+			//l.Timestamp = ts.Format(time.RFC3339Nano)
 			l.Response = resp
-			l.PrintJSONLog()
+			//l.PrintJSONLog()
 			oRes.ErrorCode = 3
 			oRes.ErrorDesc = err.Error()
 			return oRes
@@ -275,10 +284,10 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 			if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
 				//log.Println("error:", err)
 				resp = err.Error()
-				ts := time.Now()
-				l.Timestamp = ts.Format(time.RFC3339Nano)
+				//ts := time.Now()
+				//l.Timestamp = ts.Format(time.RFC3339Nano)
 				l.Response = resp
-				l.PrintJSONLog()
+				//l.PrintJSONLog()
 				oRes.ErrorCode = 4
 				oRes.ErrorDesc = err.Error()
 				return oRes
