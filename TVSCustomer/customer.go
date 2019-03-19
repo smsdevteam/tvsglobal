@@ -11,7 +11,7 @@ import (
  	_ "gopkg.in/goracle.v2"
 
 	cm "github.com/smsdevteam/tvsglobal/common" //db
-	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
  
 )
 
@@ -59,33 +59,20 @@ type updateCustomerResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
-// GetCustomerByCustomerID get info
+ 
  //CustomeGetDeviceInfo 
 func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	// Log#Start
-	/*var l cm.Applog
-	var trackingno string
-	var resp string
-
-	 t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVScustomer"
-	l.FunctionName = "Getcustomer"
-	l.Request = "customerID=" + iCustomerID
-	l.Start = t0.String()
-	l.InsertappLog("./log/tvscustomerlog.log", "GetCustomer")
-	*/
-	//resp := "SUCCESS"
+	 
 	var ocustomerInfo c.CustomerInfo
-	var oDeviceinfo   c.DeviceData
+ 	var oDeviceinfo   c.DeviceData
 	var oCustomerRespon c.Customerrespon
 //	var  oCustomerinfocolection   []c.CustomerInfo
 	var  oDeviceinfocolection []c.DeviceData
 	//var dbsource string 
-	 
-	dbsource :=  cm.GetDatasourceName("ICC") 
 	  
+	dbsource :=  cm.GetDatasourceName("ICC") 
+ 
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
 		log.Fatal(err)
@@ -122,7 +109,7 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 				}
 				//var oCustomer c.CustomerInfo
 				if values[0]!= nil {
-					ocustomerInfo.CUSTOMERID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
+					ocustomerInfo.CUSTOMERId = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
 				}
                 oDeviceinfo.DeviceID     =  values[cm.Getcolindex(colmap,"DEVICEID")].(int64)
 	            oDeviceinfo.SerialNumber     =   values[cm.Getcolindex(colmap,  "SERIALNUMBER")].(string)
@@ -155,6 +142,7 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	}
 	    
         oCustomerRespon.CustomerInfocollection =append(oCustomerRespon.CustomerInfocollection,  ocustomerInfo)
+	    
 	// Log#Stop
 	/* 	t1 := time.Now()
 	   	t2 := t1.Sub(t0)
