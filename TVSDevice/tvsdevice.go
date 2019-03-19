@@ -16,7 +16,7 @@ import (
 
 	s "strings"
 
-	cm "github.com/smsdevteam/tvsglobal/Common"     // db
+	cm "github.com/smsdevteam/tvsglobal/common"     // db
 	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 

@@ -60,7 +60,8 @@ type updateCustomerResult struct {
 }
 
 // GetCustomerByCustomerID get info
-func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
+ //CustomeGetDeviceInfo 
+func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	// Log#Start
 	/*var l cm.Applog
 	var trackingno string
@@ -77,12 +78,14 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	*/
 	//resp := "SUCCESS"
 	var ocustomerInfo c.CustomerInfo
+	var oDeviceinfo   c.DeviceData
 	var oCustomerRespon c.Customerrespon
-	var  oCustomerinfocolection   []c.CustomerInfo
+//	var  oCustomerinfocolection   []c.CustomerInfo
+	var  oDeviceinfocolection []c.DeviceData
 	//var dbsource string 
-	
-	dbsource :=  cm.GetDatasourceName("ICC") 
 	 
+	dbsource :=  cm.GetDatasourceName("ICC") 
+	  
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
 		log.Fatal(err)
@@ -90,7 +93,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	} else {
 		defer db.Close()
 		var statement string
-		statement = "begin TVS_customer.getCustomerINFO(:0,:1); end;"
+		statement = "begin TVS_Go_Product.GetDeviceByCustomerID(:0,:1); end;"
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
@@ -105,7 +108,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
 		   colmap :=cm.Createmapcol(resultC.Columns())
-		   
+		  
 			for {
 					
 				err = resultC.Next(values)
@@ -113,28 +116,45 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 					if err == io.EOF {
 						break
 					}
+					
 					log.Println("error:", err)
 					//resp = err.Error()
 				}
 				//var oCustomer c.CustomerInfo
-				if values[0] != nil {
-					ocustomerInfo.ID = values[0].(string)
+				if values[0]!= nil {
+					ocustomerInfo.CUSTOMERID = values[cm.Getcolindex(colmap, "CUSTOMER_ID")].(int64)
 				}
-                
-				ocustomerInfo.BusinessUnitID =  values[colmap["BusinessUnitID"]].(string)
-              oCustomerinfocolection =append(oCustomerinfocolection,ocustomerInfo)
-			   	print(ocustomerInfo.BusinessUnitID)
+                oDeviceinfo.DeviceID     =  values[cm.Getcolindex(colmap,"DEVICEID")].(int64)
+	            oDeviceinfo.SerialNumber     =   values[cm.Getcolindex(colmap,  "SERIALNUMBER")].(string)
+	            oDeviceinfo.StatusID           = values[cm.Getcolindex(colmap,  "STATUSID")].(int64)
+	            oDeviceinfo.StatusDesc          = values[cm.Getcolindex(colmap, "STATUSDESC")].(string)
+	            oDeviceinfo.ModelID              =values[cm.Getcolindex(colmap, "MODELID")].(int64)
+	            oDeviceinfo.ModelDesc           =values[cm.Getcolindex(colmap, "MODELDESC")].(string)
+				oDeviceinfo.ProductID          =values[cm.Getcolindex(colmap, "PRODUCTID")].(int64)
+				oDeviceinfo.ProductDesc         =values[cm.Getcolindex(colmap, "PRODUCTDESC")].(string)
+			//	oDeviceinfo.StockhandlerID       =values[cm.Getcolindex(colmap, "STOCKHANDLERID")].(int64)
+				oDeviceinfo.StockhandlerDesc    =values[cm.Getcolindex(colmap, "STOCKHANDLERDESC")].(string)
+				oDeviceinfo.AllowSystem          =values[cm.Getcolindex(colmap, "ALLOWSYSTEM")].(string)
+				oDeviceinfo.FactoryWarrantyDate  =values[cm.Getcolindex(colmap, "FACTORYWARRANTYDATE")].(string)
+				oDeviceinfo.AgentKey            =values[cm.Getcolindex(colmap, "AGENTKEY")].(string)
+				oDeviceinfo.AgentName           =values[cm.Getcolindex(colmap, "AGENTNAME")].(string)
+				oDeviceinfo.ReturnDate   =values[cm.Getcolindex(colmap, "RETURNDATE")].(string)
+			    
+				oDeviceinfocolection =append(oDeviceinfocolection,oDeviceinfo)
+				 
+			    	//print(oDeviceinfocolection)
 			}
-				  
-			
-			//oCustomerRespon.Customerrespon =ocustomerInfo
+				  ocustomerInfo.DeviceList = oDeviceinfocolection 
+		//	ocustomerInfo.DeviceList =append(ocustomerInfo.DeviceList,oDeviceinfocolection)
+			 
+		
 			//ocustomerInfo = oCustomer
-         log.Println(oCustomerinfocolection)
+         //log.Println(oCustomerinfocolection)
 		}
-
+	 
 	}
-	
-        oCustomerRespon.CustomerInfocollection =oCustomerinfocolection
+	    
+        oCustomerRespon.CustomerInfocollection =append(oCustomerRespon.CustomerInfocollection,  ocustomerInfo)
 	// Log#Stop
 	/* 	t1 := time.Now()
 	   	t2 := t1.Sub(t0)
@@ -150,3 +170,5 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	//test
 	return oCustomerRespon
 }
+ 
+
