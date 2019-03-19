@@ -105,7 +105,6 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 }
 func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.TVSBN_Responseresult
-
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
 	fmt.Println("URL:>", url)
 	b, _ := json.Marshal(tvssubmitdata)
@@ -114,16 +113,12 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 	req.Header.Set("X-Custom-Header", "myvalue")
 	req.Header.Set("Content-Type", "application/json")
-
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
-	//fmt.Println("response Status:", resp.Status)
-	//fmt.Println("response Headers:", resp.Header)
 
 	body, _ := ioutil.ReadAll(resp.Body)
 	tempbody := string(body)
