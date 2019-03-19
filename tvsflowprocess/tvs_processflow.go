@@ -4,15 +4,17 @@ import (
 	"database/sql"
 	"database/sql/driver"
 	"io"
+
 	//"encoding/json"
 	//"log"
 	cm "tvsglobal/common"
-	st "tvsglobal/tvsstructs"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
+
 	//"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
 
-func generatetasklist(Trackingno string, TVSOrdprocess  *st.TVSSubmitOrderProcess)  {
+func generatetasklist(Trackingno string, TVSOrdprocess  st.TVSSubmitOrderProcess) st.TVSSubmitOrderProcess {
 
 	var resultI driver.Rows
 	var err error
@@ -39,5 +41,6 @@ func generatetasklist(Trackingno string, TVSOrdprocess  *st.TVSSubmitOrderProces
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)
 		dataprocess.TVSTaskList = append(dataprocess.TVSTaskList, tvstask)
 	}
-	TVSOrdprocess.TVSTaskList=dataprocess.TVSTaskList
-}	
+	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
+	return TVSOrdprocess
+}

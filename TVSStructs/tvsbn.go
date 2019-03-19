@@ -225,3 +225,7 @@ type ExtendedInfo struct {
 	Name  string `xml:"name,omitempty"`
 	Value string `xml:"value,omitempty"`
 }
+
+type TVSBN_Responseresult struct {
+	ResponseResultobj ResponseResult
+}

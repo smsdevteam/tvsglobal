@@ -26,6 +26,7 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
+	var res st.TVSBN_Responseresult
 	fmt.Println("start call ccbschangepackagep")
 	fmt.Println("************************************************************************")
 	temp, err := ioutil.ReadAll(r.Body)
@@ -39,12 +40,13 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("There was an error:", err)
 		panic(err)
 	}
-	
+
 	var oRes string
-	oRes = changepackage(cm.StrToInt(cm.Int64ToStr( req.TVSOrdReq.TVSCustNo) ))
-	
+	oRes = changepackage(cm.StrToInt(cm.Int64ToStr(req.TVSOrdReq.TVSCustNo)))
+	res.ResponseResultobj.ErrorCode = 0
+	res.ResponseResultobj.ErrorDesc = oRes
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(oRes)
+	json.NewEncoder(w).Encode(res)
 }
 
 func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
