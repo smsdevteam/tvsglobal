@@ -22,7 +22,7 @@ func main() {
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvssubmitorder/", index)
-	mainRouter.HandleFunc("/tvssubmitorder/getsubmitorder/", submitorder).Methods("POST")
+	mainRouter.HandleFunc("/tvssubmitorder/submitorder/", submitorder).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8081", mainRouter))
 
 }
