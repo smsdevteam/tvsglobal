@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
 
 /* func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
@@ -68,7 +68,7 @@ func customerGetdevice(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	var cusotmerResult c.Customerrespon
-
+    
 	cusotmerResult = CustomeGetDeviceInfo(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cusotmerResult)

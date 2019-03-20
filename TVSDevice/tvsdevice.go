@@ -16,8 +16,8 @@ import (
 
 	s "strings"
 
-	cm "github.com/smsdevteam/tvsglobal/common"     // db
 	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
+	cm "github.com/smsdevteam/tvsglobal/common"     // db
 )
 
 var p = log.Println
@@ -209,6 +209,7 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 	l.Request = "SN=" + iSN
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
+	l.PrintJSONLog()
 
 	var odv st.DeviceData
 
@@ -275,6 +276,8 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 		l.End = t1.Format(time.RFC3339Nano)
 		l.Duration = t2.String()
 		l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
+		l.PrintJSONLog()
+		defer l.PrintJSONLog()
 	}
 	return odv
 }
@@ -672,6 +675,19 @@ $TemplateHD
 
 // SendCommandToDevice
 func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.ResponseResult {
+	// Log#Start
+	var l cm.Applog
+	var trackingno string
+	t0 := time.Now()
+	trackingno = t0.Format("20060102-150405")
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSDevice"
+	l.FunctionName = "SendCommandToDevice"
+	l.Request = "device id = " + cm.Int64ToStr(deviceid)
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
+	l.PrintJSONLog()
+
 	var oRes st.ResponseResult
 	requestHD, ServiceLnk := getAuthenHD(byusername)
 	if requestHD == "" {
@@ -724,6 +740,21 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 		oRes.ErrorCode = 0
 		oRes.ErrorDesc = "SUCCESS"
 	}
+
+	// Log#Stop
+	t1 := time.Now()
+	t2 := t1.Sub(t0)
+	l.TrackingNo = trackingno
+	l.ApplicationName = "TVSDevice"
+	l.FunctionName = "SendCommandToDevice"
+	l.Request = "device id = " + cm.Int64ToStr(deviceid)
+	l.Response = resp.Status
+	l.Start = t0.Format(time.RFC3339Nano)
+	l.End = t1.Format(time.RFC3339Nano)
+	l.Duration = t2.String()
+	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
+	l.PrintJSONLog()
+	defer l.PrintJSONLog()
 
 	return oRes
 }

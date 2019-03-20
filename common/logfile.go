@@ -21,5 +21,5 @@ func Writelogfile(textline string) {
 	if _, err = f.WriteString(textline); err != nil {
 		panic(err)
 	}
-
+    
 }

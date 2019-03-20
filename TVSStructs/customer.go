@@ -73,7 +73,7 @@ type CustomerInfo struct {
 	} `xml:"Extended"`
 	FiscalCode               string `xml:"FiscalCode"`
 	FiscalNumber             string `xml:"FiscalNumber"`
-	ID                       int64 `xml:"Id"`
+	CUSTOMERId                       int64 `xml:"CUSTOMERId"`
 	InternetPassword         string `xml:"InternetPassword"`
 	InternetUserID           string `xml:"InternetUserId"`
 	IsDistributor            string `xml:"IsDistributor"`
