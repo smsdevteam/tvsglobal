@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"runtime"
  	"log"
  	"strconv"
  	_ "gopkg.in/goracle.v2"
@@ -14,7 +15,10 @@ import (
 	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
  
 )
-
+const applicationname string = "tvs-customergetdevice"
+const tagappname string = "tvs-customergetdevice"
+const taglogtype string = "applogs"
+const tagenv string = "set02"
 var p = fmt.Println
 
 // MyRespEnvelope for CreateNote
@@ -63,7 +67,21 @@ type updateCustomerResult struct {
  //CustomeGetDeviceInfo 
 func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	// Log#Start
+	/* var TVSCUSTRes c.TVSCustomerOrdResData
+	 var queuename string
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "CustomeGetDeviceInfo",
+	tagenv,  tagappname, taglogtype)
+	b, _ := json.Marshal(iCustomerID)
+	// Convert bytes to string.
+	s := string(b)
+	applog.Request = s
+	queuename, TVSCUSTRes = savereq(iCustomerID)
 	 
+	applog.TrackingNo = TVSCUSTRes.Trackingno
+ */
+
 	var ocustomerInfo c.CustomerInfo
  	var oDeviceinfo   c.DeviceInfo
 	var oCustomerRespon c.Customerrespon
@@ -111,11 +129,20 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 				if values[0]!= nil {
 					ocustomerInfo.CUSTOMERId = values[cm.Getcolindex(colmap, "CUSTOMERID")].(int64)
 				}
+		  	 	defer func() {
+              if err := recover(); err != nil {
+                   fmt.Println("HERE")
+                   fmt.Println(err)
+                 _, fn, line, _ := runtime.Caller(1)
+		         log.Printf("[error] %s:%d %v", fn, line, err) 
+                  }
+				}()  
+				
 				 oDeviceinfo.ID               =  values[cm.Getcolindex(colmap,"DEVICEID")].(int64)
 	            oDeviceinfo.Serial_Number     =   values[cm.Getcolindex(colmap,  "SERIAL_NUMBER")].(string)
 			 	oDeviceinfo.Status_ID         = values[cm.Getcolindex(colmap,  "STATUS_ID")].(int64)
 				oDeviceinfo.StatusDesc        = values[cm.Getcolindex(colmap,  "STATUSDESC")].(string)
-               // oDeviceinfo.Stock_HandlerID       =values[cm.Getcolindex(colmap,  "STOCK_HANDLERID")].(int64)
+                 oDeviceinfo.Stock_HandlerID       =values[cm.Getcolindex(colmap,  "STOCK_HANDLERID")].(int64)
 				oDeviceinfo.Stock_HandlerName    =values[cm.Getcolindex(colmap,  "STOCK_HANDLERNAME")].(string)
 			    oDeviceinfo.Model_ID              =values[cm.Getcolindex(colmap,  "MODEL_ID")].(int64)
 	            oDeviceinfo.Model_Desc           =values[cm.Getcolindex(colmap,  "MODEL_DESC")].(string)

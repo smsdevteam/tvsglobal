@@ -93,9 +93,15 @@ type CustomerInfo struct {
 }
 
     type Customerrespon  struct {
-     CustomerInfocollection  []CustomerInfo
+	 CustomerInfocollection  []CustomerInfo
+	 ResponseResultobj  ResponseResult
      //ResponResult  ResponseResult
  }  
+  type TVSCustomerOrdResData struct {
+	Orderid           string
+	Trackingno        string
+	ResponseResultobj ResponseResult
+}
 // func Area(len, wid float64) float64 {
 // 	area := len * wid
 // 	return area
