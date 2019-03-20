@@ -13,7 +13,7 @@ import (
 
 func index(w http.ResponseWriter, r *http.Request) {
 	var req st.TVSSubmitOrdReqData
-	fmt.Fprintf(w, "Welcome to TVS Device Restful")
+	fmt.Println(w, "Welcome to TVS Device Restful")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(req)
 }
