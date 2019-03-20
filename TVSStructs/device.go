@@ -112,4 +112,5 @@ type DeviceInfo struct {
 	FinOption              string `json:"FinOption"`
 	DescLinkBasics         string `json:"DescLinkBasics"`
 	Batch_number           string `json:"batch_number"`
+	HardwareType           string `json:"HardwareType"`
 }

@@ -26,10 +26,10 @@ func main() {
 	mainRouter.HandleFunc("/tvscustomer", index)
 //	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
     mainRouter.HandleFunc("/tvscustomer/customerGetdevice/{customerid}", customerGetdevice)
-//	mainRouter.HandleFunc("/tvscustomer/customerGetWork/{customerid}", customerGetWork)
+ //	mainRouter.HandleFunc("/tvscustomer/customerGetWork/{customerid}", customerGetWork)
 	//mainRouter.HandleFunc("/tvsnote/getcustomerinfo", getCustomer).Methods("POST")
 	//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
-	//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
+	//	mainRouter.HandleFunc("/tvscustomer/customerGetdevice", customerGetdevice).Methods("POST")
 	//	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", mainRouter))
