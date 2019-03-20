@@ -8,12 +8,14 @@ import (
 	"encoding/json"
 	"log"
 	"time"
-	cm "tvsglobal/common"
-	st "tvsglobal/tvsstructs"
+
+	st "github.com/smsdevteam/tvsglobal/TVSStructs"
+	cm "github.com/smsdevteam/tvsglobal/common"
 
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
+
 const applicationname string = "tvs-serviceinterface"
 const tagappname string = "tvs-serviceinterface"
 const taglogtype string = "applogs"
@@ -31,14 +33,14 @@ func savereq(TVSOrdReq st.TVSSubmitOrdReqData) (string, st.TVSSubmitOrdResData) 
 		sql.Out{Dest: &queuename}, sql.Out{Dest: &TVSOrdRes.ResponseResultobj.ErrorCode}, sql.Out{Dest: &TVSOrdRes.ResponseResultobj.ErrorDesc})
 	return queuename, TVSOrdRes
 }
-func submitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdResData {
+func tvssubmitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOrdResData {
 	// save to request log and put to queue
 	var TVSOrdRes st.TVSSubmitOrdResData
 	var queuename string
 	var applog cm.Applog
 	defer applog.PrintJSONLog()
 	applog = cm.NewApploginfo("", applicationname, "submitorder",
-	tagenv,  tagappname, taglogtype)
+		tagenv, tagappname, taglogtype)
 	b, _ := json.Marshal(TVSSubmitOrderRequest)
 	// Convert bytes to string.
 	s := string(b)
@@ -86,12 +88,12 @@ func failOnError(err error, msg string) {
 	}
 }
 
-func main() {
+func mainold() {
 	var req st.TVSSubmitOrdReqData
 	req.ChannelCode = "ood"
 	req.OrderDate = time.Now()
 	req.OrderType = "1"
 	req.Orderid = "TEST001"
 	req.TVSCustNo = 104854381
-	submitorder(req)
+	tvssubmitorder(req)
 }
