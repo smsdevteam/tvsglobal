@@ -1,7 +1,7 @@
 package tvsstructs
 
-// Device Obj
-type DeviceInfo struct {
+// DeviceData Obj
+type DeviceData struct {
 	DeviceID            int64  `json:"deviceid"`
 	SerialNumber        string `json:"sn"`
 	StatusID            int64  `json:"statusid"`
@@ -86,4 +86,31 @@ type Device struct {
 type GetDeviceResponse struct {
 	ProcessResult ResponseResult
 	DeviceResult  Device
+}
+
+// Device Obj
+type DeviceInfo struct {
+	ID                     int64  `json:"id"`
+	Serial_Number          string `json:"Serial_Number"`
+	Status_ID              int64  `json:"Status_ID"`
+	StatusDesc             string `json:"StatusDesc"`
+	Stock_HandlerID        int64  `json:"Stock_HandlerID"`
+	Stock_HandlerName      string `json:"Stock_HandlerName"`
+	Model_ID               int64  `json:"Model_ID"`
+	Model_Desc             string `json:"Model_Desc"`
+	Technical_Product_ID   int64  `json:"Technical_Product_ID"`
+	Technical_Product_Desc string `json:"Technical_Product_Desc"`
+	Technical_Product_Type string `json:"Technical_Product_Type"`
+	Names                  string `json:"Names"`
+	Company                string `json:"Company"`
+	CustType               string `json:"CustType"`
+	SiliconFlag            string `json:"SiliconFlag"`
+	Duallnbf               string `json:"Duallnbf"`
+	Mac_Address1           string `json:"Mac_Address1"`
+	External_ID            string `json:"External_ID"`
+	CustomerID             int64  `json:"CustomerID"`
+	FinOption              string `json:"FinOption"`
+	DescLinkBasics         string `json:"DescLinkBasics"`
+	Batch_number           string `json:"batch_number"`
+	HardwareType           string `json:"HardwareType"`
 }

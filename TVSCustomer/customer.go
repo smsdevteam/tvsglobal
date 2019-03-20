@@ -11,7 +11,7 @@ import (
  	_ "gopkg.in/goracle.v2"
 
 	cm "github.com/smsdevteam/tvsglobal/common" //db
-	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
  
 )
 
@@ -59,30 +59,20 @@ type updateCustomerResult struct {
 	ErrorDesc   string   `xml:"ErrorDesc"`
 }
 
-// GetCustomerByCustomerID get info
-func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
+ 
+ //CustomeGetDeviceInfo 
+func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 	// Log#Start
-	/*var l cm.Applog
-	var trackingno string
-	var resp string
-
-	 t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVScustomer"
-	l.FunctionName = "Getcustomer"
-	l.Request = "customerID=" + iCustomerID
-	l.Start = t0.String()
-	l.InsertappLog("./log/tvscustomerlog.log", "GetCustomer")
-	*/
-	//resp := "SUCCESS"
-	var ocustomerInfo c.CustomerInfo
-	var oCustomerRespon c.Customerrespon
-	var  oCustomerinfocolection   []c.CustomerInfo
-	//var dbsource string 
-	
-	dbsource :=  cm.GetDatasourceName("ICC") 
 	 
+	var ocustomerInfo c.CustomerInfo
+ 	var oDeviceinfo   c.DeviceInfo
+	var oCustomerRespon c.Customerrespon
+//	var  oCustomerinfocolection   []c.CustomerInfo
+	var  oDeviceinfocolection []c.DeviceInfo
+	//var dbsource string 
+	  
+	dbsource :=  cm.GetDatasourceName("ICC") 
+ 
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
 		log.Fatal(err)
@@ -90,7 +80,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	} else {
 		defer db.Close()
 		var statement string
-		statement = "begin TVS_customer.getCustomerINFO(:0,:1); end;"
+		statement = "begin TVS_Go_Product.GetDeviceByCustomerID(:0,:1); end;"
 		var resultC driver.Rows
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
@@ -105,7 +95,7 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 			defer resultC.Close()
 			values := make([]driver.Value, len(resultC.Columns()))
 		   colmap :=cm.Createmapcol(resultC.Columns())
-		   
+		  
 			for {
 					
 				err = resultC.Next(values)
@@ -113,28 +103,54 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 					if err == io.EOF {
 						break
 					}
+					
 					log.Println("error:", err)
 					//resp = err.Error()
 				}
 				//var oCustomer c.CustomerInfo
-				if values[0] != nil {
-					ocustomerInfo.ID = values[0].(string)
+				if values[0]!= nil {
+					ocustomerInfo.CUSTOMERId = values[cm.Getcolindex(colmap, "CUSTOMERID")].(int64)
 				}
-                
-				ocustomerInfo.BusinessUnitID =  values[colmap["BusinessUnitID"]].(string)
-              oCustomerinfocolection =append(oCustomerinfocolection,ocustomerInfo)
-			   	print(ocustomerInfo.BusinessUnitID)
+				 oDeviceinfo.ID               =  values[cm.Getcolindex(colmap,"DEVICEID")].(int64)
+	            oDeviceinfo.Serial_Number     =   values[cm.Getcolindex(colmap,  "SERIAL_NUMBER")].(string)
+			 	oDeviceinfo.Status_ID         = values[cm.Getcolindex(colmap,  "STATUS_ID")].(int64)
+				oDeviceinfo.StatusDesc        = values[cm.Getcolindex(colmap,  "STATUSDESC")].(string)
+               // oDeviceinfo.Stock_HandlerID       =values[cm.Getcolindex(colmap,  "STOCK_HANDLERID")].(int64)
+				oDeviceinfo.Stock_HandlerName    =values[cm.Getcolindex(colmap,  "STOCK_HANDLERNAME")].(string)
+			    oDeviceinfo.Model_ID              =values[cm.Getcolindex(colmap,  "MODEL_ID")].(int64)
+	            oDeviceinfo.Model_Desc           =values[cm.Getcolindex(colmap,  "MODEL_DESC")].(string)
+				oDeviceinfo.Technical_Product_ID  =values[cm.Getcolindex(colmap,  "TECHNICAL_PRODUCT_ID")].(int64)
+				oDeviceinfo.Technical_Product_Desc   =values[cm.Getcolindex(colmap,  "TECHNICAL_PRODUCT_DESC")].(string)
+				oDeviceinfo.Technical_Product_Type          =values[cm.Getcolindex(colmap,  "TECHNICAL_PRODUCT_TYPE")].(string)
+				oDeviceinfo.Names               = values[cm.Getcolindex(colmap,  "NAMES")].(string)
+				oDeviceinfo.Company               = values[cm.Getcolindex(colmap,  "COMPANY")].(string)
+                oDeviceinfo.CustType   =values[cm.Getcolindex(colmap,  "CUSTTYPE")].(string)
+			    oDeviceinfo.SiliconFlag    =values[cm.Getcolindex(colmap,  "SILICONFLAG")].(string)
+                oDeviceinfo.Duallnbf            =values[cm.Getcolindex(colmap,  "DUALLNBF")].(string)
+                oDeviceinfo.Mac_Address1   =values[cm.Getcolindex(colmap,  "MAC_ADDRESS1")].(string)
+				oDeviceinfo.External_ID   =values[cm.Getcolindex(colmap, "EXTERNAL_ID")].(string)
+				oDeviceinfo.CustomerID   =values[cm.Getcolindex(colmap, "CUSTOMERID")].(int64)
+				oDeviceinfo.FinOption    =values[cm.Getcolindex(colmap, "FINOPTION")].(string)
+				oDeviceinfo.DescLinkBasics   =values[cm.Getcolindex(colmap, "DESCLINKBASICS")].(string)
+				oDeviceinfo.Batch_number   =values[cm.Getcolindex(colmap, "BATCH_NUMBER")].(string)
+				oDeviceinfo.HardwareType  =values[cm.Getcolindex(colmap, "HARDWARETYPE")].(string)
+				
+				oDeviceinfocolection =append(oDeviceinfocolection,oDeviceinfo)
+				 
+			    	//print(err)
 			}
-				  
-			
-			//oCustomerRespon.Customerrespon =ocustomerInfo
+				  ocustomerInfo.DeviceList = oDeviceinfocolection 
+		//	ocustomerInfo.DeviceList =append(ocustomerInfo.DeviceList,oDeviceinfocolection)
+			 
+		
 			//ocustomerInfo = oCustomer
-         log.Println(oCustomerinfocolection)
+         //log.Println(oCustomerinfocolection)
 		}
-
+	 
 	}
-	
-        oCustomerRespon.CustomerInfocollection =oCustomerinfocolection
+	    
+        oCustomerRespon.CustomerInfocollection =append(oCustomerRespon.CustomerInfocollection,  ocustomerInfo)
+	    
 	// Log#Stop
 	/* 	t1 := time.Now()
 	   	t2 := t1.Sub(t0)
@@ -150,3 +166,5 @@ func GetCustomerByCustomerID(iCustomerID string) c.Customerrespon {
 	//test
 	return oCustomerRespon
 }
+ 
+

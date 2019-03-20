@@ -31,11 +31,17 @@ type TVSSubmitOrderData struct {
 	TVSOrdReq  TVSSubmitOrdReqData
 }
 
+// Tvsmsresp object for task process info
+type Tvsmsresp struct {
+	Resultobj ResponseResult
+}
+
 // TVSTaskinfo object for task process info
 type TVSTaskinfo struct {
 	Taskid    string
 	Taskname  string
 	MSname    string
 	Servurl   string
+	Responseobjname string
 	Resultobj ResponseResult
 }
