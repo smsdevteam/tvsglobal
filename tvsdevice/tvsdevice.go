@@ -1,6 +1,6 @@
 package main
 
-// lb:1
+// lb:2
 import (
 	"bytes"
 	"database/sql"
@@ -283,22 +283,6 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 		defer l.PrintJSONLog()
 	}
 	return odv
-}
-
-// IfThenElse evaluates a condition, if true returns the first parameter otherwise the second
-func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
-	if condition {
-		return a
-	}
-	return b
-}
-
-// DefaultIfNil checks if the value is nil, if true returns the default value otherwise the original
-func DefaultIfNil(value interface{}, defaultValue interface{}) interface{} {
-	if value != nil {
-		return value
-	}
-	return defaultValue
 }
 
 // GetDeviceViewBySerialNumber
