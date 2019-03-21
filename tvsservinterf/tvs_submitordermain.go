@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	st "github.com/smsdevteam/tvsglobal/TVSStructs"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
