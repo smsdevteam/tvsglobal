@@ -285,14 +285,6 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 	return odv
 }
 
-// IfThenElse evaluates a condition, if true returns the first parameter otherwise the second
-func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
-	if condition {
-		return a
-	}
-	return b
-}
- 
 // GetDeviceViewBySerialNumber
 func GetDeviceViewBySerialNumber(iSN string, iChipID string, iCustNr string) st.DeviceInfo {
 	var odv st.DeviceInfo
