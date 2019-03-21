@@ -19,7 +19,7 @@ type CustomerInfo struct {
 			Value    string `xml:"Value"`
 		} `xml:"CustomFieldValue"`
 	} `xml:"CustomFields"`
-	DeviceList   []DeviceData
+	DeviceList   []DeviceInfo
 	CustomerSince  string `xml:"CustomerSince"`
 	DefaultAddress struct {
 		Text                    string `xml:",chardata"`
@@ -73,7 +73,7 @@ type CustomerInfo struct {
 	} `xml:"Extended"`
 	FiscalCode               string `xml:"FiscalCode"`
 	FiscalNumber             string `xml:"FiscalNumber"`
-	ID                       int64 `xml:"Id"`
+	CUSTOMERId                       int64 `xml:"CUSTOMERId"`
 	InternetPassword         string `xml:"InternetPassword"`
 	InternetUserID           string `xml:"InternetUserId"`
 	IsDistributor            string `xml:"IsDistributor"`
@@ -93,9 +93,15 @@ type CustomerInfo struct {
 }
 
     type Customerrespon  struct {
-     CustomerInfocollection  []CustomerInfo
+	 CustomerInfocollection  []CustomerInfo
+	 ResponseResultobj  ResponseResult
      //ResponResult  ResponseResult
  }  
+  type TVSCustomerOrdResData struct {
+	Orderid           string
+	Trackingno        string
+	ResponseResultobj ResponseResult
+}
 // func Area(len, wid float64) float64 {
 // 	area := len * wid
 // 	return area

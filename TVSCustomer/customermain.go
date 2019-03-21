@@ -8,10 +8,10 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
+	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
-
-/* func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
+ 
+/* funcx getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
 	resulttvsresponse := TVS_Customer_response{}
 	resulttvsresponse.Orderno = tvscustreq.Orderno
 	return resulttvsresponse
@@ -26,10 +26,10 @@ func main() {
 	mainRouter.HandleFunc("/tvscustomer", index)
 //	mainRouter.HandleFunc("/tvscustomer/getcustomerinfo/{customerid}", getCustomer)
     mainRouter.HandleFunc("/tvscustomer/customerGetdevice/{customerid}", customerGetdevice)
-//	mainRouter.HandleFunc("/tvscustomer/customerGetWork/{customerid}", customerGetWork)
+ //	mainRouter.HandleFunc("/tvscustomer/customerGetWork/{customerid}", customerGetWork)
 	//mainRouter.HandleFunc("/tvsnote/getcustomerinfo", getCustomer).Methods("POST")
 	//	mainRouter.HandleFunc("/tvscustomer/getlistcustomer/{customerid}", getListcustomer)
-	//	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
+	//	mainRouter.HandleFunc("/tvscustomer/customerGetdevice", customerGetdevice).Methods("POST")
 	//	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
 
 	log.Fatal(http.ListenAndServe(":8080", mainRouter))
@@ -68,7 +68,7 @@ func customerGetdevice(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 
 	var cusotmerResult c.Customerrespon
-
+    
 	cusotmerResult = CustomeGetDeviceInfo(params["customerid"])
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(cusotmerResult)
