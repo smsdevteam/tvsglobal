@@ -10,8 +10,8 @@ import (
 	"github.com/gorilla/mux"
 	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 )
-
-/* func getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
+ 
+/* funcx getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
 	resulttvsresponse := TVS_Customer_response{}
 	resulttvsresponse.Orderno = tvscustreq.Orderno
 	return resulttvsresponse

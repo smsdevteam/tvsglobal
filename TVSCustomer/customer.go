@@ -21,7 +21,7 @@ const taglogtype string = "applogs"
 const tagenv string = "set02"
 var p = fmt.Println
 
-// MyRespEnvelope for CreateNote
+//  MyRespEnvelope for CreateNote
 type MyRespEnvelope struct {
 	XMLName xml.Name `xml:"Envelope"`
 	Body    body     `xml:"Body"`
