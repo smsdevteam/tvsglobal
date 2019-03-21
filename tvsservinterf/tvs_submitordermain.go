@@ -28,7 +28,11 @@ func main() {
 }
 
 func submitorder(w http.ResponseWriter, r *http.Request) {
-
+	defer func() {
+		if err := recover(); err != nil {
+		 fmt.Printf("Error func submitorder .. %s\n", err)
+		}
+	   }()
 	fmt.Println("start call submitorder")
 	fmt.Println("************************************************************************")
 	temp, err := ioutil.ReadAll(r.Body)
