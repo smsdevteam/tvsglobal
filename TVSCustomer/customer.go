@@ -10,18 +10,18 @@ import (
  	"log"
  	"strconv"
  	_ "gopkg.in/goracle.v2"
-
+    en  "OS"
 	cm "github.com/smsdevteam/tvsglobal/common" //db
 	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
  
 )
-const applicationname string = "tvs-customergetdevice"
-const tagappname string = "tvs-customergetdevice"
+const applicationname string = "tvscustomer"
+const tagappname string = "icc-tvscustomer"
 const taglogtype string = "applogs"
 const tagenv string = "set02"
 var p = fmt.Println
 
-//  MyRespEnvelope for CreateNote
+//MyRespEnvelope for CreateNote
 type MyRespEnvelope struct {
 	XMLName xml.Name `xml:"Envelope"`
 	Body    body     `xml:"Body"`
@@ -33,10 +33,10 @@ type body struct {
 	GetResponse completeResponse `xml:"CreateCustomerResponse"`
 }
 
-// type fault struct {
+// type fault struct { 
 // 	Code   string `xml:"faultcode"`
 // 	String string `xml:"faultstring"`
-// 	Detail string `xml:"detail"`
+// 	Detail string `xml:"detail"` 
 // }
 
 type completeResponse struct {
@@ -100,6 +100,7 @@ func CustomeGetDeviceInfo(iCustomerID string) c.Customerrespon {
 		var statement string
 		statement = "begin TVS_Go_Product.GetDeviceByCustomerID(:0,:1); end;"
 		var resultC driver.Rows
+		 
 		intCustomerID, err := strconv.Atoi(iCustomerID)
 		if err != nil {
 			log.Fatal(err)
