@@ -10,7 +10,7 @@ import (
 	"github.com/gorilla/mux"
 
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
-	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
+	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
 func index(w http.ResponseWriter, r *http.Request) {

@@ -17,8 +17,8 @@ import (
 
 	_ "gopkg.in/goracle.v2"
 
-	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
+	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
 const applicationname string = "tvs-note"
