@@ -10,8 +10,8 @@ import (
 	"runtime"
 	"strconv"
 
-	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 	cm "github.com/smsdevteam/tvsglobal/common"    //db
+	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 	_ "gopkg.in/goracle.v2"
 )
 

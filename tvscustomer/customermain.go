@@ -8,7 +8,7 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	c "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
+	c "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
 /* funcx getcustomerinfo(tvscustreq TVS_Customer_request) TVS_Customer_response {
