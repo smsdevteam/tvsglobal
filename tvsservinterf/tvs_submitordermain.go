@@ -19,6 +19,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+		 fmt.Printf("Error func main .. %s\n", err)
+		}
+	   }()
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvssubmitorder/", index)
