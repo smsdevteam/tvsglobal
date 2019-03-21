@@ -1,4 +1,5 @@
 package main
+
 // lb:1
 import (
 	"bytes"
@@ -16,8 +17,8 @@ import (
 
 	s "strings"
 
-	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
+	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
 var p = log.Println
@@ -209,7 +210,7 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 	l.Request = "SN=" + iSN
 	l.Start = t0.Format(time.RFC3339Nano)
 	// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
-	l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata","uat02", "icc-tvsdevice", "applog")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata", "uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 
 	var odv st.DeviceData
@@ -277,7 +278,7 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 		l.End = t1.Format(time.RFC3339Nano)
 		l.Duration = t2.String()
 		// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
-		l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata","uat02", "icc-tvsdevice", "applog")
+		l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata", "uat02", "icc-tvsdevice", "applog")
 
 		defer l.PrintJSONLog()
 	}
@@ -688,7 +689,7 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 	l.Request = "device id = " + cm.Int64ToStr(deviceid)
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
-	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice","uat02", "icc-tvsdevice", "applog")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice", "uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 
 	var oRes st.ResponseResult
@@ -756,7 +757,7 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
-	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice","uat02", "icc-tvsdevice", "applog")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice", "uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 	defer l.PrintJSONLog()
 
