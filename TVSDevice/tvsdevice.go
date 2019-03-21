@@ -1,5 +1,5 @@
 package main
-
+// lb:1
 import (
 	"bytes"
 	"database/sql"
@@ -203,12 +203,13 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 	resp = "SUCCESS"
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSDevice"
-	l.FunctionName = "GetDeviceBySerialNumber"
+	// l.TrackingNo = trackingno
+	// l.ApplicationName = "TVSDevice"
+	// l.FunctionName = "GetDeviceBySerialNumber"
 	l.Request = "SN=" + iSN
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
+	// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata","uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 
 	var odv st.DeviceData
@@ -267,16 +268,17 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 		// Log#Stop
 		t1 := time.Now()
 		t2 := t1.Sub(t0)
-		l.TrackingNo = trackingno
-		l.ApplicationName = "TVSDevice"
-		l.FunctionName = "GetDeviceBySerialNumber"
-		l.Request = "SN=" + iSN
+		// l.TrackingNo = trackingno
+		// l.ApplicationName = "TVSDevice"
+		// l.FunctionName = "GetDeviceBySerialNumber"
+		// l.Request = "SN=" + iSN
 		l.Response = resp
 		l.Start = t0.Format(time.RFC3339Nano)
 		l.End = t1.Format(time.RFC3339Nano)
 		l.Duration = t2.String()
-		l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
-		l.PrintJSONLog()
+		// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
+		l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata","uat02", "icc-tvsdevice", "applog")
+
 		defer l.PrintJSONLog()
 	}
 	return odv
@@ -680,12 +682,13 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 	var trackingno string
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSDevice"
-	l.FunctionName = "SendCommandToDevice"
+	// l.TrackingNo = trackingno
+	// l.ApplicationName = "TVSDevice"
+	// l.FunctionName = "SendCommandToDevice"
 	l.Request = "device id = " + cm.Int64ToStr(deviceid)
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice","uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 
 	var oRes st.ResponseResult
@@ -744,15 +747,16 @@ func SendCommandToDevice(deviceid int64, reasonnr int64, byusername string) st.R
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSDevice"
-	l.FunctionName = "SendCommandToDevice"
+	// l.TrackingNo = trackingno
+	// l.ApplicationName = "TVSDevice"
+	// l.FunctionName = "SendCommandToDevice"
 	l.Request = "device id = " + cm.Int64ToStr(deviceid)
 	l.Response = resp.Status
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
 	l.InsertappLog("./log/tvsdeviceapplog.log", "SendCommandToDevice")
+	l = cm.NewApploginfo(trackingno, "tvsdevice", "sendcommandtodevice","uat02", "icc-tvsdevice", "applog")
 	l.PrintJSONLog()
 	defer l.PrintJSONLog()
 
