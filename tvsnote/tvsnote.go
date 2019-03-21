@@ -4,29 +4,32 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"strconv"
 	s "strings"
 	"time"
 
 	_ "gopkg.in/goracle.v2"
 
+	st "github.com/smsdevteam/tvsglobal/TVSStructs" // referpath
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
-	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
 
 const applicationname string = "tvs-note"
-const tagappname string = "tvs-note"
+const tagappname string = "icc-tvsnote"
 const taglogtype string = "applogs"
-const tagenv string = "set01"
+
+var tagenv = os.Getenv("ENVAPP")
 
 var p = fmt.Println
 
-// MyRespEnvelope for CreateNote
+// MyRespEnvelope for CreateNote test
 type MyRespEnvelope struct {
 	XMLName xml.Name `xml:"Envelope"`
 	Body    body     `xml:"Body"`
@@ -96,14 +99,14 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "GetNote"
+	l.ApplicationName = applicationname
+	l.FunctionName = "getnote"
 	l.Request = "NoteID=" + iNoteID
 	l.Start = t0.Format(time.RFC3339Nano)
 	var tags []string
-	tags = append(tags, "env7")
-	tags = append(tags, "TVSNote")
-	tags = append(tags, "applogs")
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
 	l.Tags = tags
 	//l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
 	defer l.PrintJSONLog()
@@ -215,7 +218,11 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "GetNote"
 	l.Request = "NoteID=" + iNoteID
-	l.Response = resp
+
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
@@ -237,14 +244,14 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "GetListNoteByCustomerID"
+	l.ApplicationName = applicationname
+	l.FunctionName = "GetListNoteByCustomerIDgetlistnotebycustomeridgetlist"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Start = t0.Format(time.RFC3339Nano)
 	var tags []string
-	tags = append(tags, "env7")
-	tags = append(tags, "TVSNote")
-	tags = append(tags, "applogs")
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
 	l.Tags = tags
 	//l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 	defer l.PrintJSONLog()
@@ -306,10 +313,10 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 					}
 					//log.Println("error:", err)
 					resp = err.Error()
-					ts := time.Now()
-					l.Timestamp = ts.Format(time.RFC3339Nano)
+					//ts := time.Now()
+					//l.Timestamp = ts.Format(time.RFC3339Nano)
 					l.Response = resp
-					l.PrintJSONLog()
+					//l.PrintJSONLog()
 					oRes.ErrorCode = 5
 					oRes.ErrorDesc = err.Error()
 					return oRes
@@ -355,14 +362,18 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	l.ApplicationName = "TVSNote"
 	l.FunctionName = "GetListNoteByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
-	l.Response = resp
+
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	ts := time.Now()
-	l.Timestamp = ts.Format(time.RFC3339Nano)
-	l.PrintJSONLog()
-	l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
+	//ts := time.Now()
+	//l.Timestamp = ts.Format(time.RFC3339Nano)
+	//l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
 	//test
 	return oRes
 }
@@ -403,7 +414,7 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = applicationname
 	l.FunctionName = "CreateNote"
 	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Start = t0.Format(time.RFC3339Nano)
@@ -413,7 +424,7 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	tags = append(tags, "applogs")
 	l.Tags = tags
 	l.PrintJSONLog()
-	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
+	//l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 
 	oRes := st.NewCreateNoteResponse()
 	var AppServiceLnk cm.AppServiceURL
