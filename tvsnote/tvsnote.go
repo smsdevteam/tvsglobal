@@ -215,9 +215,9 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "GetNote"
-	l.Request = "NoteID=" + iNoteID
+	//l.ApplicationName = applicationname
+	//l.FunctionName = "GetNote"
+	//l.Request = "NoteID=" + iNoteID
 
 	jSRes, _ := json.Marshal(oRes)
 	sJSRes := string(jSRes)
@@ -245,7 +245,7 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
 	l.ApplicationName = applicationname
-	l.FunctionName = "GetListNoteByCustomerIDgetlistnotebycustomeridgetlist"
+	l.FunctionName = "getlistnotebycustomerid"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Start = t0.Format(time.RFC3339Nano)
 	var tags []string
@@ -358,10 +358,10 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "GetListNoteByCustomerID"
-	l.Request = "CustomerID=" + iCustomerID
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = applicationname
+	//l.FunctionName = "GetListNoteByCustomerID"
+	//l.Request = "CustomerID=" + iCustomerID
 
 	jSRes, _ := json.Marshal(oRes)
 	sJSRes := string(jSRes)
@@ -416,14 +416,20 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	l.TrackingNo = trackingno
 	l.ApplicationName = applicationname
 	l.FunctionName = "CreateNote"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
 	l.Start = t0.Format(time.RFC3339Nano)
 	var tags []string
-	tags = append(tags, "env7")
-	tags = append(tags, "TVSNote")
-	tags = append(tags, "applogs")
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
 	l.Tags = tags
-	l.PrintJSONLog()
+	defer l.PrintJSONLog()
 	//l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 
 	oRes := st.NewCreateNoteResponse()
@@ -461,10 +467,10 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -476,10 +482,10 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	response, err := client.Do(req)
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -490,10 +496,10 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	if response.StatusCode != 200 {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -502,10 +508,10 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -525,18 +531,22 @@ func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "CreateNote"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
-	l.Response = resp
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSNote"
+	//l.FunctionName = "CreateNote"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
+
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	ts := time.Now()
-	l.Timestamp = ts.Format(time.RFC3339Nano)
-	l.PrintJSONLog()
-	l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
+	//ts := time.Now()
+	//l.Timestamp = ts.Format(time.RFC3339Nano)
+	//l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "CreateNote")
 	return oRes
 }
 
@@ -575,17 +585,21 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
+	l.ApplicationName = applicationname
 	l.FunctionName = "UpdateNote"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
 	l.Start = t0.Format(time.RFC3339Nano)
 	var tags []string
-	tags = append(tags, "env7")
-	tags = append(tags, "TVSNote")
-	tags = append(tags, "applogs")
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
 	l.Tags = tags
-	l.PrintJSONLog()
-	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
+	defer l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	var oRes st.UpdateNoteResponse
 
@@ -620,10 +634,10 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -635,10 +649,10 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	response, err := client.Do(req)
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -649,10 +663,10 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 
 	if response.StatusCode != 200 {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -661,10 +675,10 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
 		resp = err.Error()
-		ts := time.Now()
-		l.Timestamp = ts.Format(time.RFC3339Nano)
+		//ts := time.Now()
+		//l.Timestamp = ts.Format(time.RFC3339Nano)
 		l.Response = resp
-		l.PrintJSONLog()
+		//l.PrintJSONLog()
 		oRes.ErrorCode = 400
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -682,18 +696,18 @@ func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSNote"
-	l.FunctionName = "UpdateNote"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSNote"
+	//l.FunctionName = "UpdateNote"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
 	l.Response = resp
 	l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	ts := time.Now()
-	l.Timestamp = ts.Format(time.RFC3339Nano)
-	l.PrintJSONLog()
-	l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
+	//ts := time.Now()
+	//l.Timestamp = ts.Format(time.RFC3339Nano)
+	//l.PrintJSONLog()
+	//l.InsertappLog("./log/tvsnoteapplog.log", "UpdateNote")
 
 	return oRes
 }
