@@ -292,15 +292,7 @@ func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
 	}
 	return b
 }
-
-// DefaultIfNil checks if the value is nil, if true returns the default value otherwise the original
-func DefaultIfNil(value interface{}, defaultValue interface{}) interface{} {
-	if value != nil {
-		return value
-	}
-	return defaultValue
-}
-
+ 
 // GetDeviceViewBySerialNumber
 func GetDeviceViewBySerialNumber(iSN string, iChipID string, iCustNr string) st.DeviceInfo {
 	var odv st.DeviceInfo
