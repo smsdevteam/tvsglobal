@@ -43,11 +43,12 @@ func NewApplog() *Applog {
 
 // NewApploginfo Obj
 func NewApploginfo(trackingno string, applicationname string,
-	functionname string, tagenv string, tagappname string,
+	functionname string, tagappname string,
 	taglogtype string) Applog {
 	var applog Applog
 	var tags []string
-	tags = append(tags, tagenv)
+	env := os.Getenv("ENVAPP")
+	tags = append(tags, env)
 	tags = append(tags, tagappname)
 	tags = append(tags, taglogtype)
 	applog.TrackingNo = trackingno
