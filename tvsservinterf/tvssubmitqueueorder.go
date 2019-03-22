@@ -6,7 +6,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"log"
 	"time"
 
@@ -42,7 +41,8 @@ func tvssubmitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOr
 	s := string(b)
 	applog.Request = s
 	queuename, TVSOrdRes = savereq(TVSSubmitOrderRequest)
-	fmt.Println("start send to queue ")
+	//fmt.Println("start send to queue ")
+	TVSOrdRes.Orderid = TVSSubmitOrderRequest.Orderid
 	sendtoqueue(queuename, TVSSubmitOrderRequest, &TVSOrdRes)
 	applog.TrackingNo = TVSOrdRes.Trackingno
 	return TVSOrdRes
@@ -75,8 +75,9 @@ func sendtoqueue(queuename string, TVSOrdReq st.TVSSubmitOrdReqData, TVSOrdRes *
 		amqp.Publishing{
 			ContentType: "text/plain",
 			Body:        []byte(body),
+	
 		})
-	log.Printf(" [x] Sent %s", body)
+	//log.Printf(" [x] Sent %s", body)
 	failOnError(err, "Failed to publish a message")
 }
 func failOnError(err error, msg string) {

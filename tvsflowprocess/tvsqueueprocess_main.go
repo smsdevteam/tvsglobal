@@ -106,11 +106,14 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 	if resultcode == "success" {
 		for i := 0; i < len(Processdata.TVSTaskList); i++ {
 			taskid := Processdata.TVSTaskList[i].Taskid
-			msname := Processdata.TVSTaskList[i].MSname
+			//msname := Processdata.TVSTaskList[i].MSname
 			switch taskid {
-			case "1":
-				log.Printf(" Start procee number " + msname)
+			case "1": // change package
+				log.Printf(" Start procee number " + taskid)
 				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
+			case "100": // change package
+				log.Printf(" Start procee number " + taskid)
+				callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
 
 			}
 		}
@@ -133,15 +136,37 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 		panic(err)
 	}
 	defer resp.Body.Close()
-
 	body, _ := ioutil.ReadAll(resp.Body)
 	tempbody := string(body)
 	fmt.Println("response Body:", tempbody)
 	tempbody = strings.Replace(tempbody, taskobj.Responseobjname, "TVSBN_RESPONSERESULT", -1)
-
 	mySlice := []byte(tempbody)
 	err = json.Unmarshal(mySlice, &msresponce)
-
+	fmt.Println("response json:", msresponce)
+	fmt.Println("*********************************************************")
+}
+func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
+	var msresponce st.TVSBN_Responseresult
+	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
+	fmt.Println("URL:>", url)
+	b, _ := json.Marshal(tvssubmitdata)
+	s := string(b)
+	var jsonStr = []byte(s)
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
+	req.Header.Set("X-Custom-Header", "myvalue")
+	req.Header.Set("Content-Type", "application/json")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+	body, _ := ioutil.ReadAll(resp.Body)
+	tempbody := string(body)
+	fmt.Println("response Body:", tempbody)
+	tempbody = strings.Replace(tempbody, taskobj.Responseobjname, "TVSBN_RESPONSERESULT", -1)
+	mySlice := []byte(tempbody)
+	err = json.Unmarshal(mySlice, &msresponce)
 	fmt.Println("response json:", msresponce)
 	fmt.Println("*********************************************************")
 }
