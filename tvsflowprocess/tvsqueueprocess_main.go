@@ -10,7 +10,6 @@ import (
 
 	"net/http"
 
-	cm "github.com/smsdevteam/tvsglobal/common"
 	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
 	config "github.com/micro/go-config"
@@ -94,10 +93,11 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 			fmt.Printf("Error func initialtask .. %s\n", err)
 		}
 	}()
-	var applog cm.Applog
-	//defer applog.PrintJSONLog()
+	/*var applog cm.Applog
+	defer applog.PrintJSONLog()
 	applog = cm.NewApploginfo("", applicationname, "initialtask",
 		tagappname, taglogtype)
+	*/
 	var resultcode string
 	var Processdata st.TVSSubmitOrderProcess
 	Processdata.Orderdata = tvssubmitdata
