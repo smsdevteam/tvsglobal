@@ -7,7 +7,6 @@ import (
 	"database/sql"
 	"encoding/json"
 	"log"
-	"os"
 	"time"
 
 	cm "github.com/smsdevteam/tvsglobal/common"
@@ -16,10 +15,6 @@ import (
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
-
-const applicationname string = "tvsbn"
-const tagappname string = "icc-tvssubmitorder"
-const taglogtype string = "info"
 
 func savereq(TVSOrdReq st.TVSSubmitOrdReqData) (string, st.TVSSubmitOrdResData) {
 	var queuename string
@@ -38,10 +33,9 @@ func tvssubmitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOr
 	var TVSOrdRes st.TVSSubmitOrdResData
 	var queuename string
 	var applog cm.Applog
-	envapp := os.Getenv("ENVAPP")
 	defer applog.PrintJSONLog()
 	applog = cm.NewApploginfo("", applicationname, "submitorder",
-		envapp, tagappname, taglogtype)
+		tagappname, taglogtype)
 	b, _ := json.Marshal(TVSSubmitOrderRequest)
 	// Convert bytes to string.
 	s := string(b)

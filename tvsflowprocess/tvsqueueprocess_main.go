@@ -8,15 +8,20 @@ import (
 	"log"
 	"strings"
 
-	st "github.com/smsdevteam/tvsglobal/tvsstructs"
-
 	"net/http"
+
+	cm "github.com/smsdevteam/tvsglobal/common"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
 	config "github.com/micro/go-config"
 	"github.com/micro/go-config/source/file"
 	"github.com/streadway/amqp"
 	_ "gopkg.in/goracle.v2"
 )
+
+const applicationname string = "tvsqueueprocess"
+const tagappname string = "icc-tvsqueueprocess"
+const taglogtype string = "info"
 
 func initailreceiver() st.Tvsqueueinfo {
 
@@ -83,6 +88,15 @@ func main() {
 	<-forever
 }
 func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func initialtask .. %s\n", err)
+		}
+	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "initialtask",
+		tagappname, taglogtype)
 	var resultcode string
 	var Processdata st.TVSSubmitOrderProcess
 	Processdata.Orderdata = tvssubmitdata

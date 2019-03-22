@@ -182,19 +182,20 @@ func changepackage(customerid int) string {
 
 }
 func changepackagep(trackingno string, customerid int) st.ResponseResult {
+	defer func() {
+		if err := recover(); err != nil {
+		 fmt.Printf("Error func submitorder .. %s\n", err)
+		}
+	   }()
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
-	
 	var res st.ResponseResult
-	var tags []string
 	var applog cm.Applog
-	tags = append(tags, "env7")
-	tags = append(tags, "TVSNote")
-	tags = append(tags, "applogs")
+
 	defer applog.PrintJSONLog()
- 
 	applog   = cm.NewApploginfo(trackingno, "TVSBN","changepackagep",
 	"ICC-TVSBN","applog"  )
+	
 	applog.Request=cm.IntToStr(customerid)
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid

@@ -8,8 +8,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	cm "github.com/smsdevteam/tvsglobal/common"
 	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 )
+
+const applicationname string = "tvssubmitorder"
+const tagappname string = "icc-tvssubmitorder"
+const taglogtype string = "info"
 
 func index(w http.ResponseWriter, r *http.Request) {
 	var req st.TVSSubmitOrdReqData
@@ -21,9 +26,9 @@ func index(w http.ResponseWriter, r *http.Request) {
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-		 fmt.Printf("Error func main .. %s\n", err)
+			fmt.Printf("Error func main .. %s\n", err)
 		}
-	   }()
+	}()
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvssubmitorder/", index)
@@ -35,11 +40,15 @@ func main() {
 func submitorder(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
-		 fmt.Printf("Error func submitorder .. %s\n", err)
+			fmt.Printf("Error func submitorder .. %s\n", err)
 		}
-	   }()
-	fmt.Println("start call submitorder")
-	fmt.Println("************************************************************************")
+	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "submitorder",
+		tagappname, taglogtype)
+	//fmt.Println("start call submitorder")
+	//fmt.Println("************************************************************************")
 	temp, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
@@ -53,6 +62,9 @@ func submitorder(w http.ResponseWriter, r *http.Request) {
 	}
 
 	oRes := tvssubmitorder(req)
+
+	applog = cm.NewApploginfo(oRes.Trackingno, applicationname, "submitorder",
+		tagappname, taglogtype)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(oRes)

@@ -13,6 +13,10 @@ import (
 	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 )
 
+const applicationname string = "tvsbn"
+const tagappname string = "icc-tvsbn"
+const taglogtype string = "info"
+
 func index(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to TVS Note Restful   ")
 }
@@ -31,6 +35,11 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
 		}
 	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "ccbschangepackagep",
+		tagappname, taglogtype)
+
 	var res st.TVSBN_Responseresult
 	//fmt.Println("start call ccbschangepackagep")
 	//fmt.Println("************************************************************************")
@@ -45,7 +54,8 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("There was an error:", err)
 		panic(err)
 	}
-
+	applog = cm.NewApploginfo(req.Trackingno, applicationname, "ccbschangepackagep",
+		tagappname, taglogtype)
 	var oRes string
 	oRes = changepackage(cm.StrToInt(cm.Int64ToStr(req.TVSOrdReq.TVSCustNo)))
 	res.ResponseResultobj.ErrorCode = 0
@@ -57,9 +67,14 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+			fmt.Printf("Error func ccbschangepackage .. %s\n", err)
 		}
 	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "ccbschangepackage",
+		tagappname, taglogtype)
+
 	params := mux.Vars(r)
 	//fmt.Println("start change package  ")
 	fmt.Println("start change package  " + params["customerid"])
@@ -76,9 +91,13 @@ func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
 func ccbssuspendsub(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+			fmt.Printf("Error func ccbssuspendsub .. %s\n", err)
 		}
 	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "ccbssuspendsub",
+		tagappname, taglogtype)
 	params := mux.Vars(r)
 	fmt.Println(params["customerid"])
 	customerid := cm.StrToInt(params["customerid"])
@@ -94,9 +113,13 @@ func ccbssuspendsub(w http.ResponseWriter, r *http.Request) {
 func ccbsrestoresub(w http.ResponseWriter, r *http.Request) {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+			fmt.Printf("Error func ccbsrestoresub .. %s\n", err)
 		}
 	}()
+	var applog cm.Applog
+	defer applog.PrintJSONLog()
+	applog = cm.NewApploginfo("", applicationname, "ccbsrestoresub",
+		tagappname, taglogtype)
 	params := mux.Vars(r)
 	fmt.Println(params["customerid"])
 	customerid := cm.StrToInt(params["customerid"])
