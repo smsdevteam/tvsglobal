@@ -6,7 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-  //sss
+
+	//sss
 	//"fmt"
 
 	//"strconv"
@@ -16,6 +17,7 @@ import (
 	//"github.com/jmoiron/sqlx"
 	"net/http"
 )
+
 //Getccbssubinfo is function excute sql command
 func Getccbssubinfo(subno string) (string, error) {
 	url := "http://172.22.203.63/TVS_GlobalWCFuat/CCBS_OSB_FinanceService.svc"

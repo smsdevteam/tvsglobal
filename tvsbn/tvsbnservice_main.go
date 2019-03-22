@@ -9,8 +9,8 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
-	st "github.com/smsdevteam/tvsglobal/TVSStructs"
 	cm "github.com/smsdevteam/tvsglobal/common"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
@@ -26,9 +26,14 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+		}
+	}()
 	var res st.TVSBN_Responseresult
-	fmt.Println("start call ccbschangepackagep")
-	fmt.Println("************************************************************************")
+	//fmt.Println("start call ccbschangepackagep")
+	//fmt.Println("************************************************************************")
 	temp, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		panic(err)
@@ -50,8 +55,11 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 }
 
 func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
-	//var customerid int64
-	//var err error
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+		}
+	}()
 	params := mux.Vars(r)
 	//fmt.Println("start change package  ")
 	fmt.Println("start change package  " + params["customerid"])
@@ -66,8 +74,11 @@ func ccbschangepackage(w http.ResponseWriter, r *http.Request) {
 
 }
 func ccbssuspendsub(w http.ResponseWriter, r *http.Request) {
-	//var customerid int64
-	//var err error
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+		}
+	}()
 	params := mux.Vars(r)
 	fmt.Println(params["customerid"])
 	customerid := cm.StrToInt(params["customerid"])
@@ -81,8 +92,11 @@ func ccbssuspendsub(w http.ResponseWriter, r *http.Request) {
 
 }
 func ccbsrestoresub(w http.ResponseWriter, r *http.Request) {
-	//var customerid int64
-	//var err error
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func ccbschangepackagep .. %s\n", err)
+		}
+	}()
 	params := mux.Vars(r)
 	fmt.Println(params["customerid"])
 	customerid := cm.StrToInt(params["customerid"])
