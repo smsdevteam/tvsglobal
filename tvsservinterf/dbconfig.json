@@ -1,5 +1,5 @@
 {
-    "UAT02": {
+    "hosts": {
         "ICC": {
             "dbname": "//tv-uat62-dq.tvsit.co.th:1521/uat62",
             "username": "bgweb",

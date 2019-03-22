@@ -33,7 +33,7 @@ func main() {
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvssubmitorder/", index)
 	mainRouter.HandleFunc("/tvssubmitorder/submitorder", submitorder).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8081", mainRouter))
+	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 
 }
 
@@ -60,9 +60,7 @@ func submitorder(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("There was an error:", err)
 		panic(err)
 	}
-
 	oRes := tvssubmitorder(req)
-
 	applog = cm.NewApploginfo(oRes.Trackingno, applicationname, "submitorder",
 		tagappname, taglogtype)
 

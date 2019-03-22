@@ -6,6 +6,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -41,6 +42,7 @@ func tvssubmitorder(TVSSubmitOrderRequest st.TVSSubmitOrdReqData) st.TVSSubmitOr
 	s := string(b)
 	applog.Request = s
 	queuename, TVSOrdRes = savereq(TVSSubmitOrderRequest)
+	fmt.Println("start send to queue ")
 	sendtoqueue(queuename, TVSSubmitOrderRequest, &TVSOrdRes)
 	applog.TrackingNo = TVSOrdRes.Trackingno
 	return TVSOrdRes
