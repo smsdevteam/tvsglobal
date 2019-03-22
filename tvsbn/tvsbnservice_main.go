@@ -45,7 +45,7 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 		tagappname, taglogtype)
 
 	var res st.TVSBN_Responseresult
-	//fmt.Println("start call ccbschangepackagep")
+	fmt.Println("start call ccbschangepackagep")
 	//fmt.Println("************************************************************************")
 	temp, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -60,10 +60,10 @@ func ccbschangepackagep(w http.ResponseWriter, r *http.Request) {
 	}
 	applog = cm.NewApploginfo(req.Trackingno, applicationname, "ccbschangepackagep",
 		tagappname, taglogtype)
-	var oRes string
-	oRes = changepackage(cm.StrToInt(cm.Int64ToStr(req.TVSOrdReq.TVSCustNo)))
-	res.ResponseResultobj.ErrorCode = 0
-	res.ResponseResultobj.ErrorDesc = oRes
+	//var oRes string
+	res = changepackage(cm.StrToInt(cm.Int64ToStr(req.TVSOrdReq.TVSCustNo)))
+	//res.ResponseResultobj.ErrorCode = 0
+	//res.ResponseResultobj.ErrorDesc = oRes
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(res)
 }

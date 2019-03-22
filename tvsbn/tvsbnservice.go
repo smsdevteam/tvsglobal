@@ -162,10 +162,10 @@ func getccbsoffer(TVSBNP st.TVSBNProperty) []st.TVSBNCCBSOfferProperty {
 	return TVSBNCCBSOfferPropertylist
 }
 
-func changepackage(customerid int) string {
+func changepackage(customerid int) st.TVSBN_Responseresult {
 	var TVSBNP st.TVSBNProperty
 	var omxRequest st.SubmitOrderOpRequest
-
+	var tvsbnresult st.TVSBN_Responseresult
 	TVSBNP.CCBSORDERTYPEID = "128"
 	TVSBNP.TVSCUSTOMERNO = customerid
 	TVSBNP.CCBSFN = "CHANGEPACKAGE"
@@ -176,9 +176,12 @@ func changepackage(customerid int) string {
 	print(omxRequest.Customer.CustomerId.Text)
 	result, err := inboundtoomx(TVSBNP, omxRequest)
 	if err == nil {
-		print(result)
+		tvsbnresult.ResponseResultobj.ErrorCode=0
+	}else{
+		tvsbnresult.ResponseResultobj.ErrorCode=999
+		tvsbnresult.ResponseResultobj.ErrorDesc	=err.Error() + result
 	}
-	return TVSBNP.TRNSEQNO
+	return  tvsbnresult
 
 }
 func changepackagep(trackingno string, customerid int) st.ResponseResult {
@@ -206,6 +209,7 @@ func changepackagep(trackingno string, customerid int) st.ResponseResult {
 	omxRequest = mappingvalueomx(TVSBNP)
 	print(omxRequest.Customer.CustomerId.Text)
 	result, err := inboundtoomx(TVSBNP, omxRequest)
+	//res.CustomNum=omxRequest.Customer.CustomerId.Text
 	if err == nil {
 		print(result)
 		res.ErrorCode= 0 
