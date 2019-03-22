@@ -18,11 +18,15 @@ const tagappname string = "icc-tvsbn"
 const taglogtype string = "info"
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Welcome to TVS Note Restful   ")
+	var req st.TVSSubmitOrderData
+	fmt.Println(w, "Welcome to TVS Device Restful")
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(req)
 }
 func main() {
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
+	mainRouter.HandleFunc("/tvsbn/", index)
 	mainRouter.HandleFunc("/tvsbn/ccbschangepackage/{customerid}", ccbschangepackage)
 	mainRouter.HandleFunc("/tvsbn/ccbschangepackagep/", ccbschangepackagep).Methods("POST")
 	mainRouter.HandleFunc("/tvsbn/ccbssuspendsub/{customerid}", ccbssuspendsub)
