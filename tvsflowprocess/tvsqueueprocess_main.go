@@ -77,6 +77,7 @@ func main() {
 		for d := range msgs {
 			err := json.Unmarshal(d.Body, &tvssubmitdata)
 			if err != nil {
+				print("found error " + err.Error())
 				print(err.Error())
 			}
 			initialtask(tvssubmitdata)
@@ -110,10 +111,10 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 			switch taskid {
 			case "1": // change package
 				log.Printf(" Start procee number " + taskid)
-				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
+				//callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
 			case "100": // change package
 				log.Printf(" Start procee number " + taskid)
-				callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
+				//callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
 
 			}
 		}
@@ -146,7 +147,17 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	fmt.Println("*********************************************************")
 }
 func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
-	var msresponce st.TVSBN_Responseresult
+	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/deviceid=1/reason=1/by=1"
+	req, _ := http.NewRequest("POST", url, nil)
+	req.Header.Add("cache-control", "no-cache")
+	req.Header.Add("Postman-Token", "2d4ad3e9-71a4-4620-aac9-2b4771dc4d7b")
+	res, _ := http.DefaultClient.Do(req)
+	//defer res.Body.Close()
+	body, _ := ioutil.ReadAll(res.Body)
+	fmt.Println(res)
+	fmt.Println(string(body))
+
+	/*var msresponce st.TVSBN_Responseresult
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
 	fmt.Println("URL:>", url)
 	b, _ := json.Marshal(tvssubmitdata)
@@ -169,4 +180,5 @@ func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTa
 	err = json.Unmarshal(mySlice, &msresponce)
 	fmt.Println("response json:", msresponce)
 	fmt.Println("*********************************************************")
+	*/
 }
