@@ -1,12 +1,13 @@
 package main
 
-// lb:1
+// lb:2
 import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
 	"encoding/xml"
 	"io"
+	"os"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -198,20 +199,14 @@ type performBuildListActionResult struct {
 // GetDataSerialNumber
 func GetDataSerialNumber(iSN string) st.DeviceData {
 	// Log#Start
-	var l cm.Applog
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
+
+	l := cm.NewApplog()
 	t0 := time.Now()
 	trackingno = t0.Format("20060102-150405")
-	// l.TrackingNo = trackingno
-	// l.ApplicationName = "TVSDevice"
-	// l.FunctionName = "GetDeviceBySerialNumber"
 	l.Request = "SN=" + iSN
-	l.Start = t0.Format(time.RFC3339Nano)
-	// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
-	l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata", "uat02", "icc-tvsdevice", "applog")
-	l.PrintJSONLog()
 
 	var odv st.DeviceData
 
@@ -267,38 +262,28 @@ func GetDataSerialNumber(iSN string) st.DeviceData {
 		}
 
 		// Log#Stop
+
+		var tags []string
+		tags = append(tags, os.Getenv("ENVAPP"))
+		tags = append(tags, "icc-tvsdevice")
+		tags = append(tags, "applogs")
+
 		t1 := time.Now()
 		t2 := t1.Sub(t0)
-		// l.TrackingNo = trackingno
-		// l.ApplicationName = "TVSDevice"
-		// l.FunctionName = "GetDeviceBySerialNumber"
-		// l.Request = "SN=" + iSN
 		l.Response = resp
 		l.Start = t0.Format(time.RFC3339Nano)
 		l.End = t1.Format(time.RFC3339Nano)
 		l.Duration = t2.String()
-		// l.InsertappLog("./log/tvsdeviceapplog.log", "GetDeviceBySerialNumber")
-		l = cm.NewApploginfo(trackingno, "tvsdevice", "getdevicedata", "uat02", "icc-tvsdevice", "applog")
+		l.TrackingNo = trackingno
+		l.ApplicationName = "tvsdevice"
+		l.FunctionName = "getdevicedata"
+		l.Tags = tags
+		l.Timestamp = time.Now().Format(time.RFC3339Nano)
+		//l.NewApploginfo(trackingno, "tvsdevice", "getdevicedata", "uat02", "icc-tvsdevice", "applog")
 
 		defer l.PrintJSONLog()
 	}
 	return odv
-}
-
-// IfThenElse evaluates a condition, if true returns the first parameter otherwise the second
-func IfThenElse(condition bool, a interface{}, b interface{}) interface{} {
-	if condition {
-		return a
-	}
-	return b
-}
-
-// DefaultIfNil checks if the value is nil, if true returns the default value otherwise the original
-func DefaultIfNil(value interface{}, defaultValue interface{}) interface{} {
-	if value != nil {
-		return value
-	}
-	return defaultValue
 }
 
 // GetDeviceViewBySerialNumber

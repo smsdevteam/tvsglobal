@@ -88,11 +88,17 @@ type updateNoteResult struct {
 // GetNoteByNoteID get info
 func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	// Log#Start
-
-	// var applog cm.Applog
-	// defer applog.PrintJSONLog()
-
 	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -109,7 +115,6 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 	tags = append(tags, taglogtype)
 	l.Tags = tags
 	//l.InsertappLog("./log/tvsnoteapplog.log", "GetNote")
-	defer l.PrintJSONLog()
 
 	oRes := st.NewGetNoteResult()
 	var oNote st.Note
@@ -237,7 +242,19 @@ func GetNoteByNoteID(iNoteID string) *st.GetNoteResult {
 //GetListNoteByCustomerID get list note by customer id
 func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	// Log#Start
+
 	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
+	//l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -254,7 +271,7 @@ func GetListNoteByCustomerID(iCustomerID string) *st.GetListNoteResult {
 	tags = append(tags, taglogtype)
 	l.Tags = tags
 	//l.InsertappLog("./log/tvsnoteapplog.log", "GetListNoteByCustomerID")
-	defer l.PrintJSONLog()
+	//defer l.PrintJSONLog()
 
 	oRes := st.NewGetListNoteResult()
 	var oListNote st.ListNote
@@ -407,7 +424,19 @@ const getTemplateforCreateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 func CreateNote(iReq st.CreateNoteRequest) *st.CreateNoteResponse {
 
 	// Log#Start
+
 	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
+	//l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
@@ -578,7 +607,19 @@ const getTemplateforUpdateNote = `<s:Envelope xmlns:s="http://schemas.xmlsoap.or
 // UpdateNote to
 func UpdateNote(iReq st.UpdateNoteRequest) st.UpdateNoteResponse {
 	// Log#Start
+
 	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
+	//l := cm.NewApplog()
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
