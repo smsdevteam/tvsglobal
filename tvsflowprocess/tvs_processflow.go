@@ -10,9 +10,10 @@ import (
 	"io/ioutil"
 	"strings"
 
-	st "github.com/smsdevteam/tvsglobal/tvsstructs"
-	cm "github.com/smsdevteam/tvsglobal/common"
 	"net/http"
+
+	cm "github.com/smsdevteam/tvsglobal/common"
+	st "github.com/smsdevteam/tvsglobal/tvsstructs"
 
 	_ "gopkg.in/goracle.v2"
 )
@@ -29,7 +30,7 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 	values := make([]driver.Value, len(resultI.Columns()))
 	colmap := cm.Createmapcol(resultI.Columns())
 	for {
-		print(colmap)
+		//print(colmap)
 		err = resultI.Next(values)
 		if err == nil {
 			if err == io.EOF {
@@ -51,7 +52,7 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 func callsendcommand(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.TVSBN_Responseresult
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
-  
+
 	b, _ := json.Marshal(tvssubmitdata)
 	s := string(b)
 	var jsonStr = []byte(s)
