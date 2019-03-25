@@ -40,6 +40,7 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 			break
 		}
 		tvstask.Taskid = values[colmap["TASKID"]].(string)
+		tvstask.Seqno = values[colmap["SEQNO"]].(int64)
 		tvstask.Taskname = values[colmap["TASKNAME"]].(string)
 		tvstask.MSname = values[colmap["MSNAME"]].(string)
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)
@@ -49,16 +50,16 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
 	return TVSOrdprocess
 }
-func savelogtask(Trackingno string, seqno int64,response st.ResponseResult) string {
+func savelogtask(Trackingno string, seqno int64, response st.ResponseResult) string {
 	defer func() {
 		if err := recover(); err != nil {
 			fmt.Printf("Error func savelogtask .. %s\n", err)
-			 
+
 		}
 	}()
-	 
+
 	cm.ExcutestoreDS("ICC", `begin tvs_servorder.savelogtask(:p_trackingno,:p_seqno,:p_errorcode,:p_errordesc );  end;`,
-		Trackingno, seqno, response.ErrorCode,response.ErrorDesc )
+		Trackingno, seqno, response.ErrorCode, response.ErrorDesc)
 
 	return "success"
 }
