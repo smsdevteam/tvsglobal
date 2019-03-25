@@ -111,11 +111,11 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 			//msname := Processdata.TVSTaskList[i].MSname
 			switch taskid {
 			case "1": // change package
-				log.Printf(" Start procee number " + taskid)
+				log.Printf(" Start process number " + taskid)
 				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
-			case "100": // refresh signal
+			case "2": // refresh signal
 				log.Printf(" Start procee number " + taskid)
-				//callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
+				 callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
 
 			}
 		}
