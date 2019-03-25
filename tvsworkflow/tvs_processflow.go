@@ -49,11 +49,11 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
 	return TVSOrdprocess
 }
-func savelogtask(Trackingno string, seqno int64) string {
+func savelogtask(Trackingno string, seqno int64,response st.ResponseResult) string {
 
 	var resultI driver.Rows
 	cm.ExcutestoreDS("ICC", `begin tvs_servorder.savelogtask(:p_trackingno,:p_seqno,:p_errorcode,:p_errordesc );  end;`,
-		Trackingno, seqno, sql.Out{Dest: &resultI})
+		Trackingno, seqno, response.ErrorCode,response.ErrorDesc )
 
 	return ""
 }

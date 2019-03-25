@@ -148,6 +148,7 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	fmt.Println("*********************************************************")
 }
 func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
+	var msresponce st.ResponseResult
 	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/deviceid=1/reason=1/by=1"
 	req, _ := http.NewRequest("POST", url, nil)
 	req.Header.Add("cache-control", "no-cache")
@@ -155,31 +156,12 @@ func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTa
 	res, _ := http.DefaultClient.Do(req)
 	//defer res.Body.Close()
 	body, _ := ioutil.ReadAll(res.Body)
-	fmt.Println(res)
-	fmt.Println(string(body))
-
-	/*var msresponce st.TVSBN_Responseresult
-	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
-	fmt.Println("URL:>", url)
-	b, _ := json.Marshal(tvssubmitdata)
-	s := string(b)
-	var jsonStr = []byte(s)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("X-Custom-Header", "myvalue")
-	req.Header.Set("Content-Type", "application/json")
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
+	mySlice := []byte(body)
+	err := json.Unmarshal(mySlice, &msresponce)
+	if err!=nil{
+		fmt.Println(msresponce)
 	}
-	defer resp.Body.Close()
-	body, _ := ioutil.ReadAll(resp.Body)
-	tempbody := string(body)
-	fmt.Println("response Body:", tempbody)
-	tempbody = strings.Replace(tempbody, taskobj.Responseobjname, "TVSBN_RESPONSERESULT", -1)
-	mySlice := []byte(tempbody)
-	err = json.Unmarshal(mySlice, &msresponce)
-	fmt.Println("response json:", msresponce)
-	fmt.Println("*********************************************************")
-	*/
+	
+	fmt.Println(msresponce)
+
 }
