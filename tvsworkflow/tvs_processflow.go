@@ -49,6 +49,15 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 	TVSOrdprocess.TVSTaskList = dataprocess.TVSTaskList
 	return TVSOrdprocess
 }
+func savelogtask(Trackingno string, seqno int64) string {
+
+	var resultI driver.Rows
+	cm.ExcutestoreDS("ICC", `begin tvs_servorder.savelogtask(:p_trackingno,:p_seqno,:p_errorcode,:p_errordesc );  end;`,
+		Trackingno, seqno, sql.Out{Dest: &resultI})
+
+	return ""
+}
+
 func callsendcommand(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.TVSBN_Responseresult
 	url := taskobj.Servurl //"http://restapi3.apiary.io/notes"
