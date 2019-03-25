@@ -161,7 +161,7 @@ func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTa
 	if err!=nil{
 		fmt.Println(msresponce)
 	}
-	savelogtask(tvssubmitdata.Trackingno,taskobj.Taskid,msresponce)
+	savelogtask(tvssubmitdata.Trackingno,taskobj.Seqno,msresponce)
 	fmt.Println(msresponce)
 
 }
