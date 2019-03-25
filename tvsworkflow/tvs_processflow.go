@@ -50,12 +50,17 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 	return TVSOrdprocess
 }
 func savelogtask(Trackingno string, seqno int64,response st.ResponseResult) string {
-
-	var resultI driver.Rows
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error func savelogtask .. %s\n", err)
+			 
+		}
+	}()
+	 
 	cm.ExcutestoreDS("ICC", `begin tvs_servorder.savelogtask(:p_trackingno,:p_seqno,:p_errorcode,:p_errordesc );  end;`,
 		Trackingno, seqno, response.ErrorCode,response.ErrorDesc )
 
-	return ""
+	return "success"
 }
 
 func callsendcommand(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {

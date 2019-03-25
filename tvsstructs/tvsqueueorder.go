@@ -39,6 +39,7 @@ type Tvsmsresp struct {
 // TVSTaskinfo object for task process info
 type TVSTaskinfo struct {
 	Taskid    string
+	Seqno	  int64
 	Taskname  string
 	MSname    string
 	Servurl   string
