@@ -149,10 +149,10 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 }
 func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.ResponseResult
- 
+
 	deviceid := cm.Int64ToStr(tvssubmitdata.TVSOrdReq.Custinfo.DeviceList[0].ID)
 	//reasonno :=tvssubmitdata.TVSOrdReq.
-	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/deviceid=" + deviceid + "/reason=1/by=1"
+	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/" + deviceid + "/3535/by1"
 	req, _ := http.NewRequest("POST", url, nil)
 	req.Header.Add("cache-control", "no-cache")
 	req.Header.Add("Postman-Token", "2d4ad3e9-71a4-4620-aac9-2b4771dc4d7b")
