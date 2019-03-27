@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
+	"os"
 	"strconv"
 	s "strings"
 	"time"
@@ -18,6 +20,12 @@ import (
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
+
+const applicationname string = "tvs-offer"
+const tagappname string = "icc-tvsoffer"
+const taglogtype string = "applogs"
+
+var tagenv = os.Getenv("ENVAPP")
 
 // MyRespEnvelopeGetOffer for GetOffer
 type MyRespEnvelopeGetOffer struct {
@@ -130,29 +138,45 @@ const getTemplateforGetOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.org/
 
 //GetOfferByOfferID function
 func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
+
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "GetOffer"
-	l.Request = "OfferID=" + offerID
+	l.ApplicationName = applicationname
+	l.FunctionName = "getoffer"
+	l.Request = "offerid=" + offerID
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsofferapplog.log", "GetOffer")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvsofferapplog.log", "GetOffer")
 
 	oRes := st.NewGetOfferResponse()
 	var offer st.Offer
 
 	_, err := strconv.Atoi(offerID)
 	if err != nil {
-		log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 2
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -168,8 +192,10 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -178,8 +204,10 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -187,6 +215,8 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -194,8 +224,10 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -225,15 +257,18 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "GetOffer"
-	l.Request = "OfferID=" + offerID
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSOffer"
+	//l.FunctionName = "GetOffer"
+	//l.Request = "OfferID=" + offerID
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvsofferapplog.log", "GetOffer")
+	//l.InsertappLog("./log/tvsofferapplog.log", "GetOffer")
 	//test
 	return oRes
 }
@@ -242,18 +277,33 @@ func GetOfferByOfferID(offerID string) *st.GetOfferResponse {
 func GetListOfferByCustomerID(iCustomerID string) *st.GetListOfferResult {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "GetListOfferByCustomerID"
-	l.Request = "CustomerID=" + iCustomerID
+	l.ApplicationName = applicationname
+	l.FunctionName = "getlistofferbycustomerid"
+	l.Request = "customerid=" + iCustomerID
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsofferapplog.log", "GetListOfferByCustomerID")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvsofferapplog.log", "GetListOfferByCustomerID")
 
 	oRes := st.NewGetListOfferResult()
 	var oListOffer st.ListOffer
@@ -262,10 +312,10 @@ func GetListOfferByCustomerID(iCustomerID string) *st.GetListOfferResult {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 2
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer db.Close()
@@ -274,17 +324,17 @@ func GetListOfferByCustomerID(iCustomerID string) *st.GetListOfferResult {
 	var resultC driver.Rows
 	intCustomerID, err := strconv.Atoi(iCustomerID)
 	if err != nil {
-		log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 3
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
-		log.Fatal(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 4
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer resultC.Close()
@@ -300,10 +350,10 @@ func GetListOfferByCustomerID(iCustomerID string) *st.GetListOfferResult {
 			if err == io.EOF {
 				break
 			}
-			log.Println("error:", err)
 			resp = err.Error()
+			l.Response = resp
 			oRes.ErrorCode = 5
-			oRes.ErrorDesc = err.Error()
+			oRes.ErrorDesc = resp
 			return oRes
 		}
 
@@ -356,15 +406,18 @@ func GetListOfferByCustomerID(iCustomerID string) *st.GetListOfferResult {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "GetListOfferByCustomerID"
-	l.Request = "CustomerID=" + iCustomerID
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSOffer"
+	//l.FunctionName = "GetListOfferByCustomerID"
+	//l.Request = "CustomerID=" + iCustomerID
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvsofferapplog.log", "GetListOfferByCustomerID")
+	//l.InsertappLog("./log/tvsofferapplog.log", "GetListOfferByCustomerID")
 	//test
 	return oRes
 }
@@ -400,18 +453,37 @@ const getTemplateforCreateOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.o
 func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "CreateOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.ApplicationName = applicationname
+	l.FunctionName = "createoffer"
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsofferapplog.log", "CreateOffer")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvsofferapplog.log", "CreateOffer")
 
 	oRes := st.NewCreateOfferResponse()
 
@@ -430,8 +502,10 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 		layoutForDatetime := "2006-01-02T15:04:05Z"
 		tEndDate, err := time.Parse(layoutForDatetime, iReq.InOffer.EndDate)
 		if err != nil {
+			resp = err.Error()
+			l.Response = resp
 			oRes.ErrorCode = 2
-			oRes.ErrorDesc = err.Error()
+			oRes.ErrorDesc = resp
 			return oRes
 		}
 		sEndDate = "<EndDate>" + (tEndDate).Format("2006-01-02T15:04:05") + "</EndDate>"
@@ -466,8 +540,10 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -476,8 +552,10 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -485,15 +563,19 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error: " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
-		oRes.ErrorDesc = response.Status
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -511,15 +593,18 @@ func CreateOffer(iReq st.CreateOfferRequest) *st.CreateOfferResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "CreateOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSOffer"
+	//l.FunctionName = "CreateOffer"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvsofferapplog.log", "CreateOffer")
+	//l.InsertappLog("./log/tvsofferapplog.log", "CreateOffer")
 	return oRes
 }
 
@@ -542,18 +627,39 @@ const getTemplateforDeleteOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.o
 func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
 
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "DeleteOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.ApplicationName = applicationname
+	l.FunctionName = "deleteoffer"
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
 
 	oRes := st.NewDeleteOfferResponse()
 
@@ -577,8 +683,10 @@ func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -587,8 +695,10 @@ func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -596,15 +706,19 @@ func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
-		oRes.ErrorDesc = response.Status
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -622,15 +736,18 @@ func DeleteOffer(iReq st.DeleteOfferRequest) *st.DeleteOfferResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "DeleteOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSOffer"
+	//l.FunctionName = "DeleteOffer"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
+	//l.InsertappLog("./log/tvsofferapplog.log", "DeleteOffer")
 	return oRes
 }
 
@@ -665,18 +782,39 @@ const getTemplateforUpdateOffer = `<s:Envelope xmlns:s="http://schemas.xmlsoap.o
 func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "UpdateOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+	l.ApplicationName = applicationname
+	l.FunctionName = "updateoffer"
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
 
 	oRes := st.NewUpdateOfferResponse()
 
@@ -695,8 +833,10 @@ func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 		layoutForDatetime := "2006-01-02T15:04:05Z"
 		tEndDate, err := time.Parse(layoutForDatetime, iReq.InOffer.EndDate)
 		if err != nil {
+			resp = err.Error()
+			l.Response = resp
 			oRes.ErrorCode = 2
-			oRes.ErrorDesc = err.Error()
+			oRes.ErrorDesc = resp
 			return oRes
 		}
 		sEndDate = "<EndDate>" + (tEndDate).Format("2006-01-02T15:04:05") + "</EndDate>"
@@ -733,8 +873,10 @@ func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -743,6 +885,8 @@ func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -752,15 +896,19 @@ func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error" + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
-		oRes.ErrorDesc = response.Status
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -778,14 +926,14 @@ func UpdateOffer(iReq st.UpdateOfferRequest) *st.UpdateOfferResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSOffer"
-	l.FunctionName = "UpdateOffer"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSOffer"
+	//l.FunctionName = "UpdateOffer"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
 	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
+	//l.InsertappLog("./log/tvsofferapplog.log", "UpdateOffer")
 	return oRes
 }
