@@ -4,11 +4,14 @@ import (
 	"bytes"
 	"database/sql"
 	"database/sql/driver"
+	"encoding/json"
 	"encoding/xml"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	s "strings"
 	"time"
@@ -18,6 +21,12 @@ import (
 	cm "github.com/smsdevteam/tvsglobal/common"     // db
 	st "github.com/smsdevteam/tvsglobal/tvsstructs" // referpath
 )
+
+const applicationname string = "tvs-keyword"
+const tagappname string = "icc-tvskeyword"
+const taglogtype string = "applogs"
+
+var tagenv = os.Getenv("ENVAPP")
 
 // MyRespEnvelopeCreateKeyword obj
 type MyRespEnvelopeCreateKeyword struct {
@@ -99,19 +108,35 @@ type updateKeywordResult struct {
 
 //GetKeywordByKeywordID function
 func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
+
 	// Log#Start
-	var l cm.Applog
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
+	l.ApplicationName = applicationname
 	l.FunctionName = "GetKeyword"
 	l.Request = "KeywordID=" + iKeywordID
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvskeywordapplog.log", "GetKeyword")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
+	//l.InsertappLog("./log/tvskeywordapplog.log", "GetKeyword")
 
 	oRes := st.NewGetKeywordResult()
 	var oKeyword st.Keyword
@@ -120,8 +145,9 @@ func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -132,15 +158,17 @@ func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 	var resultC driver.Rows
 	intKeywordID, err := strconv.Atoi(iKeywordID)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 3
 		oRes.ErrorDesc = err.Error()
 		return oRes
 	}
 	if _, err := db.Exec(statement, intKeywordID, sql.Out{Dest: &resultC}); err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 4
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -156,8 +184,9 @@ func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 			if err == io.EOF {
 				break
 			}
-			log.Println("error:", err)
+			//log.Println(err)
 			resp = err.Error()
+			l.Response = resp
 			oRes.ErrorCode = 5
 			oRes.ErrorDesc = err.Error()
 			return oRes
@@ -197,15 +226,18 @@ func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
-	l.FunctionName = "GetKeyword"
-	l.Request = "KeywordID=" + iKeywordID
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSKeyword"
+	//l.FunctionName = "GetKeyword"
+	//l.Request = "KeywordID=" + iKeywordID
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvskeywordapplog.log", "GetKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "GetKeyword")
 	//test
 
 	return oRes
@@ -214,18 +246,33 @@ func GetKeywordByKeywordID(iKeywordID string) *st.GetKeywordResult {
 //GetListKeywordByCustomerID function
 func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
+	l.ApplicationName = applicationname
 	l.FunctionName = "GetListKeywordByCustomerID"
 	l.Request = "CustomerID=" + iCustomerID
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvskeywordapplog.log", "GetListKeywordByCustomerID")
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
 
 	oRes := st.NewGetListKeywordResult()
 	var oListKeyword st.ListKeyword
@@ -234,8 +281,9 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 	dbsource = cm.GetDatasourceName("ICC")
 	db, err := sql.Open("goracle", dbsource)
 	if err != nil {
-		log.Println(err)
+		//log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 2
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -246,15 +294,15 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 	var resultC driver.Rows
 	intCustomerID, err := strconv.Atoi(iCustomerID)
 	if err != nil {
-		log.Println(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 3
 		oRes.ErrorDesc = err.Error()
 		return oRes
 	}
 	if _, err := db.Exec(statement, intCustomerID, sql.Out{Dest: &resultC}); err != nil {
-		log.Fatal(err)
 		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 4
 		oRes.ErrorDesc = err.Error()
 		return oRes
@@ -270,8 +318,8 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 			if err == io.EOF {
 				break
 			}
-			log.Println("error:", err)
 			resp = err.Error()
+			l.Response = resp
 			oRes.ErrorCode = 5
 			oRes.ErrorDesc = err.Error()
 			return oRes
@@ -316,15 +364,18 @@ func GetListKeywordByCustomerID(iCustomerID string) *st.GetListKeywordResult {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
-	l.FunctionName = "GetListKeywordByCustomerID"
-	l.Request = "CustomerID=" + iCustomerID
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSKeyword"
+	//l.FunctionName = "GetListKeywordByCustomerID"
+	//l.Request = "CustomerID=" + iCustomerID
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvskeywordapplog.log", "GetListKeywordByCustomerID")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "GetListKeywordByCustomerID")
 	//test
 	return oRes
 }
@@ -359,18 +410,34 @@ const getTemplateforCreateKeyword = `<s:Envelope xmlns:s="http://schemas.xmlsoap
 func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
+	l.ApplicationName = applicationname
 	l.FunctionName = "CreateKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
 
 	oRes := st.NewCreateKeywordResponse()
 
@@ -405,8 +472,10 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -415,8 +484,10 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -424,6 +495,8 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -431,8 +504,10 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -449,15 +524,18 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
-	l.FunctionName = "CreateKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSKeyword"
+	//l.FunctionName = "CreateKeyword"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
 	return oRes
 }
 
@@ -481,18 +559,34 @@ const getTemplateforDeleteKeyword = `<s:Envelope xmlns:s="http://schemas.xmlsoap
 func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
+	l.ApplicationName = applicationname
 	l.FunctionName = "DeleteKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvskeywordapplog.log", "DeleteKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "DeleteKeyword")
 
 	oRes := st.NewDeleteKeywordResponse()
 	var AppServiceLnk cm.AppServiceURL
@@ -515,8 +609,10 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -525,8 +621,10 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -534,6 +632,8 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -541,8 +641,10 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -560,15 +662,15 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
-	l.FunctionName = "DeleteKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSKeyword"
+	//l.FunctionName = "DeleteKeyword"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
 	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvskeywordapplog.log", "DeleteKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "DeleteKeyword")
 
 	return oRes
 }
@@ -603,18 +705,34 @@ const getTemplateforUpdateKeyword = `<s:Envelope xmlns:s="http://schemas.xmlsoap
 func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 
 	// Log#Start
-	var l cm.Applog
+
+	l := cm.NewApplog()
+	defer l.PrintJSONLog()
+
+	defer func() {
+		if err := recover(); err != nil {
+			error := fmt.Sprint(err)
+			l.Response = error
+			//fmt.Printf("Error func GetNoteByNoteID .. %s\n", err)
+		}
+	}()
+
 	var trackingno string
 	var resp string
 	resp = "SUCCESS"
 	t0 := time.Now()
-	trackingno = t0.Format("20060102-150405")
+	trackingno = t0.Format(time.RFC3339Nano)
 	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
+	l.ApplicationName = applicationname
 	l.FunctionName = "UpdateKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser + " ByChannel=" + iReq.ByUser.ByChannel
+
+	jSReq, _ := json.Marshal(iReq)
+	sJSReq := string(jSReq)
+
+	l.Request = sJSReq
+
 	l.Start = t0.Format(time.RFC3339Nano)
-	l.InsertappLog("./log/tvskeywordapplog.log", "UpdateKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "UpdateKeyword")
 
 	oRes := st.NewUpdateKeywordResponse()
 
@@ -651,8 +769,10 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 	requestContent := []byte(requestValue)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(requestContent))
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -661,8 +781,10 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 	req.Header.Add("Accept", "text/xml")
 	response, err := client.Do(req)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 200
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 	defer response.Body.Close()
@@ -670,6 +792,8 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 	//log.Println(response.Body)
 
 	if response.StatusCode != 200 {
+		resp = "error " + response.Status
+		l.Response = resp
 		oRes.ErrorCode = response.StatusCode
 		oRes.ErrorDesc = response.Status
 		return oRes
@@ -677,8 +801,10 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
+		resp = err.Error()
+		l.Response = resp
 		oRes.ErrorCode = 400
-		oRes.ErrorDesc = err.Error()
+		oRes.ErrorDesc = resp
 		return oRes
 	}
 
@@ -696,14 +822,17 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 	// Log#Stop
 	t1 := time.Now()
 	t2 := t1.Sub(t0)
-	l.TrackingNo = trackingno
-	l.ApplicationName = "TVSKeyword"
-	l.FunctionName = "UpdateKeyword"
-	l.Request = "ByUser=" + iReq.ByUser.ByUser
-	l.Response = resp
-	l.Start = t0.Format(time.RFC3339Nano)
+	//l.TrackingNo = trackingno
+	//l.ApplicationName = "TVSKeyword"
+	//l.FunctionName = "UpdateKeyword"
+	//l.Request = "ByUser=" + iReq.ByUser.ByUser
+	jSRes, _ := json.Marshal(oRes)
+	sJSRes := string(jSRes)
+
+	l.Response = sJSRes
+	//l.Start = t0.Format(time.RFC3339Nano)
 	l.End = t1.Format(time.RFC3339Nano)
 	l.Duration = t2.String()
-	l.InsertappLog("./log/tvskeywordapplog.log", "UpdateKeyword")
+	//l.InsertappLog("./log/tvskeywordapplog.log", "UpdateKeyword")
 	return oRes
 }
