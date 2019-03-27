@@ -437,6 +437,11 @@ func CreateKeyword(iReq st.CreateKeywordRequest) *st.CreateKeywordResponse {
 	l.Request = sJSReq
 
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
 	//l.InsertappLog("./log/tvskeywordapplog.log", "CreateKeyword")
 
 	oRes := st.NewCreateKeywordResponse()
@@ -586,6 +591,11 @@ func DeleteKeyword(iReq st.DeleteKeywordRequest) *st.DeleteKeywordResponse {
 	l.Request = sJSReq
 
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
 	//l.InsertappLog("./log/tvskeywordapplog.log", "DeleteKeyword")
 
 	oRes := st.NewDeleteKeywordResponse()
@@ -732,6 +742,11 @@ func UpdateKeyword(iReq st.UpdateKeywordRequest) *st.UpdateKeywordResponse {
 	l.Request = sJSReq
 
 	l.Start = t0.Format(time.RFC3339Nano)
+	var tags []string
+	tags = append(tags, tagenv)
+	tags = append(tags, tagappname)
+	tags = append(tags, taglogtype)
+	l.Tags = tags
 	//l.InsertappLog("./log/tvskeywordapplog.log", "UpdateKeyword")
 
 	oRes := st.NewUpdateKeywordResponse()
