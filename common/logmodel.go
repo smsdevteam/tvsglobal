@@ -1,6 +1,7 @@
 package common
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"time"
@@ -175,7 +176,7 @@ func (a *Workflowlog) Insertworkflowlog(logfile string) error {
 
 //PrintJSONLog func
 func (a *Applog) PrintJSONLog() error {
-	//logJSON, _ := json.Marshal(a)
-	//fmt.Println(string(logJSON))
+	logJSON, _ := json.Marshal(a)
+	fmt.Println(string(logJSON))
 	return nil
 }
