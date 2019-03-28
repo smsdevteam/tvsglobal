@@ -19,14 +19,14 @@ func main() {
 	fmt.Println("Service Start...")
 	mainRouter := mux.NewRouter().StrictSlash(true)
 	mainRouter.HandleFunc("/tvsnote", index)
-	mainRouter.HandleFunc("/tvsnote/getnote/{noteid}", getNote)
-	mainRouter.HandleFunc("/tvsnote/getlistnote/{customerid}", getListNote)
-	mainRouter.HandleFunc("/tvsnote/createnote", createNote).Methods("POST")
-	mainRouter.HandleFunc("/tvsnote/updatenote", updateNote).Methods("POST")
+	mainRouter.HandleFunc("/tvsnote/getnote/{noteid}", getnote)
+	mainRouter.HandleFunc("/tvsnote/getlistnote/{customerid}", getlistnote)
+	mainRouter.HandleFunc("/tvsnote/createnote", createnote).Methods("POST")
+	mainRouter.HandleFunc("/tvsnote/updatenote", updatenote).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8000", mainRouter))
 }
 
-func getNote(w http.ResponseWriter, r *http.Request) {
+func getnote(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	//fmt.Println(params["noteid"])
 
@@ -37,7 +37,7 @@ func getNote(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(noteResult)
 }
 
-func getListNote(w http.ResponseWriter, r *http.Request) {
+func getlistnote(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	//fmt.Println(params["noteid"])
 
@@ -48,7 +48,7 @@ func getListNote(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(listNoteResult)
 }
 
-func createNote(w http.ResponseWriter, r *http.Request) {
+func createnote(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -69,7 +69,7 @@ func createNote(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(res)
 }
 
-func updateNote(w http.ResponseWriter, r *http.Request) {
+func updatenote(w http.ResponseWriter, r *http.Request) {
 
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
