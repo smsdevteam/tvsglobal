@@ -18,7 +18,11 @@ const taglogtype string = "info"
 
 func index(w http.ResponseWriter, r *http.Request) {
 	var req st.TVSSubmitOrdReqData
-	fmt.Println(w, "Welcome to TVS Device Restful")
+	req.Custinfo.CUSTOMERId = 1
+	var d st.DeviceInfo
+	d.ID = 1
+	req.Custinfo.DeviceList = append(req.Custinfo.DeviceList, d)
+	fmt.Println(w, "Welcome to TVS Device Restful 1")
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(req)
 }

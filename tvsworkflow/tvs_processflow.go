@@ -40,7 +40,7 @@ func generatetasklist(Trackingno string, TVSOrdprocess st.TVSSubmitOrderProcess)
 			break
 		}
 		tvstask.Taskid = values[colmap["TASKID"]].(string)
-		tvstask.Seqno = values[colmap["SEQNO"]].(int64)
+		tvstask.Seqno = cm.StrToInt64(  values[colmap["SEQNO"]].(string))
 		tvstask.Taskname = values[colmap["TASKNAME"]].(string)
 		tvstask.MSname = values[colmap["MSNAME"]].(string)
 		tvstask.Servurl = values[colmap["SERVURL"]].(string)

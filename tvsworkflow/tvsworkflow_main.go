@@ -115,7 +115,7 @@ func initialtask(tvssubmitdata st.TVSSubmitOrderData) {
 				callserv(Processdata.Orderdata, Processdata.TVSTaskList[i])
 			case "2": // refresh signal
 				log.Printf(" Start procee number " + taskid)
-				 callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
+				callservrefreshsignal(Processdata.Orderdata, Processdata.TVSTaskList[i])
 
 			}
 		}
@@ -149,7 +149,10 @@ func callserv(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 }
 func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTaskinfo) {
 	var msresponce st.ResponseResult
-	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/deviceid=1/reason=1/by=1"
+
+	deviceid := cm.Int64ToStr(tvssubmitdata.TVSOrdReq.Custinfo.DeviceList[0].ID)
+	//reasonno :=tvssubmitdata.TVSOrdReq.
+	url := "http://localhost:8081/tvsdevice/sendcmdtodevice/" + deviceid + "/3535/by1"
 	req, _ := http.NewRequest("POST", url, nil)
 	req.Header.Add("cache-control", "no-cache")
 	req.Header.Add("Postman-Token", "2d4ad3e9-71a4-4620-aac9-2b4771dc4d7b")
@@ -158,10 +161,10 @@ func callservrefreshsignal(tvssubmitdata st.TVSSubmitOrderData, taskobj st.TVSTa
 	body, _ := ioutil.ReadAll(res.Body)
 	mySlice := []byte(body)
 	err := json.Unmarshal(mySlice, &msresponce)
-	if err!=nil{
+	if err != nil {
 		fmt.Println(msresponce)
 	}
-	savelogtask(tvssubmitdata.Trackingno,taskobj.Seqno,msresponce)
+	savelogtask(tvssubmitdata.Trackingno, taskobj.Seqno, msresponce)
 	fmt.Println(msresponce)
 
 }
